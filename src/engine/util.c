@@ -1,5 +1,8 @@
 #include "util.h"
 
+i32 window_width = 640;
+i32 window_height = 480;
+
 char *load_file_to_string(const char path[]) {
 	// Open the file
 	FILE *file = fopen(path, "rb");

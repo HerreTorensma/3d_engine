@@ -2,9 +2,11 @@
 
 #include "global.h"
 #include "shader.h"
+#include "util.h"
+#include "input.h"
 
 typedef struct vertex {
-    vec3 pos;
+    vec3 position;
     vec2 tex_coord;
 } vertex_t;
 
@@ -13,7 +15,7 @@ typedef struct mesh {
 } mesh_t;
 
 typedef struct camera {
-    vec3 pos;
+    vec3 position;
     vec3 front;
     vec3 up;
 
@@ -24,3 +26,5 @@ typedef struct camera {
 void render_init();
 
 void render();
+
+void render_input(SDL_Event event);

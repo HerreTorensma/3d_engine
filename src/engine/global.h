@@ -7,7 +7,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-// Vendor library
+// Vendor libraries
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
 #include <glad/glad.h>

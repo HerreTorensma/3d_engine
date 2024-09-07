@@ -45,6 +45,8 @@ int main(int argc, char *argv[]) {
 	printf("Renderer: %s\n", glGetString(GL_RENDERER));
 	printf("Version: %s\n", glGetString(GL_VERSION));
 	
+	SDL_SetRelativeMouseMode(SDL_TRUE);
+
 	glViewport(0, 0, 640, 480);
 
 	render_init();
@@ -63,7 +65,17 @@ int main(int argc, char *argv[]) {
 				i32 w, h;
 				SDL_GetWindowSize(window, &w, &h);
 				glViewport(0, 0, w, h);
+				window_width = w;
+				window_height = h;
 			}
+
+			render_input(event);
+		}
+
+		input_update();
+
+		if (input_key_pressed(SDL_SCANCODE_ESCAPE)) {
+			SDL_SetRelativeMouseMode(SDL_FALSE);
 		}
 
 		render();
