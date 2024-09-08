@@ -4,15 +4,12 @@
 #include "shader.h"
 #include "util.h"
 #include "input.h"
+#include "level.h"
+#include "res.h"
 
-typedef struct vertex {
-    vec3 position;
-    vec2 tex_coord;
-} vertex_t;
+// typedef struct renderer {
 
-typedef struct mesh {
-	vertex_t *vertices;
-} mesh_t;
+// } renderer_t;
 
 typedef struct camera {
     vec3 position;

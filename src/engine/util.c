@@ -3,6 +3,8 @@
 i32 window_width = 640;
 i32 window_height = 480;
 
+// Loads a text file to a char array
+// The char array is dynamically allocated so the user is responsible for freeing it
 char *load_file_to_string(const char path[]) {
 	// Open the file
 	FILE *file = fopen(path, "rb");
@@ -30,4 +32,9 @@ char *load_file_to_string(const char path[]) {
 	fclose(file);
 
 	return buffer;
+}
+
+// Loads a tga image file to a byte array that can be used by OpenGL as a texture
+u8 *load_tga(const char path[]) {
+
 }
