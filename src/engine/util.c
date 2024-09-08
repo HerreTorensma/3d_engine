@@ -9,7 +9,7 @@ char *load_file_to_string(const char path[]) {
 	// Open the file
 	FILE *file = fopen(path, "rb");
 	if (file == NULL) {
-		printf("The file does not exist\n");
+		printf("The text file does not exist\n");
 		return NULL;
 	}
 
@@ -36,5 +36,24 @@ char *load_file_to_string(const char path[]) {
 
 // Loads a tga image file to a byte array that can be used by OpenGL as a texture
 u8 *load_tga(const char path[]) {
+	FILE *file = fopen(path, "r");
+	if (file == NULL) {
+		printf("The tga image file does not exist\n");
+		return NULL;
+	}
 
+	// u8 *buffer;
+	u8 id;
+	fread(&id, 1, 1, file);
+
+	u8 color_map_type;
+	fread(&color_map_type, 1, 1, file);
+
+	u8 image_type;
+	fread(&image_type, 1, 1, file);
+
+	u8 color_map_specification[5];
+	fread(color_map_specification, 1, 5, file);
+
+	fclose(file);
 }

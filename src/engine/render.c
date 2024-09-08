@@ -42,6 +42,34 @@ static u32 cube_indices[] = {
 	1, 6, 5
 };
 
+static vertex_t slope_vertices[] = {
+	{{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}},
+	{{0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}},
+	{{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f}},
+	{{-0.5f, 0.5f, -0.5f}, {0.0f, 0.0f}},
+
+	{{-0.5f, -0.5f, 0.5f}, {0.0f, 0.0f}},
+	{{0.5f, -0.5f, 0.5f}, {0.0f, 0.0f}},
+	{{0.5f, 0.5f, 0.5f}, {0.0f, 0.0f}},
+	{{-0.5f, 0.5f, 0.5f}, {0.0f, 0.0f}},
+};
+
+static u32 slope_indices[] = {
+	// Bottom face
+	0, 1, 5,
+	0, 5, 4,
+
+	// Back face
+	4, 5, 6,
+	4, 6, 7,
+
+	// Slope face
+	0, 6, 7,
+	0, 6, 1,
+
+	// Side faces
+};
+
 static level_t level = {0};
 
 static res_pack_t res_pack = {0};
@@ -65,10 +93,12 @@ void render_init() {
 	level.depth = 16;
 
 	res_add_mesh_raw(&res_pack, 1, cube_vertices, sizeof(cube_vertices) / sizeof(vertex_t), cube_indices, sizeof(cube_indices) / sizeof(u32));
+	res_add_mesh_raw(&res_pack, 2, slope_vertices, sizeof(slope_vertices) / sizeof(vertex_t), slope_indices, sizeof(slope_indices) / sizeof(u32));
 
 	level.map[0] = 1;
 	level.map[2] = 1;
 	level.map[4] = 1;
+	level.map[6] = 2;
 
 	camera = create_camera();
 
@@ -135,14 +165,15 @@ void render() {
 				shader_set_mat4(shader_program, "model", &model);
 
 				mesh_t mesh = res_pack.meshes[level.map[z * level.width * level.height + y * level.width + x]];
+				
 				glBindVertexArray(mesh.vao);
 
 				glDrawElements(GL_TRIANGLES, mesh.index_count, GL_UNSIGNED_INT, 0);
+				
+				glBindVertexArray(0);
 			}
 		}
 	}
-
-	glBindVertexArray(0);
 }
 
 void render_input(SDL_Event event) {
