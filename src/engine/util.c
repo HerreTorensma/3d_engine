@@ -35,25 +35,37 @@ char *load_file_to_string(const char path[]) {
 }
 
 // Loads a tga image file to a byte array that can be used by OpenGL as a texture
-u8 *load_tga(const char path[]) {
+// Represented as BGRA
+image_t load_tga(const char path[]) {
+	image_t image = {0};
+	
+	// Open file
 	FILE *file = fopen(path, "r");
 	if (file == NULL) {
 		printf("The tga image file does not exist\n");
-		return NULL;
+		return image;
 	}
 
-	// u8 *buffer;
-	u8 id;
-	fread(&id, 1, 1, file);
-
-	u8 color_map_type;
-	fread(&color_map_type, 1, 1, file);
-
+	// Read and check image type
+	fseek(file, 2, SEEK_SET);
 	u8 image_type;
 	fread(&image_type, 1, 1, file);
+	if (image_type != 2) {
+		printf("This image type is not supported\n");
+		return image;
+	}
 
-	u8 color_map_specification[5];
-	fread(color_map_specification, 1, 5, file);
+	// Read width and height
+	fseek(file, 12, SEEK_SET);
+	fread(&image.width, 2, 1, file);
+	fread(&image.height, 2, 1, file);
+
+	// Read pixel data
+	fseek(file, 18, SEEK_SET);
+	image.pixels = malloc(image.width * image.height * 4);
+	fread(image.pixels, 1, image.width * image.height * 4, file);
 
 	fclose(file);
+
+	return image;
 }
