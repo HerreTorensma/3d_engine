@@ -17,4 +17,7 @@ typedef struct mesh {
     u32 vao;
     u32 vbo;
     u32 ebo;
+
+    // OpenGL object id
+    u32 texture_id;
 } mesh_t;

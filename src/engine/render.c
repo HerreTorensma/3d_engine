@@ -4,17 +4,32 @@ static u32 shader_program;
 
 static camera_t camera = {0};
 
-static vertex_t cube_vertices[] = {
-	{{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}},
-	{{0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}},
-	{{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f}},
-	{{-0.5f, 0.5f, -0.5f}, {0.0f, 0.0f}},
+// static vertex_t cube_vertices[] = {
+// 	{{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}},
+// 	{{0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}},
+// 	{{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f}},
+// 	{{-0.5f, 0.5f, -0.5f}, {0.0f, 0.0f}},
 
-	{{-0.5f, -0.5f, 0.5f}, {0.0f, 0.0f}},
-	{{0.5f, -0.5f, 0.5f}, {0.0f, 0.0f}},
-	{{0.5f, 0.5f, 0.5f}, {0.0f, 0.0f}},
-	{{-0.5f, 0.5f, 0.5f}, {0.0f, 0.0f}},
+// 	{{-0.5f, -0.5f, 0.5f}, {0.0f, 0.0f}},
+// 	{{0.5f, -0.5f, 0.5f}, {0.0f, 0.0f}},
+// 	{{0.5f, 0.5f, 0.5f}, {0.0f, 0.0f}},
+// 	{{-0.5f, 0.5f, 0.5f}, {0.0f, 0.0f}},
+// };
+
+static vertex_t cube_vertices[] = {
+	// Front face
+	{{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}}, // Bottom-left
+	{{0.5f, -0.5f, -0.5f},  {1.0f, 0.0f}}, // Bottom-right
+	{{0.5f,  0.5f, -0.5f},  {1.0f, 1.0f}}, // Top-right
+	{{-0.5f,  0.5f, -0.5f}, {0.0f, 1.0f}}, // Top-left
+
+	// Back face
+	{{-0.5f, -0.5f,  0.5f}, {1.0f, 0.0f}}, // Bottom-right
+	{{0.5f, -0.5f,  0.5f},  {0.0f, 0.0f}}, // Bottom-left
+	{{0.5f,  0.5f,  0.5f},  {0.0f, 1.0f}}, // Top-left
+	{{-0.5f,  0.5f,  0.5f}, {1.0f, 1.0f}}, // Top-right
 };
+
 
 static u32 cube_indices[] = {
 	// Bottom face
@@ -92,8 +107,14 @@ void render_init() {
 	level.height = 16;
 	level.depth = 16;
 
+	res_add_texture(&res_pack, 1, "res/images/green.tga");
+	res_add_texture(&res_pack, 2, "res/images/test.tga");
+
 	res_add_mesh_raw(&res_pack, 1, cube_vertices, sizeof(cube_vertices) / sizeof(vertex_t), cube_indices, sizeof(cube_indices) / sizeof(u32));
 	res_add_mesh_raw(&res_pack, 2, slope_vertices, sizeof(slope_vertices) / sizeof(vertex_t), slope_indices, sizeof(slope_indices) / sizeof(u32));
+
+	res_pack.meshes[1].texture_id = 1;
+	res_pack.meshes[2].texture_id = 2;
 
 	level.map[0] = 1;
 	level.map[2] = 1;
@@ -102,7 +123,8 @@ void render_init() {
 
 	camera = create_camera();
 
-    shader_program = create_shader_program("res/shaders/vertex.glsl", "res/shaders/fragment.glsl");
+    // shader_program = create_shader_program("res/shaders/vertex.glsl", "res/shaders/fragment.glsl");
+    shader_program = create_shader_program("res/shaders/vertex.glsl", "res/shaders/fragment_tex.glsl");
 }
 
 void render() {
@@ -135,10 +157,11 @@ void render() {
 		glm_vec3_scale(temp, camera_speed, temp2);
 		glm_vec3_add(camera.position, temp2, camera.position);
 	}
-
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
+
+    glUseProgram(shader_program);
 
 	// View matrix
 	mat4 view;
@@ -152,7 +175,8 @@ void render() {
 	glm_perspective(glm_rad(45.0f), (float)window_width / (float)window_height, 0.1f, 100.0f, projection);
 	shader_set_mat4(shader_program, "projection", &projection);
 
-    glUseProgram(shader_program);
+	shader_set_int(shader_program, "texture1", 0);
+
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	for (i32 z = 0; z < level.depth; z++) {
@@ -173,6 +197,10 @@ void render() {
 				mesh_t mesh = res_pack.meshes[mesh_index];
 				
 				glBindVertexArray(mesh.vao);
+
+				glBindTexture(GL_TEXTURE_2D, mesh.texture_id);
+				// glBindTexture(GL_TEXTURE_2D, res_pack.texture_ids[1]);
+				glActiveTexture(GL_TEXTURE0);
 
 				glDrawElements(GL_TRIANGLES, mesh.index_count, GL_UNSIGNED_INT, 0);
 				

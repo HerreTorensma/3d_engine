@@ -13,4 +13,4 @@ typedef struct image {
 
 char *load_file_to_string(const char path[]);
 
-image_t load_tga(const char path[]);
+image_t load_tga(const char path[], bool flip);

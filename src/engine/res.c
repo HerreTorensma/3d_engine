@@ -45,3 +45,30 @@ void res_add_mesh_raw(res_pack_t *res_pack, size_t index, vertex_t *vertices, u3
 
 	res_pack->meshes[index] = mesh;
 }
+
+void res_add_texture(res_pack_t *res_pack, size_t index, const char path[]) {
+	// Generate a new texture in OpenGL
+	u32 id = 0;
+	glGenTextures(1, &id);
+	glBindTexture(GL_TEXTURE_2D, id);
+
+	// Set some stuff
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	// Load the actual image data
+	image_t image = load_tga(path, true);
+
+	// glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.width, image.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, image.pixels);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, image.width, image.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, image.pixels);
+	// glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, image.width, image.height, 0, GL_ARGB, GL_UNSIGNED_BYTE, image.pixels);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	free(image.pixels);
+
+	res_pack->texture_ids[index] = id;
+}
