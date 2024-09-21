@@ -158,13 +158,19 @@ void render() {
 	for (i32 z = 0; z < level.depth; z++) {
 		for (i32 y = 0; y < level.height; y++) {
 			for (i32 x = 0; x < level.width; x++) {
-				// Model matrix
+                // size_t mesh_index = level.map[z * level.width * level.height + y * level.width + x];
+				size_t mesh_index = level_get_mesh_index(&level, x, y, z);
+                if (mesh_index == 0) {
+                    continue;
+                }
+                
+                // Model matrix
 				mat4 model;
 				glm_mat4_identity(model);
 				glm_translate(model, (vec3){x, y, z});
 				shader_set_mat4(shader_program, "model", &model);
 
-				mesh_t mesh = res_pack.meshes[level.map[z * level.width * level.height + y * level.width + x]];
+				mesh_t mesh = res_pack.meshes[mesh_index];
 				
 				glBindVertexArray(mesh.vao);
 

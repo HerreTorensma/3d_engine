@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -g -Wall -pedantic -std=c99 -Ilib/glad/include -Ilib/cglm/include
+CFLAGS = -g -Wall -pedantic -O2 -std=c99 -Ilib/glad/include -Ilib/cglm/include
 
 ifeq ($(OS),Windows_NT)
 	CFLAGS += -Ilib/SDL2_win/include
@@ -18,7 +18,7 @@ else
 	endif
 endif
 
-SRC = src/main.c src/engine/render.c src/engine/util.c src/engine/shader.c src/engine/input.c src/engine/res.c
+SRC = src/main.c src/engine/render.c src/engine/util.c src/engine/shader.c src/engine/input.c src/engine/res.c src/engine/level.c
 OBJ = $(SRC:.c=.o)
 
 all: libs game

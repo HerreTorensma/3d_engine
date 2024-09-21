@@ -7,11 +7,20 @@ void res_add_mesh_raw(res_pack_t *res_pack, size_t index, vertex_t *vertices, u3
 	mesh.index_count = index_count;
 
 	mesh.vertices = malloc(vertex_count * sizeof(vertex_t));
+    if (mesh.vertices == NULL) {
+        printf("Failed to allocate memory for vertices\n");
+    }
 	memcpy(mesh.vertices, vertices, vertex_count * sizeof(vertex_t));
 
 	mesh.indices = malloc(index_count * sizeof(u32));
+    if (mesh.indices == NULL) {
+        printf("Failed to allocate memory for indices\n");
+    }
 	memcpy(mesh.indices, indices, index_count * sizeof(u32));
 
+    // This line causes a segfault on MacOS because it has no OpenGL 3.3 support
+    // Could be either because this is currently the first OpenGL call in the game,
+    // or because MacOS supports up to OpenGL 2.1 which doesn't support vao's.
 	glGenVertexArrays(1, &mesh.vao);
 	glBindVertexArray(mesh.vao);
 
