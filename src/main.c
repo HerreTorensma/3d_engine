@@ -1,5 +1,6 @@
 #include "engine/global.h"
 #include "engine/render.h"
+#include "engine/util.h"
 
 #define FPS 60
 
@@ -14,13 +15,16 @@ int main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
+	window_width = 1280;
+	window_height = 720;
+
 	// Create the window
 	SDL_Window *window = SDL_CreateWindow(
 		"game",
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
-		640,
-		480,
+		window_width,
+		window_height,
 		SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE
 	);
 
@@ -47,7 +51,7 @@ int main(int argc, char *argv[]) {
 	
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 
-	glViewport(0, 0, 640, 480);
+	glViewport(0, 0, window_width, window_height);
 
 	render_init();
 
