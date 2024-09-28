@@ -26,8 +26,8 @@ typedef struct atlas {
     u32 texture_id;
 } atlas_t;
 
-void render_init();
+void render_init(void);
 
-void render();
+void render(res_pack_t *res_pack, level_t *level);
 
 void render_input(SDL_Event event);
