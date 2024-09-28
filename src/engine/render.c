@@ -100,7 +100,8 @@ void render(res_pack_t *res_pack, level_t *level) {
 		edit_mode = !edit_mode;
 	}
 
-    glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+    // glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+    glClearColor(0.231f, 0.2f, 0.149f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
@@ -158,6 +159,10 @@ void render(res_pack_t *res_pack, level_t *level) {
 				glm_mat4_identity(model);
 				glm_translate(model, (vec3){x, y, z});
 				shader_set_mat4(shader_program, "model", &model);
+				
+				// vec3 fog_color = {1.0f, 0.0f, 0.0f};
+				vec3 fog_color = {0.231f, 0.2f, 0.149f};
+				shader_set_vec3(shader_program, "fogColor", &fog_color);
 
 				tile_t tile = res_pack->tiles[tile_index];
 				mesh_t mesh = res_pack->meshes[tile.mesh_index];
