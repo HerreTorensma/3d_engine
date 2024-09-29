@@ -8,6 +8,7 @@ typedef struct tile {
 	size_t mesh_index;
 	size_t texture_index;
 	vec3 rotation;
+	bool transparent;
 } tile_t;
 
 typedef struct res_pack {

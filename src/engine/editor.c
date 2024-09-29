@@ -73,6 +73,8 @@ void editor_render(res_pack_t *res_pack, level_t *level) {
                     continue;
                 }
 
+				printf("pula mea\n");
+
                 // Model matrix
 				mat4 model = {0};
 				glm_mat4_identity(model);

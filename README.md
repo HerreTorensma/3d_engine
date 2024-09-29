@@ -2,6 +2,16 @@
 
 - A simple grid-based 3D engine written in C99 with OpenGL 3.3.
 
+- Todo
+    - 2D sprite rendering
+    - Text rendering
+    - Level editing
+    - More general renderer class
+    - Transparency
+    - Lighting???
+    - Dithering shader for limiting color palette
+    - Billboard sprites
+
 ## Dependencies
 - SDL2
 - SDL_mixer

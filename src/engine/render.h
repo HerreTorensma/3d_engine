@@ -30,4 +30,4 @@ void render_init(void);
 
 void render_level(res_pack_t *res_pack, level_t *level, camera_t *camera);
 
-void render_2d(void);
+void render2d_image(void);

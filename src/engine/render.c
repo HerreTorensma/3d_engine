@@ -41,11 +41,14 @@ void render_level(res_pack_t *res_pack, level_t *level, camera_t *camera) {
 	glViewport(0, 0, 640, 360);
 
     // glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-    glClearColor(0.231f, 0.2f, 0.149f, 1.0f);
+    // glClearColor(0.231f, 0.2f, 0.149f, 1.0f);
+    glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
-	// glEnable(GL_BLEND);
-	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// glDepthMask(GL_FALSE);
+	// glDisable(GL_CULL_FACE);
 	
     glUseProgram(shader_program);
 
@@ -76,6 +79,10 @@ void render_level(res_pack_t *res_pack, level_t *level, camera_t *camera) {
                 }
 
 				tile_t tile = res_pack->tiles[tile_index];
+				if (tile.transparent) {
+					continue;
+				}
+
 				mesh_t mesh = res_pack->meshes[tile.mesh_index];
                 
                 // Model matrix
@@ -88,10 +95,51 @@ void render_level(res_pack_t *res_pack, level_t *level, camera_t *camera) {
 				shader_set_mat4(shader_program, "model", &model);
 				
 				// vec3 fog_color = {1.0f, 0.0f, 0.0f};
-				vec3 fog_color = {0.231f, 0.2f, 0.149f};
+				// vec3 fog_color = {0.231f, 0.2f, 0.149f};
+				vec3 fog_color = {0.8f, 0.8f, 0.8f};
 				shader_set_vec3(shader_program, "fogColor", &fog_color);
 
+				glBindVertexArray(mesh.vao);
+
+				glBindTexture(GL_TEXTURE_2D, tile.texture_index);
+				glActiveTexture(GL_TEXTURE0);
+
+				glDrawElements(GL_TRIANGLES, mesh.index_count, GL_UNSIGNED_INT, 0);
 				
+				glBindVertexArray(0);
+			}
+		}
+	}
+
+	for (i32 z = 0; z < level->depth; z++) {
+		for (i32 y = 0; y < level->height; y++) {
+			for (i32 x = 0; x < level->width; x++) {
+				size_t tile_index = level_get_tile_index(level, x, y, z);
+                if (tile_index == 0) {
+                    continue;
+                }
+
+				tile_t tile = res_pack->tiles[tile_index];
+				if (!tile.transparent) {
+					continue;
+				}
+
+				mesh_t mesh = res_pack->meshes[tile.mesh_index];
+                
+                // Model matrix
+				mat4 model;
+				glm_mat4_identity(model);
+				glm_translate(model, (vec3){x, y, z});
+				glm_rotate(model, glm_rad(tile.rotation[0]), (vec3){1.0f, 0.0f, 0.0f});
+				glm_rotate(model, glm_rad(tile.rotation[1]), (vec3){0.0f, 1.0f, 0.0f});
+				glm_rotate(model, glm_rad(tile.rotation[2]), (vec3){0.0f, 0.0f, 1.0f});
+				shader_set_mat4(shader_program, "model", &model);
+				
+				// vec3 fog_color = {1.0f, 0.0f, 0.0f};
+				// vec3 fog_color = {0.231f, 0.2f, 0.149f};
+				vec3 fog_color = {0.8f, 0.8f, 0.8f};
+				shader_set_vec3(shader_program, "fogColor", &fog_color);
+
 				glBindVertexArray(mesh.vao);
 
 				glBindTexture(GL_TEXTURE_2D, tile.texture_index);
@@ -120,8 +168,4 @@ void render_level(res_pack_t *res_pack, level_t *level, camera_t *camera) {
 
 	glBindVertexArray(0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-void render_2d(void) {
-
 }

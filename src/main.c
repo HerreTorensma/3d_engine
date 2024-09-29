@@ -98,26 +98,60 @@ static u32 floor_indices[] = {
 	2, 3, 0,
 };
 
-static vertex_t cross_vertices[] = {
-    // First quad (aligned along YZ plane, centered at the origin)
-    {{ 0.0f, -0.5f, -0.5f}, {0.0f, 0.0f}},  // Bottom-left
-    {{ 0.0f,  0.5f, -0.5f}, {1.0f, 0.0f}},  // Top-left
-    {{ 0.0f,  0.5f,  0.5f}, {1.0f, 1.0f}},  // Top-right
-    {{ 0.0f, -0.5f,  0.5f}, {0.0f, 1.0f}},  // Bottom-right
+// static vertex_t cross_vertices[] = {
+//     // First quad (aligned along YZ plane, centered at the origin)
+//     {{ 0.0f, -0.5f, -0.5f}, {0.0f, 0.0f}},  // Bottom-left
+//     {{ 0.0f,  0.5f, -0.5f}, {1.0f, 0.0f}},  // Top-left
+//     {{ 0.0f,  0.5f,  0.5f}, {1.0f, 1.0f}},  // Top-right
+//     {{ 0.0f, -0.5f,  0.5f}, {0.0f, 1.0f}},  // Bottom-right
 
-    // Second quad (aligned along XY plane, centered at the origin)
-    {{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f}},  // Bottom-left
-    {{ 0.5f, -0.5f, 0.0f}, {1.0f, 0.0f}},  // Bottom-right
+//     // Second quad (aligned along XY plane, centered at the origin)
+//     {{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f}},  // Bottom-left
+//     {{ 0.5f, -0.5f, 0.0f}, {1.0f, 0.0f}},  // Bottom-right
+//     {{ 0.5f,  0.5f, 0.0f}, {1.0f, 1.0f}},  // Top-right
+//     {{-0.5f,  0.5f, 0.0f}, {0.0f, 1.0f}},  // Top-left
+// };
+
+// static u32 cross_indices[] = {
+// 	0, 1, 2,
+// 	2, 3, 0,
+
+// 	4, 5, 6,
+// 	6, 7, 4,
+// };
+
+static vertex_t cross_vertices[] = {
+
+    // {{ 0.0f, -0.5f, -0.5f}, {0.0f, 0.0f}},  // Bottom-left
+    // {{ 0.0f,  0.5f, -0.5f}, {1.0f, 0.0f}},  // Top-left
+    // {{ 0.0f,  0.5f,  0.5f}, {1.0f, 1.0f}},  // Top-right
+    // {{ 0.0f, -0.5f,  0.5f}, {0.0f, 1.0f}},  // Bottom-right
+
+    // {{ -0.5f, -0.5f, 0.0f}, {0.0f, 0.0f}},  // Bottom-left
+    // {{ -0.5f,  0.5f, 0.0f}, {1.0f, 0.0f}},  // Top-left
+    // {{ 0.5f,  0.5f,  0.0f}, {1.0f, 1.0f}},  // Top-right
+    // {{ 0.5f, -0.5f,  0.0f}, {0.0f, 1.0f}},  // Bottom-right
+
     {{ 0.5f,  0.5f, 0.0f}, {1.0f, 1.0f}},  // Top-right
+    {{ 0.5f, -0.5f, 0.0f}, {1.0f, 0.0f}},  // Bottom-right
+    {{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f}},  // Bottom-left
     {{-0.5f,  0.5f, 0.0f}, {0.0f, 1.0f}},  // Top-left
+
+    // Second quad (YZ plane, scaled to 0.5)
+    {{ 0.0f,  0.5f,  0.5f}, {1.0f, 1.0f}},  // Top-right
+    {{ 0.0f, -0.5f,  0.5f}, {1.0f, 0.0f}},  // Bottom-right
+    {{ 0.0f, -0.5f, -0.5f}, {0.0f, 0.0f}},  // Bottom-left
+    {{ 0.0f,  0.5f, -0.5f}, {0.0f, 1.0f}},  // Top-left
 };
 
 static u32 cross_indices[] = {
-	0, 1, 2,
-	2, 3, 0,
+    // First quad (YZ plane)
+    0, 1, 2,
+    2, 3, 0,
 
-	4, 5, 6,
-	6, 7, 4,
+    // Second quad (XY plane)
+    4, 5, 6,
+    6, 7, 4,
 };
 
 static vertex_t slope_vertices[] = {
@@ -186,7 +220,7 @@ void game_input(SDL_Event event) {
 
 		vec3 front = {0};
 		front[0] = cosf(glm_rad(camera.yaw)) * cosf(glm_rad(camera.pitch));
-		// front[1] = sinf(glm_rad(camera.pitch));
+		front[1] = sinf(glm_rad(camera.pitch));
 		front[2] = sinf(glm_rad(camera.yaw)) * cosf(glm_rad(camera.pitch));
 
 		glm_vec3_normalize(front);
@@ -247,7 +281,7 @@ void game_update() {
 	}
 }
 
-#define FPS 60
+#define FPS 120
 
 int main(int argc, char *argv[]) {
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -301,6 +335,7 @@ int main(int argc, char *argv[]) {
 	res_add_texture(&res_pack, 2, "res/images/test.tga");
 	res_add_texture(&res_pack, 3, "res/images/fire.tga");
 	res_add_texture(&res_pack, 4, "res/images/bricks.tga");
+	res_add_texture(&res_pack, 5, "res/images/iron_bars.tga");
 
 	res_add_mesh_raw(&res_pack, MESH_BIG_QUAD, big_quad_vertices, sizeof(big_quad_vertices) / sizeof(vertex_t), big_quad_indices, sizeof(big_quad_indices) / sizeof(u32));
 	res_add_mesh_raw(&res_pack, MESH_CUBE, cube_vertices, sizeof(cube_vertices) / sizeof(vertex_t), cube_indices, sizeof(cube_indices) / sizeof(u32));
@@ -313,36 +348,49 @@ int main(int argc, char *argv[]) {
 		.mesh_index = MESH_CUBE,
 		.texture_index = 4,
 		.rotation = {0},
+		.transparent = false,
 	};
 
 	res_pack.tiles[2] = (tile_t){
 		.mesh_index = MESH_CUBE,
 		.texture_index = 1,
 		.rotation = {0},
+		.transparent = true,
 	};
 
 	res_pack.tiles[3] = (tile_t){
 		.mesh_index = MESH_SLOPE,
 		.texture_index = 2,
 		.rotation = {0.0f, 90.0f, 0.0f},
+		.transparent = false,
 	};
 
 	res_pack.tiles[4] = (tile_t){
 		.mesh_index = MESH_FLOOR,
 		.texture_index = 1,
 		.rotation = {0},
+		.transparent = false,
 	};
 
 	res_pack.tiles[5] = (tile_t) {
 		.mesh_index = MESH_CROSS,
 		.texture_index = 3,
 		.rotation = {0},
+		.transparent = true,
 	};
 
 	res_pack.tiles[6] = (tile_t) {
 		.mesh_index = MESH_QUAD,
 		.texture_index = 3,
 		.rotation = {0},
+		.transparent = false,
+	};
+
+	res_pack.tiles[7] = (tile_t) {
+		.mesh_index = MESH_QUAD,
+		.texture_index = 5,
+		.rotation = {0},
+		.transparent = true,
 	};
 
 	level_t level = {0};
@@ -360,7 +408,8 @@ int main(int argc, char *argv[]) {
 
 	level_set_tile_index(&level, 1, 0, 0, 0);
 	level_set_tile_index(&level, 1, 1, 0, 0);
-	level_set_tile_index(&level, 1, 2, 0, 0);
+	level_set_tile_index(&level, 7, 2, 0, 0);
+	level_set_tile_index(&level, 7, 2, 0, 1);
 	level_set_tile_index(&level, 1, 3, 0, 0);
 	level_set_tile_index(&level, 1, 4, 0, 0);
 	level_set_tile_index(&level, 1, 4, 1, 0);
@@ -369,11 +418,26 @@ int main(int argc, char *argv[]) {
 	level_set_tile_index(&level, 1, 4, 0, 3);
 	level_set_tile_index(&level, 1, 4, 0, 4);
 
+	level_set_tile_index(&level, 1, 1, 1, 0);
+	level_set_tile_index(&level, 1, 2, 1, 0);
+	level_set_tile_index(&level, 1, 3, 1, 0);
+
+	level_set_tile_index(&level, 1, 4, 1, 4);
+	level_set_tile_index(&level, 1, 4, 2, 4);
+	level_set_tile_index(&level, 1, 4, 3, 4);
+	level_set_tile_index(&level, 1, 4, 4, 4);
+	level_set_tile_index(&level, 1, 4, 5, 4);
+	level_set_tile_index(&level, 1, 4, 6, 4);
+	level_set_tile_index(&level, 1, 4, 7, 4);
+	level_set_tile_index(&level, 1, 4, 8, 4);
+	level_set_tile_index(&level, 1, 4, 9, 4);
+	level_set_tile_index(&level, 1, 4, 10, 4);
+
 	level_set_tile_index(&level, 2, 5, 0, 4);
 	level_set_tile_index(&level, 3, 6, 0, 4);
 	level_set_tile_index(&level, 4, 7, 0, 4);
 	level_set_tile_index(&level, 5, 8, 0, 4);
-	level_set_tile_index(&level, 6, 9, 0, 4);
+	// level_set_tile_index(&level, 6, 9, 0, 4);
 
 	camera = create_camera();
 
@@ -381,6 +445,9 @@ int main(int argc, char *argv[]) {
 	bool fullscreen = false;
 
 	SDL_SetRelativeMouseMode(SDL_TRUE);
+
+	// Don't lock fps
+	// SDL_GL_SetSwapInterval(0);
 
 	render_init();
 	editor_init();
@@ -444,7 +511,7 @@ int main(int argc, char *argv[]) {
 
 		SDL_GL_SwapWindow(window);		
 
-		SDL_Delay(1000/FPS);
+		// SDL_Delay(1000/FPS);
 	}
 
 	printf("Quitting\n");

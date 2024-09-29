@@ -11,7 +11,7 @@ uniform mat4 view;
 uniform mat4 model;
 
 const float fogDensity = 0.2;
-const float fogGradient = 1.5;
+const float fogGradient = 3.0;
 
 void main()
 {
