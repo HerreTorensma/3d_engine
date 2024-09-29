@@ -74,19 +74,23 @@ void render_level(res_pack_t *res_pack, level_t *level, camera_t *camera) {
                 if (tile_index == 0) {
                     continue;
                 }
+
+				tile_t tile = res_pack->tiles[tile_index];
+				mesh_t mesh = res_pack->meshes[tile.mesh_index];
                 
                 // Model matrix
 				mat4 model;
 				glm_mat4_identity(model);
 				glm_translate(model, (vec3){x, y, z});
+				glm_rotate(model, glm_rad(tile.rotation[0]), (vec3){1.0f, 0.0f, 0.0f});
+				glm_rotate(model, glm_rad(tile.rotation[1]), (vec3){0.0f, 1.0f, 0.0f});
+				glm_rotate(model, glm_rad(tile.rotation[2]), (vec3){0.0f, 0.0f, 1.0f});
 				shader_set_mat4(shader_program, "model", &model);
 				
 				// vec3 fog_color = {1.0f, 0.0f, 0.0f};
 				vec3 fog_color = {0.231f, 0.2f, 0.149f};
 				shader_set_vec3(shader_program, "fogColor", &fog_color);
 
-				tile_t tile = res_pack->tiles[tile_index];
-				mesh_t mesh = res_pack->meshes[tile.mesh_index];
 				
 				glBindVertexArray(mesh.vao);
 
@@ -109,7 +113,7 @@ void render_level(res_pack_t *res_pack, level_t *level, camera_t *camera) {
 
 	glBindTexture(GL_TEXTURE_2D, fbo_tex);
 
-	mesh_t mesh = res_pack->meshes[MESH_QUAD];
+	mesh_t mesh = res_pack->meshes[MESH_BIG_QUAD];
 	glBindVertexArray(mesh.vao);
 
 	glDrawElements(GL_TRIANGLES, mesh.index_count, GL_UNSIGNED_INT, 0);
