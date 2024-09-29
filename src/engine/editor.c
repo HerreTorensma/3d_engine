@@ -47,7 +47,7 @@ void editor_render(res_pack_t *res_pack, level_t *level) {
     shader_set_mat4(shader_program, "view", current_view);
 
 	// Projection matrix
-	mat4 projection;
+	mat4 projection = {0};
     float aspect = (float)window_width / (float)window_height;
 
     float left = -zoom;
@@ -72,9 +72,9 @@ void editor_render(res_pack_t *res_pack, level_t *level) {
                 if (tile_index == 0) {
                     continue;
                 }
-                
+
                 // Model matrix
-				mat4 model;
+				mat4 model = {0};
 				glm_mat4_identity(model);
 				glm_translate(model, (vec3){x, y, z});
 				shader_set_mat4(shader_program, "model", &model);

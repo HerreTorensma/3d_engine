@@ -141,6 +141,101 @@ static u32 slope_indices[] = {
     1, 5, 6,
 };
 
+static camera_t create_camera() {
+	camera_t camera = {0};
+
+	glm_vec3_copy((vec3){0.0f, 0.0f, 3.0f}, camera.position);
+	glm_vec3_copy((vec3){0.0f, 0.0f, -1.0f}, camera.front);
+	glm_vec3_copy((vec3){0.0f, 1.0f, 0.0f}, camera.up);
+
+	camera.pitch = 0.0f;
+	camera.yaw = -90.0f;
+
+	return camera;
+}
+
+static camera_t camera = {0};
+
+void game_input(SDL_Event event) {
+	if (event.type == SDL_MOUSEMOTION) {
+		float x_offset = (float)(event.motion.xrel);
+		float y_offset = -(float)(event.motion.yrel);
+		
+		float sensitivity = 0.1f;
+		x_offset *= sensitivity;
+		y_offset *= sensitivity;
+
+		camera.yaw += x_offset;
+		camera.pitch += y_offset;
+
+		if (camera.pitch > 89.0f)
+			camera.pitch = 89.0f;
+		if (camera.pitch < -89.0f)
+			camera.pitch = -89.0f;
+
+		vec3 front = {0};
+		front[0] = cosf(glm_rad(camera.yaw)) * cosf(glm_rad(camera.pitch));
+		// front[1] = sinf(glm_rad(camera.pitch));
+		front[2] = sinf(glm_rad(camera.yaw)) * cosf(glm_rad(camera.pitch));
+
+		glm_vec3_normalize(front);
+		glm_vec3_copy(front, camera.front);
+	}
+}
+
+void game_update() {
+	float camera_speed = 0.1f;
+	// if (input_key_held(SDL_SCANCODE_W)) {
+	// 	vec3 temp;
+	// 	glm_vec3_scale(camera.front, camera_speed, temp);
+	// 	glm_vec3_add(camera.position, temp, camera.position);
+	// }
+	// if (input_key_held(SDL_SCANCODE_S)) {
+	// 	vec3 temp;
+	// 	glm_vec3_scale(camera.front, -camera_speed, temp);
+	// 	glm_vec3_add(camera.position, temp, camera.position);
+	// }
+
+	vec3 right_vector;
+	glm_cross(camera.front, camera.up, right_vector);
+	glm_normalize(right_vector);
+
+	// Calculate the forward vector based on horizontal components
+	vec3 forward_vector = { camera.front[0], 0.0f, camera.front[2] }; // Zero out y-component
+	glm_normalize(forward_vector); // Normalize the forward vector for consistent speed
+
+	if (input_key_held(SDL_SCANCODE_W)) {
+		vec3 temp2;
+		glm_vec3_scale(forward_vector, camera_speed, temp2); // Move forward
+		glm_vec3_add(camera.position, temp2, camera.position); // Update position
+	}
+
+	if (input_key_held(SDL_SCANCODE_S)) {
+		vec3 temp2;
+		glm_vec3_scale(forward_vector, -camera_speed, temp2); // Move backward
+		glm_vec3_add(camera.position, temp2, camera.position); // Update position
+	}
+
+	if (input_key_held(SDL_SCANCODE_A)) {
+		vec3 temp;
+		glm_cross(camera.front, camera.up, temp);
+		glm_normalize(temp);
+
+		vec3 temp2;
+		glm_vec3_scale(temp, -camera_speed, temp2);
+		glm_vec3_add(camera.position, temp2, camera.position);
+	}
+	if (input_key_held(SDL_SCANCODE_D)) {
+		vec3 temp;
+		glm_cross(camera.front, camera.up, temp);
+		glm_normalize(temp);
+
+		vec3 temp2;
+		glm_vec3_scale(temp, camera_speed, temp2);
+		glm_vec3_add(camera.position, temp2, camera.position);
+	}
+}
+
 #define FPS 60
 
 int main(int argc, char *argv[]) {
@@ -198,34 +293,34 @@ int main(int argc, char *argv[]) {
 	res_add_texture(&res_pack, 3, "res/images/fire.tga");
 	res_add_texture(&res_pack, 4, "res/images/bricks.tga");
 
-	res_add_mesh_raw(&res_pack, 1, cube_vertices, sizeof(cube_vertices) / sizeof(vertex_t), cube_indices, sizeof(cube_indices) / sizeof(u32));
-	res_add_mesh_raw(&res_pack, 2, slope_vertices, sizeof(slope_vertices) / sizeof(vertex_t), slope_indices, sizeof(slope_indices) / sizeof(u32));
-	res_add_mesh_raw(&res_pack, 3, floor_vertices, sizeof(floor_vertices) / sizeof(vertex_t), floor_indices, sizeof(floor_indices) / sizeof(u32));
-	res_add_mesh_raw(&res_pack, 4, cross_vertices, sizeof(cross_vertices) / sizeof(vertex_t), cross_indices, sizeof(cross_indices) / sizeof(u32));
-	res_add_mesh_raw(&res_pack, 5, quad_vertices, sizeof(quad_vertices) / sizeof(vertex_t), quad_indices, sizeof(quad_indices) / sizeof(u32));
+	res_add_mesh_raw(&res_pack, MESH_QUAD, quad_vertices, sizeof(quad_vertices) / sizeof(vertex_t), quad_indices, sizeof(quad_indices) / sizeof(u32));
+	res_add_mesh_raw(&res_pack, MESH_CUBE, cube_vertices, sizeof(cube_vertices) / sizeof(vertex_t), cube_indices, sizeof(cube_indices) / sizeof(u32));
+	res_add_mesh_raw(&res_pack, MESH_SLOPE, slope_vertices, sizeof(slope_vertices) / sizeof(vertex_t), slope_indices, sizeof(slope_indices) / sizeof(u32));
+	res_add_mesh_raw(&res_pack, MESH_FLOOR, floor_vertices, sizeof(floor_vertices) / sizeof(vertex_t), floor_indices, sizeof(floor_indices) / sizeof(u32));
+	res_add_mesh_raw(&res_pack, MESH_CROSS, cross_vertices, sizeof(cross_vertices) / sizeof(vertex_t), cross_indices, sizeof(cross_indices) / sizeof(u32));
 
 	res_pack.tiles[1] = (tile_t){
-		.mesh_index = 1,
+		.mesh_index = MESH_CUBE,
 		.texture_index = 4
 	};
 
 	res_pack.tiles[2] = (tile_t){
-		.mesh_index = 1,
+		.mesh_index = MESH_CUBE,
 		.texture_index = 1
 	};
 
 	res_pack.tiles[3] = (tile_t){
-		.mesh_index = 2,
+		.mesh_index = MESH_SLOPE,
 		.texture_index = 2
 	};
 
 	res_pack.tiles[4] = (tile_t){
-		.mesh_index = 3,
+		.mesh_index = MESH_FLOOR,
 		.texture_index = 1
 	};
 
 	res_pack.tiles[5] = (tile_t) {
-		.mesh_index = 4,
+		.mesh_index = MESH_CROSS,
 		.texture_index = 3
 	};
 
@@ -234,21 +329,34 @@ int main(int argc, char *argv[]) {
 	level.height = 16;
 	level.depth = 16;
 
-	level.map[6] = 1;
-	level.map[2] = 1;
-	level.map[4] = 1;
-	level.map[0] = 2;
-	level.map[8] = 3;
-	level.map[9] = 4;
-	level.map[10] = 5;
+	// level.map[6] = 1;
+	// level.map[2] = 1;
+	// level.map[4] = 1;
+	// level.map[0] = 2;
+	// level.map[8] = 3;
+	// level.map[9] = 4;
+	// level.map[10] = 5;
 
-	level_set_tile_index(&level, 1, 0, 0, 2);
-	level_set_tile_index(&level, 1, 0, 0, 3);
-	level_set_tile_index(&level, 1, 0, 0, 4);
-	level_set_tile_index(&level, 1, 1, 0, 4);
-	level_set_tile_index(&level, 1, 1, 1, 4);
+	level_set_tile_index(&level, 1, 0, 0, 0);
+	level_set_tile_index(&level, 1, 1, 0, 0);
+	level_set_tile_index(&level, 1, 2, 0, 0);
+	level_set_tile_index(&level, 1, 3, 0, 0);
+	level_set_tile_index(&level, 1, 4, 0, 0);
+	level_set_tile_index(&level, 1, 4, 1, 0);
+	level_set_tile_index(&level, 1, 4, 0, 1);
+	level_set_tile_index(&level, 1, 4, 0, 2);
+	level_set_tile_index(&level, 1, 4, 0, 3);
+	level_set_tile_index(&level, 1, 4, 0, 4);
+
+	level_set_tile_index(&level, 2, 5, 0, 4);
+	level_set_tile_index(&level, 3, 6, 0, 4);
+	level_set_tile_index(&level, 4, 6, 0, 4);
+	level_set_tile_index(&level, 5, 8, 0, 4);
+
+	camera = create_camera();
 
 	bool edit_mode = false;
+	bool fullscreen = false;
 
 	render_init();
 	editor_init();
@@ -274,7 +382,8 @@ int main(int argc, char *argv[]) {
 			if (edit_mode) {
 				editor_input(event);
 			} else {
-				render_input(event);
+				// render_input(event);
+				game_input(event);
 			}
 		}
 
@@ -284,18 +393,30 @@ int main(int argc, char *argv[]) {
 			SDL_SetRelativeMouseMode(SDL_FALSE);
 		}
 
+		if (input_key_pressed(SDL_SCANCODE_F11)) {
+			fullscreen = !fullscreen;
+			if (fullscreen) {
+				SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+			} else {
+				SDL_SetWindowFullscreen(window, 0);
+			}
+		}
+
 		if (input_key_pressed(SDL_SCANCODE_E)) {
 			edit_mode = !edit_mode;
 		}
 
 		if (edit_mode) {
 			editor_update();
+		} else {
+			game_update();
 		}
 
 		if (edit_mode) {
 			editor_render(&res_pack, &level);
 		} else {
-			render(&res_pack, &level);
+			// render(&res_pack, &level, &camera);
+			render_level(&res_pack, &level, &camera);
 		}
 
 		SDL_GL_SwapWindow(window);		

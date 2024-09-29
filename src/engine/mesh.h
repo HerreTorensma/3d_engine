@@ -18,3 +18,11 @@ typedef struct mesh {
     u32 vbo;
     u32 ebo;
 } mesh_t;
+
+enum {
+    MESH_QUAD = 1,
+    MESH_CUBE = 2,
+    MESH_SLOPE = 3,
+    MESH_FLOOR = 4,
+    MESH_CROSS = 5,
+};

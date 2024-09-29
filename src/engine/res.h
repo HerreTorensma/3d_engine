@@ -10,6 +10,8 @@ typedef struct tile {
 } tile_t;
 
 typedef struct res_pack {
+	color_t fog_color;
+
     mesh_t meshes[256];
     u32 texture_ids[256];
 

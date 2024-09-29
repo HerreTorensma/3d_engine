@@ -28,6 +28,6 @@ typedef struct atlas {
 
 void render_init(void);
 
-void render(res_pack_t *res_pack, level_t *level);
+void render_level(res_pack_t *res_pack, level_t *level, camera_t *camera);
 
-void render_input(SDL_Event event);
+void render_2d(void);
