@@ -1,6 +1,25 @@
 #include "engine/global.h"
 #include "engine/render.h"
 #include "engine/util.h"
+#include "engine/editor.h"
+
+// static vertex_t quad_vertices[] = {
+//     {{1.0f,  1.0f, 0.0f}, {1.0f, 0.0f}},  // top right
+//     {{1.0f, -1.0f, 0.0f}, {1.0f, 1.0f}},  // bottom right
+//     {{-1.0f, -1.0f, 0.0f}, {0.0f, 1.0f}},  // bottom left
+//     {{-1.0f,  1.0f, 0.0f}, {0.0f, 0.0f}}   // top left 
+// };
+
+static vertex_t quad_vertices[] = {
+    {{1.0f,  1.0f, 0.0f}, {1.0f, 1.0f}},  // top right
+    {{1.0f, -1.0f, 0.0f}, {1.0f, 0.0f}},  // bottom right
+    {{-1.0f, -1.0f, 0.0f}, {0.0f, 0.0f}},  // bottom left
+    {{-1.0f,  1.0f, 0.0f}, {0.0f, 1.0f}}   // top left 
+};
+static u32 quad_indices[] = {  // note that we start from 0!
+    0, 1, 3,   // first triangle
+    1, 2, 3    // second triangle
+};
 
 static vertex_t cube_vertices[] = {
     // Front face
@@ -183,6 +202,7 @@ int main(int argc, char *argv[]) {
 	res_add_mesh_raw(&res_pack, 2, slope_vertices, sizeof(slope_vertices) / sizeof(vertex_t), slope_indices, sizeof(slope_indices) / sizeof(u32));
 	res_add_mesh_raw(&res_pack, 3, floor_vertices, sizeof(floor_vertices) / sizeof(vertex_t), floor_indices, sizeof(floor_indices) / sizeof(u32));
 	res_add_mesh_raw(&res_pack, 4, cross_vertices, sizeof(cross_vertices) / sizeof(vertex_t), cross_indices, sizeof(cross_indices) / sizeof(u32));
+	res_add_mesh_raw(&res_pack, 5, quad_vertices, sizeof(quad_vertices) / sizeof(vertex_t), quad_indices, sizeof(quad_indices) / sizeof(u32));
 
 	res_pack.tiles[1] = (tile_t){
 		.mesh_index = 1,
@@ -222,7 +242,16 @@ int main(int argc, char *argv[]) {
 	level.map[9] = 4;
 	level.map[10] = 5;
 
+	level_set_tile_index(&level, 1, 0, 0, 2);
+	level_set_tile_index(&level, 1, 0, 0, 3);
+	level_set_tile_index(&level, 1, 0, 0, 4);
+	level_set_tile_index(&level, 1, 1, 0, 4);
+	level_set_tile_index(&level, 1, 1, 1, 4);
+
+	bool edit_mode = false;
+
 	render_init();
+	editor_init();
 
 	// Window loop
 	bool running = true;
@@ -242,7 +271,11 @@ int main(int argc, char *argv[]) {
 				window_height = h;
 			}
 
-			render_input(event);
+			if (edit_mode) {
+				editor_input(event);
+			} else {
+				render_input(event);
+			}
 		}
 
 		input_update();
@@ -251,7 +284,19 @@ int main(int argc, char *argv[]) {
 			SDL_SetRelativeMouseMode(SDL_FALSE);
 		}
 
-		render(&res_pack, &level);
+		if (input_key_pressed(SDL_SCANCODE_E)) {
+			edit_mode = !edit_mode;
+		}
+
+		if (edit_mode) {
+			editor_update();
+		}
+
+		if (edit_mode) {
+			editor_render(&res_pack, &level);
+		} else {
+			render(&res_pack, &level);
+		}
 
 		SDL_GL_SwapWindow(window);		
 
