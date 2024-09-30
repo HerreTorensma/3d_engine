@@ -13,6 +13,10 @@ from bpy.types import Operator
 def export(filepath, obj):
     print(f"Exporting {filepath}")
 
+    # Ensure object mode so the uv's always get exported
+    if bpy.context.object.mode != 'OBJECT':
+        bpy.ops.object.mode_set(mode='OBJECT')
+
     # obj = bpy.context.object
     if obj.type != "MESH":
         print("Selected object is not a mesh")

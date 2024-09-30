@@ -11,6 +11,7 @@
     - Lighting???
     - Dithering shader for limiting color palette
     - Billboard sprites
+    - Move the grid thing into a grid map and make something seperate for meshes that roam freely
 
 ## Dependencies
 - SDL2

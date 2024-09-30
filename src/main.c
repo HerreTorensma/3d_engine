@@ -339,7 +339,8 @@ int main(int argc, char *argv[]) {
 
 	// mesh_t weird_mesh = load_mesh("res/meshes/sphere.herremesh");
 	// mesh_t weird_mesh = load_mesh("res/meshes/test3.mesh");
-	mesh_t weird_mesh = load_mesh("res/meshes/sphere2.herremesh");
+	// mesh_t weird_mesh = load_mesh("res/meshes/sphere2.herremesh");
+	mesh_t weird_mesh = load_mesh("res/meshes/barrel.herremesh");
 
 	res_add_mesh_raw(&res_pack, MESH_BIG_QUAD, big_quad_vertices, sizeof(big_quad_vertices) / sizeof(vertex_t), big_quad_indices, sizeof(big_quad_indices) / sizeof(u32));
 	res_add_mesh_raw(&res_pack, MESH_CUBE, cube_vertices, sizeof(cube_vertices) / sizeof(vertex_t), cube_indices, sizeof(cube_indices) / sizeof(u32));

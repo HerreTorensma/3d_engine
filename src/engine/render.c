@@ -8,6 +8,7 @@ static u32 fbo_tex = 0;
 
 void render_init(void) {
     shader_program = create_shader_program("res/shaders/vertex.glsl", "res/shaders/fragment_tex.glsl");
+    // shader_program = create_shader_program("res/shaders/vertex.glsl", "res/shaders/frag_checker.glsl");
     basic_shader = create_shader_program("res/shaders/vertex_default.glsl", "res/shaders/fragment_editor.glsl");
 	
 	// FBO and texture
@@ -41,8 +42,9 @@ void render_level(res_pack_t *res_pack, level_t *level, camera_t *camera) {
 	glViewport(0, 0, 640, 360);
 
     // glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-    glClearColor(0.231f, 0.2f, 0.149f, 1.0f);
+    // glClearColor(0.231f, 0.2f, 0.149f, 1.0f);
     // glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
+    glClearColor(0.227f, 0.192f, 0.161f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
@@ -89,14 +91,16 @@ void render_level(res_pack_t *res_pack, level_t *level, camera_t *camera) {
 				mat4 model;
 				glm_mat4_identity(model);
 				glm_translate(model, (vec3){x, y, z});
+				// glm_translate(model, (vec3){x * 2.0, y * 2.0, z * 2.0});
 				glm_rotate(model, glm_rad(tile.rotation[0]), (vec3){1.0f, 0.0f, 0.0f});
 				glm_rotate(model, glm_rad(tile.rotation[1]), (vec3){0.0f, 1.0f, 0.0f});
 				glm_rotate(model, glm_rad(tile.rotation[2]), (vec3){0.0f, 0.0f, 1.0f});
 				shader_set_mat4(shader_program, "model", &model);
 				
 				// vec3 fog_color = {1.0f, 0.0f, 0.0f};
-				vec3 fog_color = {0.231f, 0.2f, 0.149f};
+				// vec3 fog_color = {0.231f, 0.2f, 0.149f};
 				// vec3 fog_color = {0.8f, 0.8f, 0.8f};
+				vec3 fog_color = {0.227f, 0.192f, 0.161f};
 				shader_set_vec3(shader_program, "fogColor", &fog_color);
 
 				glBindVertexArray(mesh.vao);
@@ -136,8 +140,9 @@ void render_level(res_pack_t *res_pack, level_t *level, camera_t *camera) {
 				shader_set_mat4(shader_program, "model", &model);
 				
 				// vec3 fog_color = {1.0f, 0.0f, 0.0f};
-				vec3 fog_color = {0.231f, 0.2f, 0.149f};
+				// vec3 fog_color = {0.231f, 0.2f, 0.149f};
 				// vec3 fog_color = {0.8f, 0.8f, 0.8f};
+				vec3 fog_color = {0.227f, 0.192f, 0.161f};
 				shader_set_vec3(shader_program, "fogColor", &fog_color);
 
 				glBindVertexArray(mesh.vao);
