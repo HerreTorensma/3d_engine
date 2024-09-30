@@ -337,12 +337,18 @@ int main(int argc, char *argv[]) {
 	res_add_texture(&res_pack, 4, "res/images/bricks.tga");
 	res_add_texture(&res_pack, 5, "res/images/iron_bars.tga");
 
+	// mesh_t weird_mesh = load_mesh("res/meshes/sphere.herremesh");
+	// mesh_t weird_mesh = load_mesh("res/meshes/test3.mesh");
+	mesh_t weird_mesh = load_mesh("res/meshes/sphere2.herremesh");
+
 	res_add_mesh_raw(&res_pack, MESH_BIG_QUAD, big_quad_vertices, sizeof(big_quad_vertices) / sizeof(vertex_t), big_quad_indices, sizeof(big_quad_indices) / sizeof(u32));
 	res_add_mesh_raw(&res_pack, MESH_CUBE, cube_vertices, sizeof(cube_vertices) / sizeof(vertex_t), cube_indices, sizeof(cube_indices) / sizeof(u32));
 	res_add_mesh_raw(&res_pack, MESH_SLOPE, slope_vertices, sizeof(slope_vertices) / sizeof(vertex_t), slope_indices, sizeof(slope_indices) / sizeof(u32));
 	res_add_mesh_raw(&res_pack, MESH_FLOOR, floor_vertices, sizeof(floor_vertices) / sizeof(vertex_t), floor_indices, sizeof(floor_indices) / sizeof(u32));
 	res_add_mesh_raw(&res_pack, MESH_CROSS, cross_vertices, sizeof(cross_vertices) / sizeof(vertex_t), cross_indices, sizeof(cross_indices) / sizeof(u32));
 	res_add_mesh_raw(&res_pack, MESH_QUAD, quad_vertices, sizeof(quad_vertices) / sizeof(vertex_t), quad_indices, sizeof(quad_indices) / sizeof(u32));
+	
+	res_add_mesh(&res_pack, 20, weird_mesh);
 
 	res_pack.tiles[1] = (tile_t){
 		.mesh_index = MESH_CUBE,
@@ -393,6 +399,13 @@ int main(int argc, char *argv[]) {
 		.transparent = true,
 	};
 
+	res_pack.tiles[8] = (tile_t) {
+		.mesh_index = 20,
+		.texture_index = 4,
+		.rotation = {0},
+		.transparent = true,
+	};
+
 	level_t level = {0};
 	level.width = 16;
 	level.height = 16;
@@ -409,7 +422,7 @@ int main(int argc, char *argv[]) {
 	level_set_tile_index(&level, 1, 0, 0, 0);
 	level_set_tile_index(&level, 1, 1, 0, 0);
 	level_set_tile_index(&level, 7, 2, 0, 0);
-	level_set_tile_index(&level, 7, 2, 0, 1);
+	// level_set_tile_index(&level, 8, 2, 1, 1);
 	level_set_tile_index(&level, 1, 3, 0, 0);
 	level_set_tile_index(&level, 1, 4, 0, 0);
 	level_set_tile_index(&level, 1, 4, 1, 0);
@@ -437,6 +450,8 @@ int main(int argc, char *argv[]) {
 	level_set_tile_index(&level, 3, 6, 0, 4);
 	level_set_tile_index(&level, 4, 7, 0, 4);
 	level_set_tile_index(&level, 5, 8, 0, 4);
+	level_set_tile_index(&level, 6, 10, 0, 4);
+	level_set_tile_index(&level, 8, 11, 0, 4);
 	// level_set_tile_index(&level, 6, 9, 0, 4);
 
 	camera = create_camera();

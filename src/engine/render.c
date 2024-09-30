@@ -41,8 +41,8 @@ void render_level(res_pack_t *res_pack, level_t *level, camera_t *camera) {
 	glViewport(0, 0, 640, 360);
 
     // glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-    // glClearColor(0.231f, 0.2f, 0.149f, 1.0f);
-    glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
+    glClearColor(0.231f, 0.2f, 0.149f, 1.0f);
+    // glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
@@ -95,8 +95,8 @@ void render_level(res_pack_t *res_pack, level_t *level, camera_t *camera) {
 				shader_set_mat4(shader_program, "model", &model);
 				
 				// vec3 fog_color = {1.0f, 0.0f, 0.0f};
-				// vec3 fog_color = {0.231f, 0.2f, 0.149f};
-				vec3 fog_color = {0.8f, 0.8f, 0.8f};
+				vec3 fog_color = {0.231f, 0.2f, 0.149f};
+				// vec3 fog_color = {0.8f, 0.8f, 0.8f};
 				shader_set_vec3(shader_program, "fogColor", &fog_color);
 
 				glBindVertexArray(mesh.vao);
@@ -136,8 +136,8 @@ void render_level(res_pack_t *res_pack, level_t *level, camera_t *camera) {
 				shader_set_mat4(shader_program, "model", &model);
 				
 				// vec3 fog_color = {1.0f, 0.0f, 0.0f};
-				// vec3 fog_color = {0.231f, 0.2f, 0.149f};
-				vec3 fog_color = {0.8f, 0.8f, 0.8f};
+				vec3 fog_color = {0.231f, 0.2f, 0.149f};
+				// vec3 fog_color = {0.8f, 0.8f, 0.8f};
 				shader_set_vec3(shader_program, "fogColor", &fog_color);
 
 				glBindVertexArray(mesh.vao);

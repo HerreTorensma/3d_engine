@@ -40,7 +40,7 @@ image_t load_tga(const char path[], bool flip) {
 	image_t image = {0};
 	
 	// Open file
-	FILE *file = fopen(path, "r");
+	FILE *file = fopen(path, "rb");
 	if (file == NULL) {
 		printf("The tga image file does not exist\n");
 		return image;
@@ -95,4 +95,54 @@ gl_color_t color_to_gl_color(color_t color) {
 	gl_color.a = (float)color.a / 255.0f;
 
 	return gl_color;
+}
+
+mesh_t load_mesh(const char path[]) {
+	printf("Loading model %s...\n", path);
+	// printf("vertex_t size: %d\n", sizeof(vertex_t));
+
+	mesh_t mesh = {0};
+
+	FILE *file = fopen(path, "rb");
+
+	// Vertex count
+	fread(&mesh.vertex_count, sizeof(u32), 1, file);
+	printf("Vertex count: %u\n", mesh.vertex_count);
+	
+	// Allocate memory for vertices and read them
+	mesh.vertices = calloc(mesh.vertex_count, sizeof(vertex_t));
+	// fread(mesh.vertices, sizeof(vertex_t), mesh.vertex_count, file);
+
+	// printf("vertex: %f", mesh.vertices[1].position[0]);
+
+	for (size_t i = 0; i < mesh.vertex_count; i++) {
+		fread(&mesh.vertices[i].position[0], sizeof(f32), 1, file);
+		fread(&mesh.vertices[i].position[1], sizeof(f32), 1, file);
+		fread(&mesh.vertices[i].position[2], sizeof(f32), 1, file);
+
+		fread(&mesh.vertices[i].tex_coord[0], sizeof(f32), 1, file);
+		fread(&mesh.vertices[i].tex_coord[1], sizeof(f32), 1, file);
+	}
+
+	printf("pos: %ld\n", ftell(file));
+
+	// Triangle count and indices
+	// u32 triangle_count = 0;
+	// fread(&triangle_count, sizeof(u32), 1, file);
+	// printf("Triangle count: %u\n", triangle_count);
+
+	fread(&mesh.index_count, sizeof(u32), 1, file);
+	
+	mesh.index_count *= 3;
+
+	printf("Index count: %u\n", mesh.index_count);
+
+	printf("pos: %ld\n", ftell(file));
+	mesh.indices = calloc(mesh.index_count, sizeof(u32));
+	
+	fread(mesh.indices, sizeof(u32), mesh.index_count, file);
+
+	fclose(file);
+
+	return mesh;
 }

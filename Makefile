@@ -10,7 +10,7 @@ else
 	
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S),Linux)
-		LDFLAGS = lib/glad/src/glad.o -lSDL2 -lSDL2_mixer -lm
+		LDFLAGS = lib/glad/src/glad.o -lSDL2 -lm #-lSDL2_mixer
 	endif
 	ifeq ($(UNAME_S),Darwin)
 		CFLAGS += -Ilib/SDL2_mac/include

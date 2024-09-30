@@ -1,6 +1,7 @@
 #pragma once
 
 #include "global.h"
+#include "mesh.h"
 
 extern i32 window_width;
 extern i32 window_height;
@@ -28,5 +29,7 @@ typedef struct gl_color {
 char *load_file_to_string(const char path[]);
 
 image_t load_tga(const char path[], bool flip);
+
+mesh_t load_mesh(const char path[]);
 
 gl_color_t color_to_gl_color(color_t color);
