@@ -26,4 +26,5 @@ enum {
     MESH_FLOOR = 4,
     MESH_CROSS = 5,
     MESH_QUAD = 6,
+    MESH_CORNER = 7
 };

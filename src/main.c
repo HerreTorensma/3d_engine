@@ -21,11 +21,17 @@ static u32 big_quad_indices[] = {  // note that we start from 0!
     1, 2, 3    // second triangle
 };
 
+// static vertex_t quad_vertices[] = {
+//     {{0.5f,  0.5f, 0.0f}, {1.0f, 1.0f}},  // top right
+//     {{0.5f, -0.5f, 0.0f}, {1.0f, 0.0f}},  // bottom right
+//     {{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f}},  // bottom left
+//     {{-0.5f,  0.5f, 0.0f}, {0.0f, 1.0f}}   // top left 
+// };
 static vertex_t quad_vertices[] = {
-    {{0.5f,  0.5f, 0.0f}, {1.0f, 1.0f}},  // top right
-    {{0.5f, -0.5f, 0.0f}, {1.0f, 0.0f}},  // bottom right
-    {{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f}},  // bottom left
-    {{-0.5f,  0.5f, 0.0f}, {0.0f, 1.0f}}   // top left 
+    {{1.0f,  1.0f, 0.0f}, {1.0f, 1.0f}},  // top right
+    {{1.0f, -1.0f, 0.0f}, {1.0f, 0.0f}},  // bottom right
+    {{-1.0f, -1.0f, 0.0f}, {0.0f, 0.0f}},  // bottom left
+    {{-1.0f,  1.0f, 0.0f}, {0.0f, 1.0f}}   // top left 
 };
 static u32 quad_indices[] = {  // note that we start from 0!
     0, 1, 3,   // first triangle
@@ -336,26 +342,37 @@ int main(int argc, char *argv[]) {
 	res_add_texture(&res_pack, 3, "res/images/fire.tga");
 	res_add_texture(&res_pack, 4, "res/images/bricks.tga");
 	res_add_texture(&res_pack, 5, "res/images/iron_bars.tga");
+	res_add_texture(&res_pack, 6, "res/images/tree.tga");
 
 	// mesh_t weird_mesh = load_mesh("res/meshes/sphere.herremesh");
 	// mesh_t weird_mesh = load_mesh("res/meshes/test3.mesh");
 	// mesh_t weird_mesh = load_mesh("res/meshes/sphere2.herremesh");
-	mesh_t weird_mesh = load_mesh("res/meshes/barrel.herremesh");
+	// mesh_t weird_mesh = load_mesh("res/meshes/barrel.herremesh");
+	// mesh_t weird_mesh = load_mesh("res/meshes/monkey.herremesh");
+	// mesh_t weird_mesh = load_mesh("res/meshes/pyramid.herremesh");
+	mesh_t weird_mesh = load_mesh("res/meshes/monkey.herremesh");
+
+	mesh_t corner_mesh = load_mesh("res/meshes/corner.herremesh");
+
+	mesh_t cube_mesh = load_mesh("res/meshes/cube.herremesh");
 
 	res_add_mesh_raw(&res_pack, MESH_BIG_QUAD, big_quad_vertices, sizeof(big_quad_vertices) / sizeof(vertex_t), big_quad_indices, sizeof(big_quad_indices) / sizeof(u32));
-	res_add_mesh_raw(&res_pack, MESH_CUBE, cube_vertices, sizeof(cube_vertices) / sizeof(vertex_t), cube_indices, sizeof(cube_indices) / sizeof(u32));
+	// res_add_mesh_raw(&res_pack, MESH_CUBE, cube_vertices, sizeof(cube_vertices) / sizeof(vertex_t), cube_indices, sizeof(cube_indices) / sizeof(u32));
 	res_add_mesh_raw(&res_pack, MESH_SLOPE, slope_vertices, sizeof(slope_vertices) / sizeof(vertex_t), slope_indices, sizeof(slope_indices) / sizeof(u32));
 	res_add_mesh_raw(&res_pack, MESH_FLOOR, floor_vertices, sizeof(floor_vertices) / sizeof(vertex_t), floor_indices, sizeof(floor_indices) / sizeof(u32));
 	res_add_mesh_raw(&res_pack, MESH_CROSS, cross_vertices, sizeof(cross_vertices) / sizeof(vertex_t), cross_indices, sizeof(cross_indices) / sizeof(u32));
 	res_add_mesh_raw(&res_pack, MESH_QUAD, quad_vertices, sizeof(quad_vertices) / sizeof(vertex_t), quad_indices, sizeof(quad_indices) / sizeof(u32));
 	
 	res_add_mesh(&res_pack, 20, weird_mesh);
+	res_add_mesh(&res_pack, MESH_CUBE, cube_mesh);
+	res_add_mesh(&res_pack, MESH_CORNER, corner_mesh);
 
 	res_pack.tiles[1] = (tile_t){
 		.mesh_index = MESH_CUBE,
 		.texture_index = 4,
 		.rotation = {0},
 		.transparent = false,
+		.billboard = false,
 	};
 
 	res_pack.tiles[2] = (tile_t){
@@ -363,6 +380,7 @@ int main(int argc, char *argv[]) {
 		.texture_index = 1,
 		.rotation = {0},
 		.transparent = true,
+		.billboard = false,
 	};
 
 	res_pack.tiles[3] = (tile_t){
@@ -370,6 +388,7 @@ int main(int argc, char *argv[]) {
 		.texture_index = 2,
 		.rotation = {0.0f, 90.0f, 0.0f},
 		.transparent = false,
+		.billboard = false,
 	};
 
 	res_pack.tiles[4] = (tile_t){
@@ -377,6 +396,7 @@ int main(int argc, char *argv[]) {
 		.texture_index = 1,
 		.rotation = {0},
 		.transparent = false,
+		.billboard = false,
 	};
 
 	res_pack.tiles[5] = (tile_t) {
@@ -384,13 +404,15 @@ int main(int argc, char *argv[]) {
 		.texture_index = 3,
 		.rotation = {0},
 		.transparent = true,
+		.billboard = false,
 	};
 
 	res_pack.tiles[6] = (tile_t) {
 		.mesh_index = MESH_QUAD,
-		.texture_index = 3,
+		.texture_index = 6,
 		.rotation = {0},
-		.transparent = false,
+		.transparent = true,
+		.billboard = true,
 	};
 
 	res_pack.tiles[7] = (tile_t) {
@@ -398,13 +420,23 @@ int main(int argc, char *argv[]) {
 		.texture_index = 5,
 		.rotation = {0},
 		.transparent = true,
+		.billboard = false,
 	};
 
 	res_pack.tiles[8] = (tile_t) {
 		.mesh_index = 20,
 		.texture_index = 4,
 		.rotation = {0},
-		.transparent = true,
+		.transparent = false,
+		.billboard = false,
+	};
+
+	res_pack.tiles[9] = (tile_t) {
+		.mesh_index = MESH_CORNER,
+		.texture_index = 4,
+		.rotation = {0.0f, 180.0f, 0.0f},
+		.transparent = false,
+		.billboard = false,
 	};
 
 	level_t level = {0};
@@ -432,6 +464,9 @@ int main(int argc, char *argv[]) {
 	level_set_tile_index(&level, 1, 4, 0, 3);
 	level_set_tile_index(&level, 1, 4, 0, 4);
 
+	level_set_tile_index(&level, 9, 3, 0, 1);
+
+
 	level_set_tile_index(&level, 1, 1, 1, 0);
 	level_set_tile_index(&level, 1, 2, 1, 0);
 	level_set_tile_index(&level, 1, 3, 1, 0);
@@ -446,6 +481,8 @@ int main(int argc, char *argv[]) {
 	level_set_tile_index(&level, 1, 4, 8, 4);
 	level_set_tile_index(&level, 1, 4, 9, 4);
 	level_set_tile_index(&level, 1, 4, 10, 4);
+
+	// level_set_tile_index(&level, 9, 5, 9, 4);
 
 	level_set_tile_index(&level, 2, 5, 0, 4);
 	level_set_tile_index(&level, 3, 6, 0, 4);

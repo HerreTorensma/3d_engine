@@ -71,6 +71,7 @@ void render_level(res_pack_t *res_pack, level_t *level, camera_t *camera) {
 	shader_set_int(shader_program, "texture1", 0);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	for (i32 z = 0; z < level->depth; z++) {
 		for (i32 y = 0; y < level->height; y++) {
@@ -91,6 +92,7 @@ void render_level(res_pack_t *res_pack, level_t *level, camera_t *camera) {
 				mat4 model;
 				glm_mat4_identity(model);
 				glm_translate(model, (vec3){x, y, z});
+				glm_scale(model, (vec3){0.5f, 0.5f, 0.5f});
 				// glm_translate(model, (vec3){x * 2.0, y * 2.0, z * 2.0});
 				glm_rotate(model, glm_rad(tile.rotation[0]), (vec3){1.0f, 0.0f, 0.0f});
 				glm_rotate(model, glm_rad(tile.rotation[1]), (vec3){0.0f, 1.0f, 0.0f});
@@ -128,15 +130,30 @@ void render_level(res_pack_t *res_pack, level_t *level, camera_t *camera) {
 					continue;
 				}
 
+				if (tile.billboard) {
+					shader_set_int(shader_program, "billboard", true);
+				}
+
+
 				mesh_t mesh = res_pack->meshes[tile.mesh_index];
                 
                 // Model matrix
 				mat4 model;
 				glm_mat4_identity(model);
 				glm_translate(model, (vec3){x, y, z});
+				glm_scale(model, (vec3){0.5f, 0.5f, 0.5f});
 				glm_rotate(model, glm_rad(tile.rotation[0]), (vec3){1.0f, 0.0f, 0.0f});
 				glm_rotate(model, glm_rad(tile.rotation[1]), (vec3){0.0f, 1.0f, 0.0f});
 				glm_rotate(model, glm_rad(tile.rotation[2]), (vec3){0.0f, 0.0f, 1.0f});
+				
+				// if (tile.billboard) {
+				// 	glm_rotate(model, )
+				// } else {
+				// 	glm_rotate(model, glm_rad(tile.rotation[0]), (vec3){1.0f, 0.0f, 0.0f});
+				// 	glm_rotate(model, glm_rad(tile.rotation[1]), (vec3){0.0f, 1.0f, 0.0f});
+				// 	glm_rotate(model, glm_rad(tile.rotation[2]), (vec3){0.0f, 0.0f, 1.0f});
+				// }
+
 				shader_set_mat4(shader_program, "model", &model);
 				
 				// vec3 fog_color = {1.0f, 0.0f, 0.0f};

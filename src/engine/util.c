@@ -121,8 +121,6 @@ mesh_t load_mesh(const char path[]) {
 		fread(&mesh.vertices[i].tex_coord[1], sizeof(f32), 1, file);
 	}
 
-	printf("pos: %ld\n", ftell(file));
-
 	// Triangle count and indices
 	fread(&mesh.index_count, sizeof(u32), 1, file);
 	
