@@ -6,6 +6,7 @@
 #include "input.h"
 #include "level.h"
 #include "res.h"
+#include "ecs.h"
 
 typedef struct camera {
     vec3 position;
@@ -16,18 +17,15 @@ typedef struct camera {
     f32 yaw;
 } camera_t;
 
-typedef struct atlas {
-    u32 rows;
-    u32 columns;
-    
-    u32 tex_width;
-    u32 tex_height;
-
-    u32 texture_id;
-} atlas_t;
+typedef struct renderer {
+    camera_t *camera;
+    ecs_world_t *ecs;
+} renderer_t;
 
 void render_init(void);
 
-void render_level(res_pack_t *res_pack, level_t *level, camera_t *camera);
+void render_level(res_pack_t *res_pack, level_t *level, ecs_world_t *ecs, camera_t *camera);
+
+void render_level_ortho(res_pack_t *res_pack, level_t *level, enum ortho_view orientation, float zoom);
 
 void render2d_image(void);

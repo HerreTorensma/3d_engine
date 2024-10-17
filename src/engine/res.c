@@ -1,34 +1,5 @@
 #include "res.h"
 
-// void res_add_mesh(res_pack_t *res_pack, size_t index, mesh_t *mesh) {
-// 	// This line causes a segfault on MacOS because it has no OpenGL 3.3 support
-//     // Could be either because this is currently the first OpenGL call in the game,
-//     // or because MacOS supports up to OpenGL 2.1 which doesn't support vao's.
-// 	glGenVertexArrays(1, &mesh->vao);
-// 	glBindVertexArray(mesh->vao);
-
-// 	// Upload vertices
-// 	glGenBuffers(1, &mesh->vbo);
-// 	glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo);
-// 	glBufferData(GL_ARRAY_BUFFER, mesh->vertex_count * sizeof(vertex_t), &mesh->vertices[0], GL_STATIC_DRAW);
-
-// 	// Upload indices
-// 	glGenBuffers(1, &mesh->ebo);
-// 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ebo);
-// 	// glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.index_count * sizeof(GLuint), &mesh.indices[0], GL_STATIC_DRAW);
-// 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->index_count * sizeof(u32), &mesh->indices[0], GL_STATIC_DRAW);
-	
-// 	glEnableVertexAttribArray(0);
-// 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (void*)offsetof(vertex_t, position));
-
-// 	glEnableVertexAttribArray(1);
-// 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (void*)offsetof(vertex_t, tex_coord));
-
-// 	glBindVertexArray(0);
-
-// 	res_pack->meshes[index] = *mesh;
-// }
-
 void res_add_mesh(res_pack_t *res_pack, size_t index, mesh_t mesh) {
 	// This line causes a segfault on MacOS because it has no OpenGL 3.3 support
     // Could be either because this is currently the first OpenGL call in the game,
@@ -76,35 +47,7 @@ void res_add_mesh_raw(res_pack_t *res_pack, size_t index, vertex_t *vertices, u3
     }
 	memcpy(mesh.indices, indices, index_count * sizeof(u32));
 
-    // // This line causes a segfault on MacOS because it has no OpenGL 3.3 support
-    // // Could be either because this is currently the first OpenGL call in the game,
-    // // or because MacOS supports up to OpenGL 2.1 which doesn't support vao's.
-	// glGenVertexArrays(1, &mesh.vao);
-	// glBindVertexArray(mesh.vao);
-
-	// // Upload vertices
-	// glGenBuffers(1, &mesh.vbo);
-	// glBindBuffer(GL_ARRAY_BUFFER, mesh.vbo);
-	// glBufferData(GL_ARRAY_BUFFER, mesh.vertex_count * sizeof(vertex_t), &mesh.vertices[0], GL_STATIC_DRAW);
-
-	// // Upload indices
-	// glGenBuffers(1, &mesh.ebo);
-	// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.ebo);
-	// // glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.index_count * sizeof(GLuint), &mesh.indices[0], GL_STATIC_DRAW);
-	// glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.index_count * sizeof(u32), &mesh.indices[0], GL_STATIC_DRAW);
-	
-	// glEnableVertexAttribArray(0);
-	// glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (void*)offsetof(vertex_t, position));
-
-	// glEnableVertexAttribArray(1);
-	// glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (void*)offsetof(vertex_t, tex_coord));
-
-	// glBindVertexArray(0);
-
-	// res_add_mesh(res_pack, index, &mesh);
 	res_add_mesh(res_pack, index, mesh);
-
-	// res_pack->meshes[index] = mesh;
 }
 
 void res_add_texture(res_pack_t *res_pack, size_t index, const char path[]) {

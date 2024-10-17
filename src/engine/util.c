@@ -86,15 +86,11 @@ image_t load_tga(const char path[], bool flip) {
 	return image;
 }
 
-gl_color_t color_to_gl_color(color_t color) {
-	gl_color_t gl_color = {0};
-
-	gl_color.r = (float)color.r / 255.0f;
-	gl_color.g = (float)color.g / 255.0f;
-	gl_color.b = (float)color.b / 255.0f;
-	gl_color.a = (float)color.a / 255.0f;
-
-	return gl_color;
+void color_to_gl_color(color_t color, vec4 gl_color) {
+	gl_color[0] = (float)color.r / 255.0f;
+	gl_color[1] = (float)color.g / 255.0f;
+	gl_color[2] = (float)color.b / 255.0f;
+	gl_color[3] = (float)color.a / 255.0f;
 }
 
 mesh_t load_mesh(const char path[]) {

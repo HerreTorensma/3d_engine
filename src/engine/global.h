@@ -3,9 +3,10 @@
 // Standard library
 #include <stdio.h>
 #include <stdlib.h>
-#include <inttypes.h>
+#include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include <stdarg.h>
 
 // Vendor libraries
 #include <SDL2/SDL.h>
@@ -25,3 +26,23 @@ typedef int64_t i64;
 
 typedef float f32;
 typedef double f64;
+
+enum ortho_view {
+    ORTHO_TOP,
+    ORTHO_BOTTOM,
+    ORTHO_FRONT,
+    ORTHO_BACK,
+    ORTHO_LEFT,
+    ORTHO_RIGHT,
+};
+
+typedef struct {
+	vec3 position;
+	vec3 rotation;
+	vec3 scale;
+} transform_c;
+
+typedef struct {
+	size_t texture_index;
+	bool billboard;
+} sprite_c;

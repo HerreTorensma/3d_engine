@@ -2,6 +2,7 @@
 #include "engine/render.h"
 #include "engine/util.h"
 #include "engine/editor.h"
+#include "engine/ecs.h"
 
 // static vertex_t quad_vertices[] = {
 //     {{1.0f,  1.0f, 0.0f}, {1.0f, 0.0f}},  // top right
@@ -226,7 +227,7 @@ void game_input(SDL_Event event) {
 
 		vec3 front = {0};
 		front[0] = cosf(glm_rad(camera.yaw)) * cosf(glm_rad(camera.pitch));
-		front[1] = sinf(glm_rad(camera.pitch));
+		// front[1] = sinf(glm_rad(camera.pitch));
 		front[2] = sinf(glm_rad(camera.yaw)) * cosf(glm_rad(camera.pitch));
 
 		glm_vec3_normalize(front);
@@ -287,6 +288,10 @@ void game_update() {
 	}
 }
 
+// enum {
+// 	TEX_GRASS,
+// };
+
 #define FPS 120
 
 int main(int argc, char *argv[]) {
@@ -337,6 +342,16 @@ int main(int argc, char *argv[]) {
 	glViewport(0, 0, window_width, window_height);
 
 	res_pack_t res_pack = {0};
+    // glClearColor(0.227f, 0.192f, 0.161f, 1.0f);
+	res_pack.sky_color = (color_t){58, 49, 41, 255};
+	res_pack.fog_color = (color_t){58, 49, 41, 255};
+	res_pack.editor_color = (color_t){50, 50, 50, 255};
+	// compute_gl_color(&res_pack.sky_color);
+	// compute_gl_color(&res_pack.fog_color);
+	// compute_gl_color(&res_pack.editor_color);
+
+	// printf("r: %f\n", res_pack.sky_color.gl_color[0]);
+
 	res_add_texture(&res_pack, 1, "res/images/green.tga");
 	res_add_texture(&res_pack, 2, "res/images/test.tga");
 	res_add_texture(&res_pack, 3, "res/images/fire.tga");
@@ -371,72 +386,55 @@ int main(int argc, char *argv[]) {
 		.mesh_index = MESH_CUBE,
 		.texture_index = 4,
 		.rotation = {0},
-		.transparent = false,
-		.billboard = false,
 	};
 
 	res_pack.tiles[2] = (tile_t){
 		.mesh_index = MESH_CUBE,
 		.texture_index = 1,
 		.rotation = {0},
-		.transparent = true,
-		.billboard = false,
 	};
 
 	res_pack.tiles[3] = (tile_t){
 		.mesh_index = MESH_SLOPE,
 		.texture_index = 2,
 		.rotation = {0.0f, 90.0f, 0.0f},
-		.transparent = false,
-		.billboard = false,
 	};
 
 	res_pack.tiles[4] = (tile_t){
 		.mesh_index = MESH_FLOOR,
 		.texture_index = 1,
 		.rotation = {0},
-		.transparent = false,
-		.billboard = false,
 	};
 
 	res_pack.tiles[5] = (tile_t) {
 		.mesh_index = MESH_CROSS,
 		.texture_index = 3,
 		.rotation = {0},
-		.transparent = true,
-		.billboard = false,
 	};
 
 	res_pack.tiles[6] = (tile_t) {
 		.mesh_index = MESH_QUAD,
 		.texture_index = 6,
 		.rotation = {0},
-		.transparent = true,
-		.billboard = true,
 	};
 
+	// Iron bars
 	res_pack.tiles[7] = (tile_t) {
 		.mesh_index = MESH_QUAD,
 		.texture_index = 5,
 		.rotation = {0},
-		.transparent = true,
-		.billboard = false,
 	};
 
 	res_pack.tiles[8] = (tile_t) {
 		.mesh_index = 20,
 		.texture_index = 4,
 		.rotation = {0},
-		.transparent = false,
-		.billboard = false,
 	};
 
 	res_pack.tiles[9] = (tile_t) {
 		.mesh_index = MESH_CORNER,
 		.texture_index = 4,
 		.rotation = {0.0f, 180.0f, 0.0f},
-		.transparent = false,
-		.billboard = false,
 	};
 
 	level_t level = {0};
@@ -454,7 +452,10 @@ int main(int argc, char *argv[]) {
 
 	level_set_tile_index(&level, 1, 0, 0, 0);
 	level_set_tile_index(&level, 1, 1, 0, 0);
-	level_set_tile_index(&level, 7, 2, 0, 0);
+
+	// Iron bars
+	// level_set_tile_index(&level, 7, 2, 0, 0);
+
 	// level_set_tile_index(&level, 8, 2, 1, 1);
 	level_set_tile_index(&level, 1, 3, 0, 0);
 	level_set_tile_index(&level, 1, 4, 0, 0);
@@ -484,12 +485,12 @@ int main(int argc, char *argv[]) {
 
 	// level_set_tile_index(&level, 9, 5, 9, 4);
 
-	level_set_tile_index(&level, 2, 5, 0, 4);
-	level_set_tile_index(&level, 3, 6, 0, 4);
-	level_set_tile_index(&level, 4, 7, 0, 4);
-	level_set_tile_index(&level, 5, 8, 0, 4);
-	level_set_tile_index(&level, 6, 10, 0, 4);
-	level_set_tile_index(&level, 8, 11, 0, 4);
+	// level_set_tile_index(&level, 2, 5, 0, 4);
+	// level_set_tile_index(&level, 3, 6, 0, 4);
+	// level_set_tile_index(&level, 4, 7, 0, 4);
+	// level_set_tile_index(&level, 5, 8, 0, 4);
+	// level_set_tile_index(&level, 6, 10, 0, 4);
+	// level_set_tile_index(&level, 8, 11, 0, 4);
 	// level_set_tile_index(&level, 6, 9, 0, 4);
 
 	camera = create_camera();
@@ -501,6 +502,31 @@ int main(int argc, char *argv[]) {
 
 	// Don't lock fps
 	// SDL_GL_SetSwapInterval(0);
+
+	ecs_world_t ecs = ecs_create();
+	ECS_REGISTER_COMPONENT(&ecs, transform_c);
+	ECS_REGISTER_COMPONENT(&ecs, sprite_c);
+
+	for (int i = 0; i < 10; i++) {
+		entity_t tree = ecs_new(&ecs);
+		transform_c *transform = ECS_SET(&ecs, tree, transform_c, {0});
+		transform->position[0] = 10.0f;
+		transform->position[1] = 0.0f;
+		transform->position[2] = 10.0f + i;
+
+		ECS_SET(&ecs, tree, sprite_c, {6, false});
+	}
+
+	// Iron bars
+	for (int i = 0; i < 10000; i++) {
+		entity_t bars = ecs_new(&ecs);
+		transform_c *transform = ECS_SET(&ecs, bars, transform_c, {0});
+		transform->position[0] = 2.0f;
+		transform->position[1] = 0.0f;
+		transform->position[2] = 0.0f + i;
+		ECS_SET(&ecs, bars, sprite_c, {5, false});
+
+	}
 
 	render_init();
 	editor_init();
@@ -559,10 +585,10 @@ int main(int argc, char *argv[]) {
 		if (edit_mode) {
 			editor_render(&res_pack, &level);
 		} else {
-			render_level(&res_pack, &level, &camera);
+			render_level(&res_pack, &level, &ecs, &camera);
 		}
 
-		SDL_GL_SwapWindow(window);		
+		SDL_GL_SwapWindow(window);
 
 		// SDL_Delay(1000/FPS);
 	}

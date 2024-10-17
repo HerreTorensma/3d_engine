@@ -13,7 +13,7 @@ typedef struct level {
 	u32 height;
 	u32 depth;
 
-	u8 map[4096];
+	u64 map[4096];
 
 	vec3i transparent_tile_cells[256];
 } level_t;

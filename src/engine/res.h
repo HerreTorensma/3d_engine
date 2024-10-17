@@ -8,12 +8,12 @@ typedef struct tile {
 	size_t mesh_index;
 	size_t texture_index;
 	vec3 rotation;
-	bool transparent;
-	bool billboard;
 } tile_t;
 
 typedef struct res_pack {
 	color_t fog_color;
+	color_t sky_color;
+	color_t editor_color;
 
     mesh_t meshes[256];
     u32 texture_ids[256];

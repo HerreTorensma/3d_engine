@@ -6,6 +6,7 @@
 #include "level.h"
 #include "shader.h"
 #include "input.h"
+#include "render.h"
 
 void editor_init(void);
 
