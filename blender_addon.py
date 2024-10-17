@@ -1,5 +1,5 @@
 bl_info = {
-    "name": "HerreTech Exporter",
+    "name": "Custom Exporter",
     "blender": (2, 80, 0),
     "category": "Import-Export",
 }
@@ -70,9 +70,9 @@ def export(filepath, obj):
             file.write(struct.pack("fff ff", pos[0], pos[2], pos[1], uv[0], uv[1]))  # 3 floats (pos) + 2 floats (UV)
         
         # I: u32
-        triangle_count = len(mesh.loop_triangles)
-        print(f"Triangle count: {triangle_count}")
-        file.write(struct.pack("I", triangle_count))
+        index_count = len(mesh.loop_triangles) * 3
+        print(f"Triangle count: {index_count}")
+        file.write(struct.pack("I", index_count))
         
         # Write each triangle"s reindexed vertex indices
         for triangle in mesh.loop_triangles:
@@ -83,11 +83,11 @@ def export(filepath, obj):
 
 # Operator class to add to the Export menu
 class ExportHerreMesh(Operator, ExportHelper):
-    bl_idname = "export_mesh.herremesh"
-    bl_label = "Export HerreMesh"
+    bl_idname = "export_mesh.mesh"
+    bl_label = "Export Custom Mesh"
     
     # Filter file extensions
-    filename_ext = ".herremesh"
+    filename_ext = ".mesh"
     
     # Property for file path
     filepath: StringProperty(subtype="FILE_PATH")
@@ -99,7 +99,7 @@ class ExportHerreMesh(Operator, ExportHelper):
 
 # Register the operator and add it to the Export menu
 def menu_func_export(self, context):
-    self.layout.operator(ExportHerreMesh.bl_idname, text="HerreMesh (.herremesh)")
+    self.layout.operator(ExportHerreMesh.bl_idname, text="Custom Mesh (.mesh)")
 
 # Register and unregister functions
 def register():

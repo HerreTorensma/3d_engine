@@ -120,7 +120,7 @@ mesh_t load_mesh(const char path[]) {
 	// Triangle count and indices
 	fread(&mesh.index_count, sizeof(u32), 1, file);
 	
-	mesh.index_count *= 3;
+	// mesh.index_count *= 3;
 
 	printf("Index count: %u\n", mesh.index_count);
 

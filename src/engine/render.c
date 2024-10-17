@@ -12,6 +12,18 @@ static mat4 ortho_views[6] = {0};
 static camera_t *global_camera = NULL;
 static ecs_world_t *global_ecs = NULL;
 
+// static vertex_t quad_vertices[] = {
+//     {{1.0f,  1.0f, 0.0f}, {1.0f, 1.0f}},
+//     {{1.0f, -1.0f, 0.0f}, {1.0f, 0.0f}},
+//     {{-1.0f, -1.0f, 0.0f}, {0.0f, 0.0f}},
+//     {{-1.0f,  1.0f, 0.0f}, {0.0f, 1.0f}},
+// };
+// static u32 quad_indices[] = {
+//     0, 1, 3,
+//     1, 2, 3,
+// };
+// mesh_t quad_mesh = {0};
+
 static void clear(color_t color) {
 	vec4 gl_color = {0};
 	color_to_gl_color(color, gl_color);
@@ -216,7 +228,7 @@ void render_level(res_pack_t *res_pack, level_t *level, ecs_world_t *ecs, camera
 
 	glBindTexture(GL_TEXTURE_2D, fbo_tex);
 
-	mesh_t mesh = res_pack->meshes[MESH_BIG_QUAD];
+	mesh_t mesh = res_pack->meshes[MESH_QUAD];
 	glBindVertexArray(mesh.vao);
 
 	glDrawElements(GL_TRIANGLES, mesh.index_count, GL_UNSIGNED_INT, 0);

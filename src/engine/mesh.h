@@ -20,11 +20,5 @@ typedef struct mesh {
 } mesh_t;
 
 enum {
-    MESH_BIG_QUAD = 1,
-    MESH_CUBE = 2,
-    MESH_SLOPE = 3,
-    MESH_FLOOR = 4,
-    MESH_CROSS = 5,
-    MESH_QUAD = 6,
-    MESH_CORNER = 7
+    MESH_QUAD = 1,
 };

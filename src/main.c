@@ -11,16 +11,16 @@
 //     {{-1.0f,  1.0f, 0.0f}, {0.0f, 0.0f}}   // top left 
 // };
 
-static vertex_t big_quad_vertices[] = {
-    {{1.0f,  1.0f, 0.0f}, {1.0f, 1.0f}},  // top right
-    {{1.0f, -1.0f, 0.0f}, {1.0f, 0.0f}},  // bottom right
-    {{-1.0f, -1.0f, 0.0f}, {0.0f, 0.0f}},  // bottom left
-    {{-1.0f,  1.0f, 0.0f}, {0.0f, 1.0f}}   // top left 
-};
-static u32 big_quad_indices[] = {  // note that we start from 0!
-    0, 1, 3,   // first triangle
-    1, 2, 3    // second triangle
-};
+// static vertex_t big_quad_vertices[] = {
+//     {{1.0f,  1.0f, 0.0f}, {1.0f, 1.0f}},  // top right
+//     {{1.0f, -1.0f, 0.0f}, {1.0f, 0.0f}},  // bottom right
+//     {{-1.0f, -1.0f, 0.0f}, {0.0f, 0.0f}},  // bottom left
+//     {{-1.0f,  1.0f, 0.0f}, {0.0f, 1.0f}}   // top left 
+// };
+// static u32 big_quad_indices[] = {  // note that we start from 0!
+//     0, 1, 3,   // first triangle
+//     1, 2, 3    // second triangle
+// };
 
 // static vertex_t quad_vertices[] = {
 //     {{0.5f,  0.5f, 0.0f}, {1.0f, 1.0f}},  // top right
@@ -39,71 +39,71 @@ static u32 quad_indices[] = {  // note that we start from 0!
     1, 2, 3    // second triangle
 };
 
-static vertex_t cube_vertices[] = {
-    // Front face
-    {{-0.5f, -0.5f,  0.5f}, {0.0f, 0.0f}}, // Bottom-left
-    {{ 0.5f, -0.5f,  0.5f}, {1.0f, 0.0f}}, // Bottom-right
-    {{ 0.5f,  0.5f,  0.5f}, {1.0f, 1.0f}}, // Top-right
-    {{-0.5f,  0.5f,  0.5f}, {0.0f, 1.0f}}, // Top-left
+// static vertex_t cube_vertices[] = {
+//     // Front face
+//     {{-0.5f, -0.5f,  0.5f}, {0.0f, 0.0f}}, // Bottom-left
+//     {{ 0.5f, -0.5f,  0.5f}, {1.0f, 0.0f}}, // Bottom-right
+//     {{ 0.5f,  0.5f,  0.5f}, {1.0f, 1.0f}}, // Top-right
+//     {{-0.5f,  0.5f,  0.5f}, {0.0f, 1.0f}}, // Top-left
 
-    // Back face
-    {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}}, // Bottom-left
-    {{-0.5f,  0.5f, -0.5f}, {0.0f, 1.0f}}, // Top-left
-    {{ 0.5f,  0.5f, -0.5f}, {1.0f, 1.0f}}, // Top-right
-    {{ 0.5f, -0.5f, -0.5f}, {1.0f, 0.0f}}, // Bottom-right
+//     // Back face
+//     {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}}, // Bottom-left
+//     {{-0.5f,  0.5f, -0.5f}, {0.0f, 1.0f}}, // Top-left
+//     {{ 0.5f,  0.5f, -0.5f}, {1.0f, 1.0f}}, // Top-right
+//     {{ 0.5f, -0.5f, -0.5f}, {1.0f, 0.0f}}, // Bottom-right
 
-    // Left face
-    {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f}}, // Bottom-right
-    {{-0.5f, -0.5f,  0.5f}, {0.0f, 0.0f}}, // Bottom-left
-    {{-0.5f,  0.5f,  0.5f}, {0.0f, 1.0f}}, // Top-left
-    {{-0.5f,  0.5f, -0.5f}, {1.0f, 1.0f}}, // Top-right
+//     // Left face
+//     {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f}}, // Bottom-right
+//     {{-0.5f, -0.5f,  0.5f}, {0.0f, 0.0f}}, // Bottom-left
+//     {{-0.5f,  0.5f,  0.5f}, {0.0f, 1.0f}}, // Top-left
+//     {{-0.5f,  0.5f, -0.5f}, {1.0f, 1.0f}}, // Top-right
 
-    // Right face
-    {{ 0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}}, // Bottom-left
-    {{ 0.5f,  0.5f, -0.5f}, {0.0f, 1.0f}}, // Top-left
-    {{ 0.5f,  0.5f,  0.5f}, {1.0f, 1.0f}}, // Top-right
-    {{ 0.5f, -0.5f,  0.5f}, {1.0f, 0.0f}}, // Bottom-right
+//     // Right face
+//     {{ 0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}}, // Bottom-left
+//     {{ 0.5f,  0.5f, -0.5f}, {0.0f, 1.0f}}, // Top-left
+//     {{ 0.5f,  0.5f,  0.5f}, {1.0f, 1.0f}}, // Top-right
+//     {{ 0.5f, -0.5f,  0.5f}, {1.0f, 0.0f}}, // Bottom-right
 
-    // Top face
-    {{-0.5f,  0.5f, -0.5f}, {0.0f, 1.0f}}, // Top-left
-    {{-0.5f,  0.5f,  0.5f}, {0.0f, 0.0f}}, // Bottom-left
-    {{ 0.5f,  0.5f,  0.5f}, {1.0f, 0.0f}}, // Bottom-right
-    {{ 0.5f,  0.5f, -0.5f}, {1.0f, 1.0f}}, // Top-right
+//     // Top face
+//     {{-0.5f,  0.5f, -0.5f}, {0.0f, 1.0f}}, // Top-left
+//     {{-0.5f,  0.5f,  0.5f}, {0.0f, 0.0f}}, // Bottom-left
+//     {{ 0.5f,  0.5f,  0.5f}, {1.0f, 0.0f}}, // Bottom-right
+//     {{ 0.5f,  0.5f, -0.5f}, {1.0f, 1.0f}}, // Top-right
 
-    // Bottom face
-    {{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f}}, // Top-right
-    {{ 0.5f, -0.5f, -0.5f}, {0.0f, 1.0f}}, // Top-left
-    {{ 0.5f, -0.5f,  0.5f}, {0.0f, 0.0f}}, // Bottom-left
-    {{-0.5f, -0.5f,  0.5f}, {1.0f, 0.0f}}, // Bottom-right
-};
+//     // Bottom face
+//     {{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f}}, // Top-right
+//     {{ 0.5f, -0.5f, -0.5f}, {0.0f, 1.0f}}, // Top-left
+//     {{ 0.5f, -0.5f,  0.5f}, {0.0f, 0.0f}}, // Bottom-left
+//     {{-0.5f, -0.5f,  0.5f}, {1.0f, 0.0f}}, // Bottom-right
+// };
 
-static u32 cube_indices[] = {
-	// Front face
-	0, 1, 2, 2, 3, 0,
-	// Back face
-	4, 5, 6, 6, 7, 4,
-	// Left face
-	8, 9, 10, 10, 11, 8,
-	// Right face
-	12, 13, 14, 14, 15, 12,
-	// Top face
-	16, 17, 18, 18, 19, 16,
-	// Bottom face
-	20, 21, 22, 22, 23, 20,
-};
+// static u32 cube_indices[] = {
+// 	// Front face
+// 	0, 1, 2, 2, 3, 0,
+// 	// Back face
+// 	4, 5, 6, 6, 7, 4,
+// 	// Left face
+// 	8, 9, 10, 10, 11, 8,
+// 	// Right face
+// 	12, 13, 14, 14, 15, 12,
+// 	// Top face
+// 	16, 17, 18, 18, 19, 16,
+// 	// Bottom face
+// 	20, 21, 22, 22, 23, 20,
+// };
 
-static vertex_t floor_vertices[] = {
-	// Bottom face
-    {{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f}}, // Top-right
-    {{ 0.5f, -0.5f, -0.5f}, {0.0f, 1.0f}}, // Top-left
-    {{ 0.5f, -0.5f,  0.5f}, {0.0f, 0.0f}}, // Bottom-left
-    {{-0.5f, -0.5f,  0.5f}, {1.0f, 0.0f}}, // Bottom-right
-};
+// static vertex_t floor_vertices[] = {
+// 	// Bottom face
+//     {{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f}}, // Top-right
+//     {{ 0.5f, -0.5f, -0.5f}, {0.0f, 1.0f}}, // Top-left
+//     {{ 0.5f, -0.5f,  0.5f}, {0.0f, 0.0f}}, // Bottom-left
+//     {{-0.5f, -0.5f,  0.5f}, {1.0f, 0.0f}}, // Bottom-right
+// };
 
-static u32 floor_indices[] = {
-	0, 1, 2,
-	2, 3, 0,
-};
+// static u32 floor_indices[] = {
+// 	0, 1, 2,
+// 	2, 3, 0,
+// };
 
 // static vertex_t cross_vertices[] = {
 //     // First quad (aligned along YZ plane, centered at the origin)
@@ -127,70 +127,96 @@ static u32 floor_indices[] = {
 // 	6, 7, 4,
 // };
 
-static vertex_t cross_vertices[] = {
+// static vertex_t cross_vertices[] = {
 
-    // {{ 0.0f, -0.5f, -0.5f}, {0.0f, 0.0f}},  // Bottom-left
-    // {{ 0.0f,  0.5f, -0.5f}, {1.0f, 0.0f}},  // Top-left
-    // {{ 0.0f,  0.5f,  0.5f}, {1.0f, 1.0f}},  // Top-right
-    // {{ 0.0f, -0.5f,  0.5f}, {0.0f, 1.0f}},  // Bottom-right
+//     // {{ 0.0f, -0.5f, -0.5f}, {0.0f, 0.0f}},  // Bottom-left
+//     // {{ 0.0f,  0.5f, -0.5f}, {1.0f, 0.0f}},  // Top-left
+//     // {{ 0.0f,  0.5f,  0.5f}, {1.0f, 1.0f}},  // Top-right
+//     // {{ 0.0f, -0.5f,  0.5f}, {0.0f, 1.0f}},  // Bottom-right
 
-    // {{ -0.5f, -0.5f, 0.0f}, {0.0f, 0.0f}},  // Bottom-left
-    // {{ -0.5f,  0.5f, 0.0f}, {1.0f, 0.0f}},  // Top-left
-    // {{ 0.5f,  0.5f,  0.0f}, {1.0f, 1.0f}},  // Top-right
-    // {{ 0.5f, -0.5f,  0.0f}, {0.0f, 1.0f}},  // Bottom-right
+//     // {{ -0.5f, -0.5f, 0.0f}, {0.0f, 0.0f}},  // Bottom-left
+//     // {{ -0.5f,  0.5f, 0.0f}, {1.0f, 0.0f}},  // Top-left
+//     // {{ 0.5f,  0.5f,  0.0f}, {1.0f, 1.0f}},  // Top-right
+//     // {{ 0.5f, -0.5f,  0.0f}, {0.0f, 1.0f}},  // Bottom-right
 
-    {{ 0.5f,  0.5f, 0.0f}, {1.0f, 1.0f}},  // Top-right
-    {{ 0.5f, -0.5f, 0.0f}, {1.0f, 0.0f}},  // Bottom-right
-    {{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f}},  // Bottom-left
-    {{-0.5f,  0.5f, 0.0f}, {0.0f, 1.0f}},  // Top-left
+//     {{ 0.5f,  0.5f, 0.0f}, {1.0f, 1.0f}},  // Top-right
+//     {{ 0.5f, -0.5f, 0.0f}, {1.0f, 0.0f}},  // Bottom-right
+//     {{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f}},  // Bottom-left
+//     {{-0.5f,  0.5f, 0.0f}, {0.0f, 1.0f}},  // Top-left
 
-    // Second quad (YZ plane, scaled to 0.5)
-    {{ 0.0f,  0.5f,  0.5f}, {1.0f, 1.0f}},  // Top-right
-    {{ 0.0f, -0.5f,  0.5f}, {1.0f, 0.0f}},  // Bottom-right
-    {{ 0.0f, -0.5f, -0.5f}, {0.0f, 0.0f}},  // Bottom-left
-    {{ 0.0f,  0.5f, -0.5f}, {0.0f, 1.0f}},  // Top-left
+//     // Second quad (YZ plane, scaled to 0.5)
+//     {{ 0.0f,  0.5f,  0.5f}, {1.0f, 1.0f}},  // Top-right
+//     {{ 0.0f, -0.5f,  0.5f}, {1.0f, 0.0f}},  // Bottom-right
+//     {{ 0.0f, -0.5f, -0.5f}, {0.0f, 0.0f}},  // Bottom-left
+//     {{ 0.0f,  0.5f, -0.5f}, {0.0f, 1.0f}},  // Top-left
+// };
+
+// static u32 cross_indices[] = {
+//     // First quad (YZ plane)
+//     0, 1, 2,
+//     2, 3, 0,
+
+//     // Second quad (XY plane)
+//     4, 5, 6,
+//     6, 7, 4,
+// };
+
+// static vertex_t slope_vertices[] = {
+//     {{-0.5f, -0.5f, -0.5f}, {0.0f, 1.0f}}, // 0 (Bottom left)
+//     {{0.5f, -0.5f, -0.5f}, {1.0f, 1.0f}},  // 1 (Bottom right)
+//     {{0.5f, 0.5f, -0.5f}, {1.0f, 0.0f}},   // 2 (Top right)
+//     {{-0.5f, 0.5f, -0.5f}, {0.0f, 0.0f}},  // 3 (Top left)
+
+//     {{-0.5f, -0.5f, 0.5f}, {0.0f, 1.0f}},   // 4 (Bottom left)
+//     {{0.5f, -0.5f, 0.5f}, {1.0f, 1.0f}},    // 5 (Bottom right)
+//     {{0.5f, 0.5f, 0.5f}, {1.0f, 0.0f}},     // 6 (Top right)
+//     {{-0.5f, 0.5f, 0.5f}, {0.0f, 0.0f}},    // 7 (Top left)
+// };
+
+// static u32 slope_indices[] = {
+//     // Bottom face
+//     0, 1, 5,
+//     0, 5, 4,
+
+//     // Back face
+//     4, 5, 6,
+//     4, 6, 7,
+
+//     // Slope face
+//     0, 6, 7,
+//     0, 6, 1,
+
+//     // Left face
+//     0, 7, 4,
+
+//     // Right face
+//     1, 5, 6,
+// };
+
+enum {
+	MESH_CUBE = 2,
+	MESH_SLAB,
+	MESH_CORNER,
+	MESH_FLOOR,
+	MESH_PYRAMID,
+	MESH_SLOPE,
+	MESH_MONKEY,
 };
 
-static u32 cross_indices[] = {
-    // First quad (YZ plane)
-    0, 1, 2,
-    2, 3, 0,
-
-    // Second quad (XY plane)
-    4, 5, 6,
-    6, 7, 4,
+enum {
+	TEX_BRICKS = 1,
+	TEX_IRON_BARS,
+	TEX_TREE,
 };
 
-static vertex_t slope_vertices[] = {
-    {{-0.5f, -0.5f, -0.5f}, {0.0f, 1.0f}}, // 0 (Bottom left)
-    {{0.5f, -0.5f, -0.5f}, {1.0f, 1.0f}},  // 1 (Bottom right)
-    {{0.5f, 0.5f, -0.5f}, {1.0f, 0.0f}},   // 2 (Top right)
-    {{-0.5f, 0.5f, -0.5f}, {0.0f, 0.0f}},  // 3 (Top left)
-
-    {{-0.5f, -0.5f, 0.5f}, {0.0f, 1.0f}},   // 4 (Bottom left)
-    {{0.5f, -0.5f, 0.5f}, {1.0f, 1.0f}},    // 5 (Bottom right)
-    {{0.5f, 0.5f, 0.5f}, {1.0f, 0.0f}},     // 6 (Top right)
-    {{-0.5f, 0.5f, 0.5f}, {0.0f, 0.0f}},    // 7 (Top left)
-};
-
-static u32 slope_indices[] = {
-    // Bottom face
-    0, 1, 5,
-    0, 5, 4,
-
-    // Back face
-    4, 5, 6,
-    4, 6, 7,
-
-    // Slope face
-    0, 6, 7,
-    0, 6, 1,
-
-    // Left face
-    0, 7, 4,
-
-    // Right face
-    1, 5, 6,
+enum {
+	TILE_BRICK_CUBE = 1,
+	TILE_BRICK_SLAB,
+	TILE_BRICK_CORNER,
+	TILE_BRICK_FLOOR,
+	TILE_BRICK_PYRAMID,
+	TILE_BRICK_SLOPE,
+	TILE_BRICK_MONKEY,
 };
 
 static camera_t create_camera() {
@@ -227,7 +253,7 @@ void game_input(SDL_Event event) {
 
 		vec3 front = {0};
 		front[0] = cosf(glm_rad(camera.yaw)) * cosf(glm_rad(camera.pitch));
-		// front[1] = sinf(glm_rad(camera.pitch));
+		front[1] = sinf(glm_rad(camera.pitch));
 		front[2] = sinf(glm_rad(camera.yaw)) * cosf(glm_rad(camera.pitch));
 
 		glm_vec3_normalize(front);
@@ -288,10 +314,6 @@ void game_update() {
 	}
 }
 
-// enum {
-// 	TEX_GRASS,
-// };
-
 #define FPS 120
 
 int main(int argc, char *argv[]) {
@@ -342,99 +364,63 @@ int main(int argc, char *argv[]) {
 	glViewport(0, 0, window_width, window_height);
 
 	res_pack_t res_pack = {0};
-    // glClearColor(0.227f, 0.192f, 0.161f, 1.0f);
 	res_pack.sky_color = (color_t){58, 49, 41, 255};
 	res_pack.fog_color = (color_t){58, 49, 41, 255};
 	res_pack.editor_color = (color_t){50, 50, 50, 255};
-	// compute_gl_color(&res_pack.sky_color);
-	// compute_gl_color(&res_pack.fog_color);
-	// compute_gl_color(&res_pack.editor_color);
 
-	// printf("r: %f\n", res_pack.sky_color.gl_color[0]);
+	res_add_texture(&res_pack, TEX_BRICKS, "res/images/bricks.tga");
+	res_add_texture(&res_pack, TEX_IRON_BARS, "res/images/iron_bars.tga");
+	res_add_texture(&res_pack, TEX_TREE, "res/images/tree.tga");
 
-	res_add_texture(&res_pack, 1, "res/images/green.tga");
-	res_add_texture(&res_pack, 2, "res/images/test.tga");
-	res_add_texture(&res_pack, 3, "res/images/fire.tga");
-	res_add_texture(&res_pack, 4, "res/images/bricks.tga");
-	res_add_texture(&res_pack, 5, "res/images/iron_bars.tga");
-	res_add_texture(&res_pack, 6, "res/images/tree.tga");
-
-	// mesh_t weird_mesh = load_mesh("res/meshes/sphere.herremesh");
-	// mesh_t weird_mesh = load_mesh("res/meshes/test3.mesh");
-	// mesh_t weird_mesh = load_mesh("res/meshes/sphere2.herremesh");
-	// mesh_t weird_mesh = load_mesh("res/meshes/barrel.herremesh");
-	// mesh_t weird_mesh = load_mesh("res/meshes/monkey.herremesh");
-	// mesh_t weird_mesh = load_mesh("res/meshes/pyramid.herremesh");
-	mesh_t weird_mesh = load_mesh("res/meshes/monkey.herremesh");
-
-	mesh_t corner_mesh = load_mesh("res/meshes/corner.herremesh");
-
-	mesh_t cube_mesh = load_mesh("res/meshes/cube.herremesh");
-
-	res_add_mesh_raw(&res_pack, MESH_BIG_QUAD, big_quad_vertices, sizeof(big_quad_vertices) / sizeof(vertex_t), big_quad_indices, sizeof(big_quad_indices) / sizeof(u32));
-	// res_add_mesh_raw(&res_pack, MESH_CUBE, cube_vertices, sizeof(cube_vertices) / sizeof(vertex_t), cube_indices, sizeof(cube_indices) / sizeof(u32));
-	res_add_mesh_raw(&res_pack, MESH_SLOPE, slope_vertices, sizeof(slope_vertices) / sizeof(vertex_t), slope_indices, sizeof(slope_indices) / sizeof(u32));
-	res_add_mesh_raw(&res_pack, MESH_FLOOR, floor_vertices, sizeof(floor_vertices) / sizeof(vertex_t), floor_indices, sizeof(floor_indices) / sizeof(u32));
-	res_add_mesh_raw(&res_pack, MESH_CROSS, cross_vertices, sizeof(cross_vertices) / sizeof(vertex_t), cross_indices, sizeof(cross_indices) / sizeof(u32));
 	res_add_mesh_raw(&res_pack, MESH_QUAD, quad_vertices, sizeof(quad_vertices) / sizeof(vertex_t), quad_indices, sizeof(quad_indices) / sizeof(u32));
+	res_add_mesh(&res_pack, MESH_CUBE, load_mesh("res/meshes/cube.mesh"));
+	res_add_mesh(&res_pack, MESH_FLOOR, load_mesh("res/meshes/floor.mesh"));
+	res_add_mesh(&res_pack, MESH_SLAB, load_mesh("res/meshes/slab.mesh"));
+	res_add_mesh(&res_pack, MESH_SLOPE, load_mesh("res/meshes/slope.mesh"));
+	res_add_mesh(&res_pack, MESH_PYRAMID, load_mesh("res/meshes/pyramid.mesh"));
+	res_add_mesh(&res_pack, MESH_CORNER, load_mesh("res/meshes/corner.mesh"));
+	res_add_mesh(&res_pack, MESH_MONKEY, load_mesh("res/meshes/monkey.mesh"));
+
+	res_pack.tiles[TILE_BRICK_CUBE] = (tile_t) {
+		.mesh_index = MESH_CUBE,
+		.texture_index = TEX_BRICKS,
+		.rotation = {0},
+	};
 	
-	res_add_mesh(&res_pack, 20, weird_mesh);
-	res_add_mesh(&res_pack, MESH_CUBE, cube_mesh);
-	res_add_mesh(&res_pack, MESH_CORNER, corner_mesh);
-
-	res_pack.tiles[1] = (tile_t){
-		.mesh_index = MESH_CUBE,
-		.texture_index = 4,
-		.rotation = {0},
-	};
-
-	res_pack.tiles[2] = (tile_t){
-		.mesh_index = MESH_CUBE,
-		.texture_index = 1,
-		.rotation = {0},
-	};
-
-	res_pack.tiles[3] = (tile_t){
-		.mesh_index = MESH_SLOPE,
-		.texture_index = 2,
-		.rotation = {0.0f, 90.0f, 0.0f},
-	};
-
-	res_pack.tiles[4] = (tile_t){
+	res_pack.tiles[TILE_BRICK_FLOOR] = (tile_t) {
 		.mesh_index = MESH_FLOOR,
-		.texture_index = 1,
+		.texture_index = TEX_BRICKS,
 		.rotation = {0},
 	};
 
-	res_pack.tiles[5] = (tile_t) {
-		.mesh_index = MESH_CROSS,
-		.texture_index = 3,
+	res_pack.tiles[TILE_BRICK_SLAB] = (tile_t) {
+		.mesh_index = MESH_SLAB,
+		.texture_index = TEX_BRICKS,
 		.rotation = {0},
 	};
 
-	res_pack.tiles[6] = (tile_t) {
-		.mesh_index = MESH_QUAD,
-		.texture_index = 6,
+	res_pack.tiles[TILE_BRICK_SLOPE] = (tile_t) {
+		.mesh_index = MESH_SLOPE,
+		.texture_index = TEX_BRICKS,
 		.rotation = {0},
 	};
 
-	// Iron bars
-	res_pack.tiles[7] = (tile_t) {
-		.mesh_index = MESH_QUAD,
-		.texture_index = 5,
+	res_pack.tiles[TILE_BRICK_PYRAMID] = (tile_t) {
+		.mesh_index = MESH_PYRAMID,
+		.texture_index = TEX_BRICKS,
 		.rotation = {0},
 	};
 
-	res_pack.tiles[8] = (tile_t) {
-		.mesh_index = 20,
-		.texture_index = 4,
-		.rotation = {0},
-	};
-
-	res_pack.tiles[9] = (tile_t) {
+	res_pack.tiles[TILE_BRICK_CORNER] = (tile_t) {
 		.mesh_index = MESH_CORNER,
-		.texture_index = 4,
-		.rotation = {0.0f, 180.0f, 0.0f},
+		.texture_index = TEX_BRICKS,
+		.rotation = {0},
+	};
+
+	res_pack.tiles[TILE_BRICK_MONKEY] = (tile_t) {
+		.mesh_index = MESH_MONKEY,
+		.texture_index = TEX_BRICKS,
+		.rotation = {0},
 	};
 
 	level_t level = {0};
@@ -442,56 +428,32 @@ int main(int argc, char *argv[]) {
 	level.height = 16;
 	level.depth = 16;
 
-	// level.map[6] = 1;
-	// level.map[2] = 1;
-	// level.map[4] = 1;
-	// level.map[0] = 2;
-	// level.map[8] = 3;
-	// level.map[9] = 4;
-	// level.map[10] = 5;
+	level_set_tile_index(&level, TILE_BRICK_CUBE, 0, 0, 0);
+	level_set_tile_index(&level, TILE_BRICK_CUBE, 1, 0, 0);
+	// level_set_tile_index(&level, TILE_BRICK_CUBE, 2, 0, 0);
+	level_set_tile_index(&level, TILE_BRICK_CUBE, 3, 0, 0);
+	level_set_tile_index(&level, TILE_BRICK_CUBE, 4, 0, 0);
+	level_set_tile_index(&level, TILE_BRICK_CUBE, 5, 0, 0);
+	level_set_tile_index(&level, TILE_BRICK_CUBE, 6, 0, 0);
+	level_set_tile_index(&level, TILE_BRICK_CUBE, 7, 0, 0);
+	level_set_tile_index(&level, TILE_BRICK_CUBE, 8, 0, 0);
+	level_set_tile_index(&level, TILE_BRICK_CUBE, 9, 0, 0);
 
-	level_set_tile_index(&level, 1, 0, 0, 0);
-	level_set_tile_index(&level, 1, 1, 0, 0);
+	level_set_tile_index(&level, TILE_BRICK_CUBE, 7, 1, 0);
+	level_set_tile_index(&level, TILE_BRICK_CUBE, 8, 1, 0);
+	level_set_tile_index(&level, TILE_BRICK_CUBE, 9, 1, 0);
 
-	// Iron bars
-	// level_set_tile_index(&level, 7, 2, 0, 0);
-
-	// level_set_tile_index(&level, 8, 2, 1, 1);
-	level_set_tile_index(&level, 1, 3, 0, 0);
-	level_set_tile_index(&level, 1, 4, 0, 0);
-	level_set_tile_index(&level, 1, 4, 1, 0);
-	level_set_tile_index(&level, 1, 4, 0, 1);
-	level_set_tile_index(&level, 1, 4, 0, 2);
-	level_set_tile_index(&level, 1, 4, 0, 3);
-	level_set_tile_index(&level, 1, 4, 0, 4);
-
-	level_set_tile_index(&level, 9, 3, 0, 1);
-
-
-	level_set_tile_index(&level, 1, 1, 1, 0);
-	level_set_tile_index(&level, 1, 2, 1, 0);
-	level_set_tile_index(&level, 1, 3, 1, 0);
-
-	level_set_tile_index(&level, 1, 4, 1, 4);
-	level_set_tile_index(&level, 1, 4, 2, 4);
-	level_set_tile_index(&level, 1, 4, 3, 4);
-	level_set_tile_index(&level, 1, 4, 4, 4);
-	level_set_tile_index(&level, 1, 4, 5, 4);
-	level_set_tile_index(&level, 1, 4, 6, 4);
-	level_set_tile_index(&level, 1, 4, 7, 4);
-	level_set_tile_index(&level, 1, 4, 8, 4);
-	level_set_tile_index(&level, 1, 4, 9, 4);
-	level_set_tile_index(&level, 1, 4, 10, 4);
-
-	// level_set_tile_index(&level, 9, 5, 9, 4);
-
-	// level_set_tile_index(&level, 2, 5, 0, 4);
-	// level_set_tile_index(&level, 3, 6, 0, 4);
-	// level_set_tile_index(&level, 4, 7, 0, 4);
-	// level_set_tile_index(&level, 5, 8, 0, 4);
-	// level_set_tile_index(&level, 6, 10, 0, 4);
-	// level_set_tile_index(&level, 8, 11, 0, 4);
-	// level_set_tile_index(&level, 6, 9, 0, 4);
+	level_set_tile_index(&level, TILE_BRICK_CUBE, 9, 0, 1);
+	level_set_tile_index(&level, TILE_BRICK_CUBE, 9, 0, 2);
+	level_set_tile_index(&level, TILE_BRICK_CUBE, 9, 0, 3);
+	level_set_tile_index(&level, TILE_BRICK_CUBE, 9, 0, 4);
+	
+	level_set_tile_index(&level, TILE_BRICK_SLOPE, 10, 0, 4);
+	level_set_tile_index(&level, TILE_BRICK_FLOOR, 11, 0, 4);
+	level_set_tile_index(&level, TILE_BRICK_PYRAMID, 12, 0, 4);
+	level_set_tile_index(&level, TILE_BRICK_SLAB, 13, 0, 4);
+	level_set_tile_index(&level, TILE_BRICK_CORNER, 14, 0, 4);
+	level_set_tile_index(&level, TILE_BRICK_MONKEY, 15, 0, 4);
 
 	camera = create_camera();
 
@@ -514,17 +476,17 @@ int main(int argc, char *argv[]) {
 		transform->position[1] = 0.0f;
 		transform->position[2] = 10.0f + i;
 
-		ECS_SET(&ecs, tree, sprite_c, {6, false});
+		ECS_SET(&ecs, tree, sprite_c, {TEX_TREE, false});
 	}
 
 	// Iron bars
-	for (int i = 0; i < 10000; i++) {
+	for (int i = 0; i < 1; i++) {
 		entity_t bars = ecs_new(&ecs);
 		transform_c *transform = ECS_SET(&ecs, bars, transform_c, {0});
 		transform->position[0] = 2.0f;
 		transform->position[1] = 0.0f;
 		transform->position[2] = 0.0f + i;
-		ECS_SET(&ecs, bars, sprite_c, {5, false});
+		ECS_SET(&ecs, bars, sprite_c, {TEX_IRON_BARS, false});
 
 	}
 

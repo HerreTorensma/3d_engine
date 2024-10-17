@@ -4,3 +4,5 @@ game.exe
 .DS_Store
 *.o
 backup
+*.blend1
+*.blend2
