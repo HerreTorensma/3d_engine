@@ -1,6 +1,6 @@
 .vscode
-game
-game.exe
+/game
+/game.exe
 .DS_Store
 *.o
 backup
