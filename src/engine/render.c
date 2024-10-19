@@ -217,12 +217,20 @@ void render_level(res_pack_t *res_pack, level_t *level, ecs_world_t *ecs, camera
 
 		mat4 model;
 		glm_mat4_identity(model);
-		glm_translate(model, (vec3){transform->position[0], transform->position[1], transform->position[2]});
+		glm_translate(model, transform->position);
 		glm_scale(model, (vec3){0.5f, 0.5f, 0.5f});
-		// glm_translate(model, (vec3){x * 2.0, y * 2.0, z * 2.0});
-		// glm_rotate(model, glm_rad(tile.rotation[0]), (vec3){1.0f, 0.0f, 0.0f});
-		// glm_rotate(model, glm_rad(tile.rotation[1]), (vec3){0.0f, 1.0f, 0.0f});
-		// glm_rotate(model, glm_rad(tile.rotation[2]), (vec3){0.0f, 0.0f, 1.0f});
+
+		glm_rotate(model, glm_rad(transform->rotation[0]), (vec3){1.0f, 0.0f, 0.0f});
+		glm_rotate(model, glm_rad(transform->rotation[1]), (vec3){0.0f, 1.0f, 0.0f});
+		glm_rotate(model, glm_rad(transform->rotation[2]), (vec3){0.0f, 0.0f, 1.0f});
+
+		if (sprite->billboard) {
+			vec3 direction = {camera->position[0] - transform->position[0], 0.0f, camera->position[2] - transform->position[2]};
+			glm_normalize(direction);
+			float angle = atan2(direction[0], direction[2]);
+			glm_rotate(model, angle, (vec3){0.0f, 1.0f, 0.0f});
+		}
+
 		shader_set_mat4(game_shader, "model", &model);
 
 		// Draw quad with texture

@@ -476,7 +476,7 @@ int main(int argc, char *argv[]) {
 		transform->position[1] = 0.0f;
 		transform->position[2] = 10.0f + i;
 
-		ECS_SET(&ecs, tree, sprite_c, {TEX_TREE, false});
+		ECS_SET(&ecs, tree, sprite_c, {TEX_TREE, true});
 	}
 
 	// Iron bars
@@ -486,6 +486,8 @@ int main(int argc, char *argv[]) {
 		transform->position[0] = 2.0f;
 		transform->position[1] = 0.0f;
 		transform->position[2] = 0.0f + i;
+
+		transform->rotation[1] = 90.0f;
 		ECS_SET(&ecs, bars, sprite_c, {TEX_IRON_BARS, false});
 
 	}
