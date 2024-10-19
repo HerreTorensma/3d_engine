@@ -9,6 +9,8 @@ static u32 fbo_tex = 0;
 
 static mat4 ortho_views[6] = {0};
 
+static mat4 isometric_view = {0};
+
 static camera_t *global_camera = NULL;
 static ecs_world_t *global_ecs = NULL;
 
@@ -31,6 +33,19 @@ static void clear(color_t color) {
 }
 
 void render_init(void) {
+	{
+		vec3 camera_pos = {10.0f, 10.0f, 10.0f};  // Camera position (above looking down)
+		// vec3 camera_pos = {0.0f, 10.0f, 10.0f};  // Camera position (above looking down)
+		vec3 target_pos = {0.0f, 0.0f, 0.0f};   // Looking at the origin
+		vec3 up_vector  = {0.0f, 1.0f, 0.0f};  // Up vector (in Blender's coordinate system)
+
+		camera_pos[0] *= cosf(glm_rad(45.0f));
+		camera_pos[1] *= sinf(glm_rad(30.0f));
+		camera_pos[2] *= sinf(glm_rad(45.0f));
+
+		glm_lookat(camera_pos, target_pos, up_vector, isometric_view);
+	}
+
 	{
 		vec3 camera_pos = {0.0f, 10.0f, 0.0f};  // Camera position (above looking down)
 		vec3 target_pos = {0.0f, 0.0f, 0.0f};   // Looking at the origin
@@ -248,7 +263,8 @@ void render_level_ortho(res_pack_t *res_pack, level_t *level, enum ortho_view or
     glUseProgram(ortho_shader);
 
     // shader_set_mat4(game_shader, "view", current_view);
-    shader_set_mat4(ortho_shader, "view", &ortho_views[orientation]);
+    // shader_set_mat4(ortho_shader, "view", &ortho_views[orientation]);
+    shader_set_mat4(ortho_shader, "view", &isometric_view);
 
 	// Projection matrix
 	mat4 projection = {0};
