@@ -45,4 +45,16 @@ typedef struct {
 typedef struct {
 	size_t texture_index;
 	bool billboard;
+
+    float x_scale;
+    float y_scale;
 } sprite_c;
+
+typedef struct {
+    size_t mesh_index;
+    size_t texture_index;
+} mesh_c;
+
+typedef struct {
+    vec3 speed;
+} rotating_c;

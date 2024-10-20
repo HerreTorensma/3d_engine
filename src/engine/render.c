@@ -115,6 +115,14 @@ int compare_by_distance(const void *a, const void *b) {
 	}
 }
 
+static void render_mesh_components() {
+
+}
+
+static void render_sprites() {
+
+}
+
 void render_level(res_pack_t *res_pack, level_t *level, ecs_world_t *ecs, camera_t *camera) {
 	// Frame buffer stuff
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -205,7 +213,35 @@ void render_level(res_pack_t *res_pack, level_t *level, ecs_world_t *ecs, camera
 			}
 		}
 	}
-	
+
+	{
+		ecs_query_t query = ecs_query1(ecs, "transform_c", "mesh_c", NULL);
+		for (size_t i = 0; i < query.length; i++) {
+			mesh_c *mesh_component = ECS_GET(ecs, query.entities[i], mesh_c);
+			transform_c *transform = ECS_GET(ecs, query.entities[i], transform_c);
+
+			mesh_t mesh = res_pack->meshes[mesh_component->mesh_index];
+
+			mat4 model;
+			glm_mat4_identity(model);
+			glm_translate(model, transform->position);
+			glm_scale(model, (vec3){0.5f, 0.5f, 0.5f});
+
+			glm_rotate(model, glm_rad(transform->rotation[0]), (vec3){1.0f, 0.0f, 0.0f});
+			glm_rotate(model, glm_rad(transform->rotation[1]), (vec3){0.0f, 1.0f, 0.0f});
+			glm_rotate(model, glm_rad(transform->rotation[2]), (vec3){0.0f, 0.0f, 1.0f});
+
+			shader_set_mat4(game_shader, "model", &model);
+
+			glBindVertexArray(mesh.vao);
+			glBindTexture(GL_TEXTURE_2D, mesh_component->texture_index);
+			glActiveTexture(GL_TEXTURE0);
+
+			glDrawElements(GL_TRIANGLES, mesh.index_count, GL_UNSIGNED_INT, 0);
+			glBindVertexArray(0);
+		}
+	}
+
 	// Transparent stuff
 	ecs_query_t query = ecs_query1(ecs, "transform_c", "sprite_c", NULL);
 	qsort(query.entities, query.length, sizeof(entity_t), compare_by_distance);
@@ -217,8 +253,8 @@ void render_level(res_pack_t *res_pack, level_t *level, ecs_world_t *ecs, camera
 
 		mat4 model;
 		glm_mat4_identity(model);
-		glm_translate(model, transform->position);
-		glm_scale(model, (vec3){0.5f, 0.5f, 0.5f});
+		glm_translate(model, (vec3){transform->position[0], transform->position[1] + ((sprite->y_scale - 1) / 2), transform->position[2]});
+		glm_scale(model, (vec3){0.5f * sprite->x_scale, 0.5f * sprite->y_scale, 0.5f});
 
 		glm_rotate(model, glm_rad(transform->rotation[0]), (vec3){1.0f, 0.0f, 0.0f});
 		glm_rotate(model, glm_rad(transform->rotation[1]), (vec3){0.0f, 1.0f, 0.0f});
@@ -270,9 +306,8 @@ void render_level_ortho(res_pack_t *res_pack, level_t *level, enum ortho_view or
 
     glUseProgram(ortho_shader);
 
-    // shader_set_mat4(game_shader, "view", current_view);
-    // shader_set_mat4(ortho_shader, "view", &ortho_views[orientation]);
-    shader_set_mat4(ortho_shader, "view", &isometric_view);
+    shader_set_mat4(ortho_shader, "view", &ortho_views[orientation]);
+    // shader_set_mat4(ortho_shader, "view", &isometric_view);
 
 	// Projection matrix
 	mat4 projection = {0};

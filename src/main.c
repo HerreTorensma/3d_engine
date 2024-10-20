@@ -207,6 +207,8 @@ enum {
 	TEX_BRICKS = 1,
 	TEX_IRON_BARS,
 	TEX_TREE,
+	TEX_BIRCH,
+	TEX_DIRT,
 };
 
 enum {
@@ -217,12 +219,14 @@ enum {
 	TILE_BRICK_PYRAMID,
 	TILE_BRICK_SLOPE,
 	TILE_BRICK_MONKEY,
+	TILE_DIRT_FLOOR,
 };
 
 static camera_t create_camera() {
 	camera_t camera = {0};
 
-	glm_vec3_copy((vec3){0.0f, 0.0f, 3.0f}, camera.position);
+	// glm_vec3_copy((vec3){0.0f, 0.0f, 3.0f}, camera.position);
+	glm_vec3_copy((vec3){0.0f, 0.3f, 3.0f}, camera.position);
 	glm_vec3_copy((vec3){0.0f, 0.0f, -1.0f}, camera.front);
 	glm_vec3_copy((vec3){0.0f, 1.0f, 0.0f}, camera.up);
 
@@ -261,8 +265,20 @@ void game_input(SDL_Event event) {
 	}
 }
 
-void game_update() {
-	float camera_speed = 0.1f;
+static void rotating_system(ecs_world_t *ecs) {
+	ecs_query_t query = ecs_query1(ecs, "transform_c", "rotating_c", NULL);
+	for (size_t i = 0; i < query.length; i++) {
+		transform_c *transform = ECS_GET(ecs, query.entities[i], transform_c);
+		rotating_c *rotating = ECS_GET(ecs, query.entities[i], rotating_c);
+
+		transform->rotation[0] += rotating->speed[0];
+		transform->rotation[1] += rotating->speed[1];
+		transform->rotation[2] += rotating->speed[2];
+	}
+}
+
+void game_update(ecs_world_t *ecs) {
+	float camera_speed = 0.05f;
 	// if (input_key_held(SDL_SCANCODE_W)) {
 	// 	vec3 temp;
 	// 	glm_vec3_scale(camera.front, camera_speed, temp);
@@ -312,6 +328,8 @@ void game_update() {
 		glm_vec3_scale(temp, camera_speed, temp2);
 		glm_vec3_add(camera.position, temp2, camera.position);
 	}
+
+	rotating_system(ecs);
 }
 
 #define FPS 120
@@ -371,6 +389,8 @@ int main(int argc, char *argv[]) {
 	res_add_texture(&res_pack, TEX_BRICKS, "res/images/bricks.tga");
 	res_add_texture(&res_pack, TEX_IRON_BARS, "res/images/iron_bars.tga");
 	res_add_texture(&res_pack, TEX_TREE, "res/images/tree.tga");
+	res_add_texture(&res_pack, TEX_BIRCH, "res/images/birch.tga");
+	res_add_texture(&res_pack, TEX_DIRT, "res/images/dirt.tga");
 
 	res_add_mesh_raw(&res_pack, MESH_QUAD, quad_vertices, sizeof(quad_vertices) / sizeof(vertex_t), quad_indices, sizeof(quad_indices) / sizeof(u32));
 	res_add_mesh(&res_pack, MESH_CUBE, load_mesh("res/meshes/cube.mesh"));
@@ -423,10 +443,22 @@ int main(int argc, char *argv[]) {
 		.rotation = {0},
 	};
 
+	res_pack.tiles[TILE_DIRT_FLOOR] = (tile_t) {
+		.mesh_index = MESH_FLOOR,
+		.texture_index = TEX_DIRT,
+		.rotation = {0},
+	};
+
 	level_t level = {0};
 	level.width = 16;
 	level.height = 16;
 	level.depth = 16;
+
+	for (int z = 0; z < 16; z++) {
+		for (int x = 0; x < 16; x++) {
+			level_set_tile_index(&level, TILE_DIRT_FLOOR, x, 0, z);
+		}
+	}
 
 	level_set_tile_index(&level, TILE_BRICK_CUBE, 0, 0, 0);
 	level_set_tile_index(&level, TILE_BRICK_CUBE, 1, 0, 0);
@@ -468,15 +500,17 @@ int main(int argc, char *argv[]) {
 	ecs_world_t ecs = ecs_create();
 	ECS_REGISTER_COMPONENT(&ecs, transform_c);
 	ECS_REGISTER_COMPONENT(&ecs, sprite_c);
+	ECS_REGISTER_COMPONENT(&ecs, mesh_c);
+	ECS_REGISTER_COMPONENT(&ecs, rotating_c);
 
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 10000; i++) {
 		entity_t tree = ecs_new(&ecs);
 		transform_c *transform = ECS_SET(&ecs, tree, transform_c, {0});
 		transform->position[0] = 10.0f;
 		transform->position[1] = 0.0f;
-		transform->position[2] = 10.0f + i;
+		transform->position[2] = 5.0f + i;
 
-		ECS_SET(&ecs, tree, sprite_c, {TEX_TREE, true});
+		ECS_SET(&ecs, tree, sprite_c, {TEX_BIRCH, true, 1.0f, 2.0f});
 	}
 
 	// Iron bars
@@ -487,9 +521,29 @@ int main(int argc, char *argv[]) {
 		transform->position[1] = 0.0f;
 		transform->position[2] = 0.0f + i;
 
-		transform->rotation[1] = 90.0f;
-		ECS_SET(&ecs, bars, sprite_c, {TEX_IRON_BARS, false});
+		// transform->rotation[1] = 90.0f;
+		ECS_SET(&ecs, bars, sprite_c, {TEX_IRON_BARS, false, 1.0f, 1.0f});
 
+	}
+
+	{
+		entity_t monke = ecs_new(&ecs);
+		transform_c *transform = ECS_SET(&ecs, monke, transform_c, {0});
+		mesh_c *mesh = ECS_SET(&ecs, monke, mesh_c, {0});
+		rotating_c *rotating = ECS_SET(&ecs, monke, rotating_c, {0});
+
+		rotating->speed[0] = 1.0f;
+		// rotating->speed[1] = 1.0f;
+		// rotating->speed[2] = 1.0f;
+
+		transform->position[0] = 1.0f;
+		transform->position[1] = 1.0f;
+		transform->position[2] = 1.0f;
+
+		transform->rotation[1] = 45.0f;
+
+		mesh->mesh_index = MESH_MONKEY;
+		mesh->texture_index = TEX_BRICKS;
 	}
 
 	render_init();
@@ -543,7 +597,7 @@ int main(int argc, char *argv[]) {
 		if (edit_mode) {
 			editor_update();
 		} else {
-			game_update();
+			game_update(&ecs);
 		}
 
 		if (edit_mode) {
