@@ -15,6 +15,9 @@ typedef struct res_pack {
 	color_t sky_color;
 	color_t editor_color;
 
+	u32 render_width;
+	u32 render_height;
+
     mesh_t meshes[256];
     u32 texture_ids[256];
 

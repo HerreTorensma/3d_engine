@@ -36,11 +36,13 @@ enum ortho_view {
     ORTHO_RIGHT,
 };
 
-typedef struct {
+typedef struct transform {
 	vec3 position;
 	vec3 rotation;
 	vec3 scale;
-} transform_c;
+} transform_t;
+
+typedef transform_t transform_c;
 
 typedef struct {
 	size_t texture_index;

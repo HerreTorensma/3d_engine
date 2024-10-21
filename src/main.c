@@ -4,30 +4,6 @@
 #include "engine/editor.h"
 #include "engine/ecs.h"
 
-// static vertex_t quad_vertices[] = {
-//     {{1.0f,  1.0f, 0.0f}, {1.0f, 0.0f}},  // top right
-//     {{1.0f, -1.0f, 0.0f}, {1.0f, 1.0f}},  // bottom right
-//     {{-1.0f, -1.0f, 0.0f}, {0.0f, 1.0f}},  // bottom left
-//     {{-1.0f,  1.0f, 0.0f}, {0.0f, 0.0f}}   // top left 
-// };
-
-// static vertex_t big_quad_vertices[] = {
-//     {{1.0f,  1.0f, 0.0f}, {1.0f, 1.0f}},  // top right
-//     {{1.0f, -1.0f, 0.0f}, {1.0f, 0.0f}},  // bottom right
-//     {{-1.0f, -1.0f, 0.0f}, {0.0f, 0.0f}},  // bottom left
-//     {{-1.0f,  1.0f, 0.0f}, {0.0f, 1.0f}}   // top left 
-// };
-// static u32 big_quad_indices[] = {  // note that we start from 0!
-//     0, 1, 3,   // first triangle
-//     1, 2, 3    // second triangle
-// };
-
-// static vertex_t quad_vertices[] = {
-//     {{0.5f,  0.5f, 0.0f}, {1.0f, 1.0f}},  // top right
-//     {{0.5f, -0.5f, 0.0f}, {1.0f, 0.0f}},  // bottom right
-//     {{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f}},  // bottom left
-//     {{-0.5f,  0.5f, 0.0f}, {0.0f, 1.0f}}   // top left 
-// };
 static vertex_t quad_vertices[] = {
     {{1.0f,  1.0f, 0.0f}, {1.0f, 1.0f}},  // top right
     {{1.0f, -1.0f, 0.0f}, {1.0f, 0.0f}},  // bottom right
@@ -39,160 +15,6 @@ static u32 quad_indices[] = {  // note that we start from 0!
     1, 2, 3    // second triangle
 };
 
-// static vertex_t cube_vertices[] = {
-//     // Front face
-//     {{-0.5f, -0.5f,  0.5f}, {0.0f, 0.0f}}, // Bottom-left
-//     {{ 0.5f, -0.5f,  0.5f}, {1.0f, 0.0f}}, // Bottom-right
-//     {{ 0.5f,  0.5f,  0.5f}, {1.0f, 1.0f}}, // Top-right
-//     {{-0.5f,  0.5f,  0.5f}, {0.0f, 1.0f}}, // Top-left
-
-//     // Back face
-//     {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}}, // Bottom-left
-//     {{-0.5f,  0.5f, -0.5f}, {0.0f, 1.0f}}, // Top-left
-//     {{ 0.5f,  0.5f, -0.5f}, {1.0f, 1.0f}}, // Top-right
-//     {{ 0.5f, -0.5f, -0.5f}, {1.0f, 0.0f}}, // Bottom-right
-
-//     // Left face
-//     {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f}}, // Bottom-right
-//     {{-0.5f, -0.5f,  0.5f}, {0.0f, 0.0f}}, // Bottom-left
-//     {{-0.5f,  0.5f,  0.5f}, {0.0f, 1.0f}}, // Top-left
-//     {{-0.5f,  0.5f, -0.5f}, {1.0f, 1.0f}}, // Top-right
-
-//     // Right face
-//     {{ 0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}}, // Bottom-left
-//     {{ 0.5f,  0.5f, -0.5f}, {0.0f, 1.0f}}, // Top-left
-//     {{ 0.5f,  0.5f,  0.5f}, {1.0f, 1.0f}}, // Top-right
-//     {{ 0.5f, -0.5f,  0.5f}, {1.0f, 0.0f}}, // Bottom-right
-
-//     // Top face
-//     {{-0.5f,  0.5f, -0.5f}, {0.0f, 1.0f}}, // Top-left
-//     {{-0.5f,  0.5f,  0.5f}, {0.0f, 0.0f}}, // Bottom-left
-//     {{ 0.5f,  0.5f,  0.5f}, {1.0f, 0.0f}}, // Bottom-right
-//     {{ 0.5f,  0.5f, -0.5f}, {1.0f, 1.0f}}, // Top-right
-
-//     // Bottom face
-//     {{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f}}, // Top-right
-//     {{ 0.5f, -0.5f, -0.5f}, {0.0f, 1.0f}}, // Top-left
-//     {{ 0.5f, -0.5f,  0.5f}, {0.0f, 0.0f}}, // Bottom-left
-//     {{-0.5f, -0.5f,  0.5f}, {1.0f, 0.0f}}, // Bottom-right
-// };
-
-// static u32 cube_indices[] = {
-// 	// Front face
-// 	0, 1, 2, 2, 3, 0,
-// 	// Back face
-// 	4, 5, 6, 6, 7, 4,
-// 	// Left face
-// 	8, 9, 10, 10, 11, 8,
-// 	// Right face
-// 	12, 13, 14, 14, 15, 12,
-// 	// Top face
-// 	16, 17, 18, 18, 19, 16,
-// 	// Bottom face
-// 	20, 21, 22, 22, 23, 20,
-// };
-
-// static vertex_t floor_vertices[] = {
-// 	// Bottom face
-//     {{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f}}, // Top-right
-//     {{ 0.5f, -0.5f, -0.5f}, {0.0f, 1.0f}}, // Top-left
-//     {{ 0.5f, -0.5f,  0.5f}, {0.0f, 0.0f}}, // Bottom-left
-//     {{-0.5f, -0.5f,  0.5f}, {1.0f, 0.0f}}, // Bottom-right
-// };
-
-// static u32 floor_indices[] = {
-// 	0, 1, 2,
-// 	2, 3, 0,
-// };
-
-// static vertex_t cross_vertices[] = {
-//     // First quad (aligned along YZ plane, centered at the origin)
-//     {{ 0.0f, -0.5f, -0.5f}, {0.0f, 0.0f}},  // Bottom-left
-//     {{ 0.0f,  0.5f, -0.5f}, {1.0f, 0.0f}},  // Top-left
-//     {{ 0.0f,  0.5f,  0.5f}, {1.0f, 1.0f}},  // Top-right
-//     {{ 0.0f, -0.5f,  0.5f}, {0.0f, 1.0f}},  // Bottom-right
-
-//     // Second quad (aligned along XY plane, centered at the origin)
-//     {{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f}},  // Bottom-left
-//     {{ 0.5f, -0.5f, 0.0f}, {1.0f, 0.0f}},  // Bottom-right
-//     {{ 0.5f,  0.5f, 0.0f}, {1.0f, 1.0f}},  // Top-right
-//     {{-0.5f,  0.5f, 0.0f}, {0.0f, 1.0f}},  // Top-left
-// };
-
-// static u32 cross_indices[] = {
-// 	0, 1, 2,
-// 	2, 3, 0,
-
-// 	4, 5, 6,
-// 	6, 7, 4,
-// };
-
-// static vertex_t cross_vertices[] = {
-
-//     // {{ 0.0f, -0.5f, -0.5f}, {0.0f, 0.0f}},  // Bottom-left
-//     // {{ 0.0f,  0.5f, -0.5f}, {1.0f, 0.0f}},  // Top-left
-//     // {{ 0.0f,  0.5f,  0.5f}, {1.0f, 1.0f}},  // Top-right
-//     // {{ 0.0f, -0.5f,  0.5f}, {0.0f, 1.0f}},  // Bottom-right
-
-//     // {{ -0.5f, -0.5f, 0.0f}, {0.0f, 0.0f}},  // Bottom-left
-//     // {{ -0.5f,  0.5f, 0.0f}, {1.0f, 0.0f}},  // Top-left
-//     // {{ 0.5f,  0.5f,  0.0f}, {1.0f, 1.0f}},  // Top-right
-//     // {{ 0.5f, -0.5f,  0.0f}, {0.0f, 1.0f}},  // Bottom-right
-
-//     {{ 0.5f,  0.5f, 0.0f}, {1.0f, 1.0f}},  // Top-right
-//     {{ 0.5f, -0.5f, 0.0f}, {1.0f, 0.0f}},  // Bottom-right
-//     {{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f}},  // Bottom-left
-//     {{-0.5f,  0.5f, 0.0f}, {0.0f, 1.0f}},  // Top-left
-
-//     // Second quad (YZ plane, scaled to 0.5)
-//     {{ 0.0f,  0.5f,  0.5f}, {1.0f, 1.0f}},  // Top-right
-//     {{ 0.0f, -0.5f,  0.5f}, {1.0f, 0.0f}},  // Bottom-right
-//     {{ 0.0f, -0.5f, -0.5f}, {0.0f, 0.0f}},  // Bottom-left
-//     {{ 0.0f,  0.5f, -0.5f}, {0.0f, 1.0f}},  // Top-left
-// };
-
-// static u32 cross_indices[] = {
-//     // First quad (YZ plane)
-//     0, 1, 2,
-//     2, 3, 0,
-
-//     // Second quad (XY plane)
-//     4, 5, 6,
-//     6, 7, 4,
-// };
-
-// static vertex_t slope_vertices[] = {
-//     {{-0.5f, -0.5f, -0.5f}, {0.0f, 1.0f}}, // 0 (Bottom left)
-//     {{0.5f, -0.5f, -0.5f}, {1.0f, 1.0f}},  // 1 (Bottom right)
-//     {{0.5f, 0.5f, -0.5f}, {1.0f, 0.0f}},   // 2 (Top right)
-//     {{-0.5f, 0.5f, -0.5f}, {0.0f, 0.0f}},  // 3 (Top left)
-
-//     {{-0.5f, -0.5f, 0.5f}, {0.0f, 1.0f}},   // 4 (Bottom left)
-//     {{0.5f, -0.5f, 0.5f}, {1.0f, 1.0f}},    // 5 (Bottom right)
-//     {{0.5f, 0.5f, 0.5f}, {1.0f, 0.0f}},     // 6 (Top right)
-//     {{-0.5f, 0.5f, 0.5f}, {0.0f, 0.0f}},    // 7 (Top left)
-// };
-
-// static u32 slope_indices[] = {
-//     // Bottom face
-//     0, 1, 5,
-//     0, 5, 4,
-
-//     // Back face
-//     4, 5, 6,
-//     4, 6, 7,
-
-//     // Slope face
-//     0, 6, 7,
-//     0, 6, 1,
-
-//     // Left face
-//     0, 7, 4,
-
-//     // Right face
-//     1, 5, 6,
-// };
-
 enum {
 	MESH_CUBE = 2,
 	MESH_SLAB,
@@ -201,6 +23,7 @@ enum {
 	MESH_PYRAMID,
 	MESH_SLOPE,
 	MESH_MONKEY,
+	MESH_MUSHROOM,
 };
 
 enum {
@@ -209,6 +32,7 @@ enum {
 	TEX_TREE,
 	TEX_BIRCH,
 	TEX_DIRT,
+	TEX_CROSSHAIR,
 };
 
 enum {
@@ -225,8 +49,9 @@ enum {
 static camera_t create_camera() {
 	camera_t camera = {0};
 
-	// glm_vec3_copy((vec3){0.0f, 0.0f, 3.0f}, camera.position);
-	glm_vec3_copy((vec3){0.0f, 0.3f, 3.0f}, camera.position);
+	glm_vec3_copy((vec3){0.0f, 0.0f, 3.0f}, camera.position);
+	// glm_vec3_copy((vec3){0.0f, 0.3f, 3.0f}, camera.position);
+	// glm_vec3_copy((vec3){0.0f, 1.0f, 3.0f}, camera.position);
 	glm_vec3_copy((vec3){0.0f, 0.0f, -1.0f}, camera.front);
 	glm_vec3_copy((vec3){0.0f, 1.0f, 0.0f}, camera.up);
 
@@ -382,15 +207,22 @@ int main(int argc, char *argv[]) {
 	glViewport(0, 0, window_width, window_height);
 
 	res_pack_t res_pack = {0};
+	res_pack.render_width = 640;
+	res_pack.render_height = 360;
 	res_pack.sky_color = (color_t){58, 49, 41, 255};
+	// res_pack.sky_color = (color_t){2, 9, 23, 255};
+	// res_pack.sky_color = (color_t){0, 0, 0, 255};
 	res_pack.fog_color = (color_t){58, 49, 41, 255};
 	res_pack.editor_color = (color_t){50, 50, 50, 255};
+
+	// render_init(&res_pack);
 
 	res_add_texture(&res_pack, TEX_BRICKS, "res/images/bricks.tga");
 	res_add_texture(&res_pack, TEX_IRON_BARS, "res/images/iron_bars.tga");
 	res_add_texture(&res_pack, TEX_TREE, "res/images/tree.tga");
 	res_add_texture(&res_pack, TEX_BIRCH, "res/images/birch.tga");
 	res_add_texture(&res_pack, TEX_DIRT, "res/images/dirt.tga");
+	res_add_texture(&res_pack, TEX_CROSSHAIR, "res/images/crosshair.tga");
 
 	res_add_mesh_raw(&res_pack, MESH_QUAD, quad_vertices, sizeof(quad_vertices) / sizeof(vertex_t), quad_indices, sizeof(quad_indices) / sizeof(u32));
 	res_add_mesh(&res_pack, MESH_CUBE, load_mesh("res/meshes/cube.mesh"));
@@ -400,6 +232,7 @@ int main(int argc, char *argv[]) {
 	res_add_mesh(&res_pack, MESH_PYRAMID, load_mesh("res/meshes/pyramid.mesh"));
 	res_add_mesh(&res_pack, MESH_CORNER, load_mesh("res/meshes/corner.mesh"));
 	res_add_mesh(&res_pack, MESH_MONKEY, load_mesh("res/meshes/monkey.mesh"));
+	res_add_mesh(&res_pack, MESH_MUSHROOM, load_mesh("res/meshes/mushroom.mesh"));
 
 	res_pack.tiles[TILE_BRICK_CUBE] = (tile_t) {
 		.mesh_index = MESH_CUBE,
@@ -445,6 +278,7 @@ int main(int argc, char *argv[]) {
 
 	res_pack.tiles[TILE_DIRT_FLOOR] = (tile_t) {
 		.mesh_index = MESH_FLOOR,
+		// .mesh_index = MESH_MUSHROOM,
 		.texture_index = TEX_DIRT,
 		.rotation = {0},
 	};
@@ -546,7 +380,7 @@ int main(int argc, char *argv[]) {
 		mesh->texture_index = TEX_BRICKS;
 	}
 
-	render_init();
+	render_init(&res_pack);
 	editor_init();
 
 	// Window loop
@@ -603,7 +437,7 @@ int main(int argc, char *argv[]) {
 		if (edit_mode) {
 			editor_render(&res_pack, &level);
 		} else {
-			render_level(&res_pack, &level, &ecs, &camera);
+			render_game(&res_pack, &level, &ecs, &camera);
 		}
 
 		SDL_GL_SwapWindow(window);

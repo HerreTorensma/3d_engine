@@ -22,9 +22,9 @@ typedef struct renderer {
     ecs_world_t *ecs;
 } renderer_t;
 
-void render_init(void);
+void render_init(res_pack_t *res_pack);
 
-void render_level(res_pack_t *res_pack, level_t *level, ecs_world_t *ecs, camera_t *camera);
+void render_game(res_pack_t *res_pack, level_t *level, ecs_world_t *ecs, camera_t *camera);
 
 void render_level_ortho(res_pack_t *res_pack, level_t *level, enum ortho_view orientation, float zoom);
 

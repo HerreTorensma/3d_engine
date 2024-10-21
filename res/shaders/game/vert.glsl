@@ -13,7 +13,7 @@ uniform mat4 model;
 uniform bool billboard;
 
 const float fogDensity = 0.2;
-const float fogGradient = 3.0;
+const float fogGradient = 1.0;
 
 void main()
 {
@@ -25,6 +25,6 @@ void main()
 
     float distance = length(posRelativeToCam.xyz);
     Visibility = exp(-pow((distance * fogDensity), fogGradient));
-    Visibility = clamp(Visibility, 0.0, 1.0);
-    // Visibility = clamp(Visibility, 1.0, 1.0);
+    // Visibility = clamp(Visibility, 0.0, 1.0);
+    Visibility = clamp(Visibility, 0.05, 1.0);
 }

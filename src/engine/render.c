@@ -3,6 +3,7 @@
 static u32 game_shader = 0;
 static u32 basic_shader = 0;
 static u32 ortho_shader = 0;
+static u32 gui_shader = 0;
 
 static u32 fbo = 0;
 static u32 fbo_tex = 0;
@@ -14,25 +15,70 @@ static mat4 isometric_view = {0};
 static camera_t *global_camera = NULL;
 static ecs_world_t *global_ecs = NULL;
 
-// static vertex_t quad_vertices[] = {
-//     {{1.0f,  1.0f, 0.0f}, {1.0f, 1.0f}},
-//     {{1.0f, -1.0f, 0.0f}, {1.0f, 0.0f}},
-//     {{-1.0f, -1.0f, 0.0f}, {0.0f, 0.0f}},
-//     {{-1.0f,  1.0f, 0.0f}, {0.0f, 1.0f}},
-// };
-// static u32 quad_indices[] = {
-//     0, 1, 3,
-//     1, 2, 3,
-// };
-// mesh_t quad_mesh = {0};
-
 static void clear(color_t color) {
 	vec4 gl_color = {0};
 	color_to_gl_color(color, gl_color);
 	glClearColor(gl_color[0], gl_color[1], gl_color[2], gl_color[3]);
 }
 
-void render_init(void) {
+inline static void render_mesh(res_pack_t *res_pack, mesh_t *mesh, size_t texture_index) {
+	glActiveTexture(GL_TEXTURE0);
+	// glBindTexture(GL_TEXTURE_2D, res_pack->texture_ids[texture_index]);
+	glBindTexture(GL_TEXTURE_2D, texture_index);
+
+	glBindVertexArray(mesh->vao);
+	glDrawElements(GL_TRIANGLES, mesh->index_count, GL_UNSIGNED_INT, 0);
+	
+	glBindVertexArray(0);
+}
+
+static void init_frame_buffer(res_pack_t *res_pack) {
+	// FBO and texture
+	glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+	u32 rbo;
+	glGenRenderbuffers(1, &rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, res_pack->render_width, res_pack->render_height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+	glGenTextures(1, &fbo_tex);
+	glBindTexture(GL_TEXTURE_2D, fbo_tex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, res_pack->render_width, res_pack->render_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbo_tex, 0);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+		printf("Frame buffer not complete\n");
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+
+static void start_frame_buffer(res_pack_t *res_pack) {
+	// Frame buffer stuff
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glViewport(0, 0, res_pack->render_width, res_pack->render_height);
+}
+
+static void end_frame_buffer(res_pack_t *res_pack) {
+	// More framebuffer stuff
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);  // Bind default framebuffer
+	glViewport(0, 0, window_width, window_height);  // Set viewport back to full resolution
+	glDisable(GL_DEPTH_TEST);
+
+	glUseProgram(basic_shader);
+
+	render_mesh(res_pack, &(res_pack->meshes[MESH_QUAD]), fbo_tex);
+	
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void render_init(res_pack_t *res_pack) {
 	{
 		vec3 camera_pos = {10.0f, 10.0f, 10.0f};  // Camera position (above looking down)
 		// vec3 camera_pos = {0.0f, 10.0f, 10.0f};  // Camera position (above looking down)
@@ -70,30 +116,9 @@ void render_init(void) {
     game_shader = create_shader_program("res/shaders/game/vert.glsl", "res/shaders/game/frag.glsl");
     basic_shader = create_shader_program("res/shaders/2d/vert.glsl", "res/shaders/2d/frag.glsl");
     ortho_shader = create_shader_program("res/shaders/editor/vert.glsl", "res/shaders/editor/frag.glsl");
+    gui_shader = create_shader_program("res/shaders/gui/vert.glsl", "res/shaders/gui/frag.glsl");
 	
-	// FBO and texture
-	glGenFramebuffers(1, &fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-
-	u32 rbo;
-	glGenRenderbuffers(1, &rbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 640, 360);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
-
-	glGenTextures(1, &fbo_tex);
-	glBindTexture(GL_TEXTURE_2D, fbo_tex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 640, 360, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbo_tex, 0);
-
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-		printf("Frame buffer not complete\n");
-	}
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	init_frame_buffer(res_pack);
 }
 
 int compare_by_distance(const void *a, const void *b) {
@@ -115,18 +140,96 @@ int compare_by_distance(const void *a, const void *b) {
 	}
 }
 
-static void render_mesh_components() {
+static void render_mesh_components(res_pack_t *res_pack, ecs_world_t *ecs) {
+	ecs_query_t query = ecs_query1(ecs, "transform_c", "mesh_c", NULL);
+	for (size_t i = 0; i < query.length; i++) {
+		mesh_c *mesh_component = ECS_GET(ecs, query.entities[i], mesh_c);
+		transform_c *transform = ECS_GET(ecs, query.entities[i], transform_c);
+
+		mesh_t mesh = res_pack->meshes[mesh_component->mesh_index];
+
+		mat4 model;
+		glm_mat4_identity(model);
+		glm_translate(model, transform->position);
+		glm_scale(model, (vec3){0.5f, 0.5f, 0.5f});
+
+		glm_rotate(model, glm_rad(transform->rotation[0]), (vec3){1.0f, 0.0f, 0.0f});
+		glm_rotate(model, glm_rad(transform->rotation[1]), (vec3){0.0f, 1.0f, 0.0f});
+		glm_rotate(model, glm_rad(transform->rotation[2]), (vec3){0.0f, 0.0f, 1.0f});
+
+		shader_set_mat4(game_shader, "model", &model);
+
+		render_mesh(res_pack, &mesh, mesh_component->texture_index);
+	}
+}
+
+static void render_sprite_components(res_pack_t *res_pack, ecs_world_t *ecs, camera_t *camera) {
+	// Transparent stuff
+	ecs_query_t query = ecs_query1(ecs, "transform_c", "sprite_c", NULL);
+	qsort(query.entities, query.length, sizeof(entity_t), compare_by_distance);
+	for (size_t i = 0; i < query.length; i++) {
+		sprite_c *sprite = ECS_GET(ecs, query.entities[i], sprite_c);
+		transform_c *transform = ECS_GET(ecs, query.entities[i], transform_c);
+
+		mesh_t mesh = res_pack->meshes[MESH_QUAD];
+
+		mat4 model;
+		glm_mat4_identity(model);
+		glm_translate(model, (vec3){transform->position[0], transform->position[1] + ((sprite->y_scale - 1) / 2), transform->position[2]});
+		glm_scale(model, (vec3){0.5f * sprite->x_scale, 0.5f * sprite->y_scale, 0.5f});
+
+		glm_rotate(model, glm_rad(transform->rotation[0]), (vec3){1.0f, 0.0f, 0.0f});
+		glm_rotate(model, glm_rad(transform->rotation[1]), (vec3){0.0f, 1.0f, 0.0f});
+		glm_rotate(model, glm_rad(transform->rotation[2]), (vec3){0.0f, 0.0f, 1.0f});
+
+		if (sprite->billboard) {
+			vec3 direction = {camera->position[0] - transform->position[0], 0.0f, camera->position[2] - transform->position[2]};
+			glm_normalize(direction);
+			float angle = atan2(direction[0], direction[2]);
+			glm_rotate(model, angle, (vec3){0.0f, 1.0f, 0.0f});
+		}
+
+		shader_set_mat4(game_shader, "model", &model);
+
+		render_mesh(res_pack, &mesh, sprite->texture_index);
+	}
+}
+
+static void render_level() {
 
 }
 
-static void render_sprites() {
+static void render_image(res_pack_t *res_pack, size_t texture_index, u32 x, u32 y) {
+	glDisable(GL_DEPTH_TEST);
 
+	glUseProgram(gui_shader);
+
+	// glm::mat4 projection = glm::ortho(0.0f, 800.0f, 600.0f, 0.0f, -1.0f, 1.0f);  
+	mat4 projection = {0};
+	glm_ortho(0.0f, res_pack->render_width, res_pack->render_height, 0.0f, -1.0f, 1.0f, projection);
+
+	mat4 model = {0};
+	glm_mat4_identity(model);
+	glm_translate(model, (vec3){(float)x, (float)y, 0.0f});
+	glm_scale(model, (vec3){4.0f, 4.0f, 0.0f});
+
+	shader_set_mat4(gui_shader, "model", &model);
+	shader_set_mat4(gui_shader, "projection", &projection);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, res_pack->texture_ids[texture_index]);
+
+	mesh_t mesh = res_pack->meshes[MESH_QUAD];
+	
+	glBindVertexArray(mesh.vao);
+	glDrawElements(GL_TRIANGLES, mesh.index_count, GL_UNSIGNED_INT, 0);
+	
+	glBindVertexArray(0);
 }
 
-void render_level(res_pack_t *res_pack, level_t *level, ecs_world_t *ecs, camera_t *camera) {
+void render_game(res_pack_t *res_pack, level_t *level, ecs_world_t *ecs, camera_t *camera) {
 	// Frame buffer stuff
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-	glViewport(0, 0, 640, 360);
+	start_frame_buffer(res_pack);
 
 	global_camera = camera;
 	global_ecs = ecs;
@@ -137,9 +240,7 @@ void render_level(res_pack_t *res_pack, level_t *level, ecs_world_t *ecs, camera
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	// glDepthMask(GL_FALSE);
-	// glDisable(GL_CULL_FACE);
-	
+
     glUseProgram(game_shader);
 
 	// View matrix
@@ -194,109 +295,30 @@ void render_level(res_pack_t *res_pack, level_t *level, ecs_world_t *ecs, camera
 				// vec3 fog_color = {0.231f, 0.2f, 0.149f};
 				// vec3 fog_color = {0.8f, 0.8f, 0.8f};
 				vec3 fog_color = {0.227f, 0.192f, 0.161f};
+				// vec3 fog_color = {0.0f, 0.0f, 0.0f};
 				
-				// vec3 fog_color = {
-				// 	res_pack->fog_color.gl_color[0],
-				// 	res_pack->fog_color.gl_color[1],
-				// 	res_pack->fog_color.gl_color[2],
-				// };
 				shader_set_vec3(game_shader, "fogColor", &fog_color);
 
-				glBindVertexArray(mesh.vao);
-
-				glBindTexture(GL_TEXTURE_2D, tile.texture_index);
-				glActiveTexture(GL_TEXTURE0);
-
-				glDrawElements(GL_TRIANGLES, mesh.index_count, GL_UNSIGNED_INT, 0);
-				
-				glBindVertexArray(0);
+				render_mesh(res_pack, &mesh, tile.texture_index);
 			}
 		}
 	}
 
-	{
-		ecs_query_t query = ecs_query1(ecs, "transform_c", "mesh_c", NULL);
-		for (size_t i = 0; i < query.length; i++) {
-			mesh_c *mesh_component = ECS_GET(ecs, query.entities[i], mesh_c);
-			transform_c *transform = ECS_GET(ecs, query.entities[i], transform_c);
+	render_mesh_components(res_pack, ecs);
 
-			mesh_t mesh = res_pack->meshes[mesh_component->mesh_index];
+	render_sprite_components(res_pack, ecs, camera);
 
-			mat4 model;
-			glm_mat4_identity(model);
-			glm_translate(model, transform->position);
-			glm_scale(model, (vec3){0.5f, 0.5f, 0.5f});
-
-			glm_rotate(model, glm_rad(transform->rotation[0]), (vec3){1.0f, 0.0f, 0.0f});
-			glm_rotate(model, glm_rad(transform->rotation[1]), (vec3){0.0f, 1.0f, 0.0f});
-			glm_rotate(model, glm_rad(transform->rotation[2]), (vec3){0.0f, 0.0f, 1.0f});
-
-			shader_set_mat4(game_shader, "model", &model);
-
-			glBindVertexArray(mesh.vao);
-			glBindTexture(GL_TEXTURE_2D, mesh_component->texture_index);
-			glActiveTexture(GL_TEXTURE0);
-
-			glDrawElements(GL_TRIANGLES, mesh.index_count, GL_UNSIGNED_INT, 0);
-			glBindVertexArray(0);
-		}
-	}
-
-	// Transparent stuff
-	ecs_query_t query = ecs_query1(ecs, "transform_c", "sprite_c", NULL);
-	qsort(query.entities, query.length, sizeof(entity_t), compare_by_distance);
-	for (size_t i = 0; i < query.length; i++) {
-		sprite_c *sprite = ECS_GET(ecs, query.entities[i], sprite_c);
-		transform_c *transform = ECS_GET(ecs, query.entities[i], transform_c);
-
-		mesh_t mesh = res_pack->meshes[MESH_QUAD];
-
-		mat4 model;
-		glm_mat4_identity(model);
-		glm_translate(model, (vec3){transform->position[0], transform->position[1] + ((sprite->y_scale - 1) / 2), transform->position[2]});
-		glm_scale(model, (vec3){0.5f * sprite->x_scale, 0.5f * sprite->y_scale, 0.5f});
-
-		glm_rotate(model, glm_rad(transform->rotation[0]), (vec3){1.0f, 0.0f, 0.0f});
-		glm_rotate(model, glm_rad(transform->rotation[1]), (vec3){0.0f, 1.0f, 0.0f});
-		glm_rotate(model, glm_rad(transform->rotation[2]), (vec3){0.0f, 0.0f, 1.0f});
-
-		if (sprite->billboard) {
-			vec3 direction = {camera->position[0] - transform->position[0], 0.0f, camera->position[2] - transform->position[2]};
-			glm_normalize(direction);
-			float angle = atan2(direction[0], direction[2]);
-			glm_rotate(model, angle, (vec3){0.0f, 1.0f, 0.0f});
-		}
-
-		shader_set_mat4(game_shader, "model", &model);
-
-		// Draw quad with texture
-		glBindVertexArray(mesh.vao);
-		glBindTexture(GL_TEXTURE_2D, sprite->texture_index);
-		glActiveTexture(GL_TEXTURE0);
-
-		glDrawElements(GL_TRIANGLES, mesh.index_count, GL_UNSIGNED_INT, 0);
-		glBindVertexArray(0);
-	}
-
-	// More framebuffer stuff
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);  // Bind default framebuffer
-	glViewport(0, 0, window_width, window_height);  // Set viewport back to full resolution
-	glDisable(GL_DEPTH_TEST);
-
-	glUseProgram(basic_shader);
-
-	glBindTexture(GL_TEXTURE_2D, fbo_tex);
-
-	mesh_t mesh = res_pack->meshes[MESH_QUAD];
-	glBindVertexArray(mesh.vao);
-
-	glDrawElements(GL_TRIANGLES, mesh.index_count, GL_UNSIGNED_INT, 0);
-
-	glBindVertexArray(0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	// render_image(res_pack, 3, 10, 10);
+	// render_image(res_pack, 6, 10, 10);
+	render_image(res_pack, 6, res_pack->render_width / 2, res_pack->render_height / 2);
+	
+	
+	end_frame_buffer(res_pack);
 }
 
 void render_level_ortho(res_pack_t *res_pack, level_t *level, enum ortho_view orientation, float zoom) {
+	// start_frame_buffer();
+
 	// glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	clear(res_pack->editor_color);
 	// glClearColor(res_pack->editor_color.gl_color[0], res_pack->editor_color.gl_color[1], res_pack->editor_color.gl_color[2], res_pack->editor_color.gl_color[3]);
@@ -351,17 +373,10 @@ void render_level_ortho(res_pack_t *res_pack, level_t *level, enum ortho_view or
 				glm_rotate(model, glm_rad(tile.rotation[2]), (vec3){0.0f, 0.0f, 1.0f});
 				shader_set_mat4(ortho_shader, "model", &model);
 				
-				// tile_t tile = res_pack->tiles[tile_index];
-				
-				glBindVertexArray(mesh.vao);
-
-				glBindTexture(GL_TEXTURE_2D, tile.texture_index);
-				glActiveTexture(GL_TEXTURE0);
-
-				glDrawElements(GL_TRIANGLES, mesh.index_count, GL_UNSIGNED_INT, 0);
-				
-				glBindVertexArray(0);
+				render_mesh(res_pack, &mesh, tile.texture_index);
 			}
 		}
 	}
+
+	// end_frame_buffer(res_pack);
 }
