@@ -217,12 +217,12 @@ int main(int argc, char *argv[]) {
 
 	// render_init(&res_pack);
 
-	res_add_texture(&res_pack, TEX_BRICKS, "res/images/bricks.tga");
-	res_add_texture(&res_pack, TEX_IRON_BARS, "res/images/iron_bars.tga");
-	res_add_texture(&res_pack, TEX_TREE, "res/images/tree.tga");
-	res_add_texture(&res_pack, TEX_BIRCH, "res/images/birch.tga");
-	res_add_texture(&res_pack, TEX_DIRT, "res/images/dirt.tga");
-	res_add_texture(&res_pack, TEX_CROSSHAIR, "res/images/crosshair.tga");
+	res_add_texture(&res_pack, TEX_BRICKS, load_tga("res/images/bricks.tga", true));
+	res_add_texture(&res_pack, TEX_IRON_BARS, load_tga("res/images/iron_bars.tga", true));
+	res_add_texture(&res_pack, TEX_TREE, load_tga("res/images/tree.tga", true));
+	res_add_texture(&res_pack, TEX_BIRCH, load_tga("res/images/birch.tga", true));
+	res_add_texture(&res_pack, TEX_DIRT, load_tga("res/images/dirt.tga", true));
+	res_add_texture(&res_pack, TEX_CROSSHAIR, load_tga("res/images/crosshair.tga", true));
 
 	res_add_mesh_raw(&res_pack, MESH_QUAD, quad_vertices, sizeof(quad_vertices) / sizeof(vertex_t), quad_indices, sizeof(quad_indices) / sizeof(u32));
 	res_add_mesh(&res_pack, MESH_CUBE, load_mesh("res/meshes/cube.mesh"));

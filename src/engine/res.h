@@ -19,7 +19,7 @@ typedef struct res_pack {
 	u32 render_height;
 
     mesh_t meshes[256];
-    u32 texture_ids[256];
+	texture_t textures[256];
 
 	tile_t tiles[256];
 } res_pack_t;
@@ -28,4 +28,4 @@ void res_add_mesh(res_pack_t *res_pack, size_t index, mesh_t mesh);
 
 void res_add_mesh_raw(res_pack_t *res_pack, size_t index, vertex_t *vertices, u32 vertex_count, u32 *indices, u32 index_count);
 
-void res_add_texture(res_pack_t *res_pack, size_t index, const char path[]);
+void res_add_texture(res_pack_t *res_pack, size_t index, texture_t texture);

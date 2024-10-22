@@ -13,6 +13,10 @@
     - Billboard sprites
     - Move the grid thing into a grid map and make something seperate for meshes that roam freely
 
+    - Remake the ECS without the fuckass macros and dict
+    - Make a generic texture struct that also saves the pixels and whatnot
+    
+
 ## Dependencies
 - SDL2
 - SDL_mixer

@@ -36,8 +36,8 @@ char *load_file_to_string(const char path[]) {
 
 // Loads a tga image file to a byte array that can be used by OpenGL as a texture
 // Represented as BGRA
-image_t load_tga(const char path[], bool flip) {
-	image_t image = {0};
+texture_t load_tga(const char path[], bool flip) {
+	texture_t image = {0};
 	
 	// Open file
 	FILE *file = fopen(path, "rb");

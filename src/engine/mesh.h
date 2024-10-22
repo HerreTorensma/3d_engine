@@ -22,3 +22,11 @@ typedef struct mesh {
 enum {
     MESH_QUAD = 1,
 };
+
+typedef struct texture {
+    u16 width;
+    u16 height;
+    u8 *pixels;
+
+	u32 id;
+} texture_t;

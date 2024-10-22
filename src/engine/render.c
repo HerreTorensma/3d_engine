@@ -24,7 +24,9 @@ static void clear(color_t color) {
 inline static void render_mesh(res_pack_t *res_pack, mesh_t *mesh, size_t texture_index) {
 	glActiveTexture(GL_TEXTURE0);
 	// glBindTexture(GL_TEXTURE_2D, res_pack->texture_ids[texture_index]);
+	
 	glBindTexture(GL_TEXTURE_2D, texture_index);
+	// glBindTexture(GL_TEXTURE_2D, res_pack->textures[texture_index].id);
 
 	glBindVertexArray(mesh->vao);
 	glDrawElements(GL_TRIANGLES, mesh->index_count, GL_UNSIGNED_INT, 0);
@@ -199,32 +201,36 @@ static void render_level() {
 
 }
 
-static void render_image(res_pack_t *res_pack, size_t texture_index, u32 x, u32 y) {
+enum pivot {
+	PIVOT_CENTER,
+	PIVOT_TOP_LEFT,
+};
+
+static void render_image(res_pack_t *res_pack, enum pivot pivot, size_t texture_index, i32 x, i32 y) {
 	glDisable(GL_DEPTH_TEST);
 
 	glUseProgram(gui_shader);
 
-	// glm::mat4 projection = glm::ortho(0.0f, 800.0f, 600.0f, 0.0f, -1.0f, 1.0f);  
 	mat4 projection = {0};
 	glm_ortho(0.0f, res_pack->render_width, res_pack->render_height, 0.0f, -1.0f, 1.0f, projection);
 
+	texture_t texture = res_pack->textures[texture_index];
+
 	mat4 model = {0};
 	glm_mat4_identity(model);
+
 	glm_translate(model, (vec3){(float)x, (float)y, 0.0f});
-	glm_scale(model, (vec3){4.0f, 4.0f, 0.0f});
+	
+	glm_scale(model, (vec3){(float)texture.width / 2.0f, (float)texture.height / 2.0f, 0.0f});
+
+	if (pivot == PIVOT_TOP_LEFT) {
+		glm_translate(model, (vec3){1.0f, 1.0f, 0.0f});
+	}
 
 	shader_set_mat4(gui_shader, "model", &model);
 	shader_set_mat4(gui_shader, "projection", &projection);
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, res_pack->texture_ids[texture_index]);
-
-	mesh_t mesh = res_pack->meshes[MESH_QUAD];
-	
-	glBindVertexArray(mesh.vao);
-	glDrawElements(GL_TRIANGLES, mesh.index_count, GL_UNSIGNED_INT, 0);
-	
-	glBindVertexArray(0);
+	render_mesh(res_pack, &res_pack->meshes[MESH_QUAD], texture_index);
 }
 
 void render_game(res_pack_t *res_pack, level_t *level, ecs_world_t *ecs, camera_t *camera) {
@@ -308,11 +314,12 @@ void render_game(res_pack_t *res_pack, level_t *level, ecs_world_t *ecs, camera_
 
 	render_sprite_components(res_pack, ecs, camera);
 
-	// render_image(res_pack, 3, 10, 10);
-	// render_image(res_pack, 6, 10, 10);
-	render_image(res_pack, 6, res_pack->render_width / 2, res_pack->render_height / 2);
-	
-	
+
+	render_image(res_pack, PIVOT_CENTER, 6, res_pack->render_width / 2, res_pack->render_height / 2);
+
+	render_image(res_pack, PIVOT_TOP_LEFT, 6, 1, 1);
+
+
 	end_frame_buffer(res_pack);
 }
 

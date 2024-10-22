@@ -50,11 +50,10 @@ void res_add_mesh_raw(res_pack_t *res_pack, size_t index, vertex_t *vertices, u3
 	res_add_mesh(res_pack, index, mesh);
 }
 
-void res_add_texture(res_pack_t *res_pack, size_t index, const char path[]) {
+void res_add_texture(res_pack_t *res_pack, size_t index, texture_t texture) {
 	// Generate a new texture in OpenGL
-	u32 id = 0;
-	glGenTextures(1, &id);
-	glBindTexture(GL_TEXTURE_2D, id);
+	glGenTextures(1, &texture.id);
+	glBindTexture(GL_TEXTURE_2D, texture.id);
 
 	// Set some stuff
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -62,17 +61,14 @@ void res_add_texture(res_pack_t *res_pack, size_t index, const char path[]) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	// Load the actual image data
-	image_t image = load_tga(path, true);
-
 	// glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.width, image.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, image.pixels);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, image.width, image.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, image.pixels);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, texture.width, texture.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, texture.pixels);
 	// glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, image.width, image.height, 0, GL_ARGB, GL_UNSIGNED_BYTE, image.pixels);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	free(image.pixels);
+	// free(image.pixels);
 
-	res_pack->texture_ids[index] = id;
+	res_pack->textures[index] = texture;
 }
