@@ -317,14 +317,18 @@ void render_game(res_pack_t *res_pack, level_t *level, ecs_world_t *ecs, camera_
 
 	render_image(res_pack, PIVOT_CENTER, 6, res_pack->render_width / 2, res_pack->render_height / 2);
 
-	render_image(res_pack, PIVOT_TOP_LEFT, 6, 1, 1);
+	// render_image(res_pack, PIVOT_TOP_LEFT, 6, 1, 1);
+	render_image(res_pack, PIVOT_TOP_LEFT, 4, 0, 0);
+	render_image(res_pack, PIVOT_TOP_LEFT, 3, 0, -4);
+	render_image(res_pack, PIVOT_TOP_LEFT, 4, 640-64, 0);
+	render_image(res_pack, PIVOT_TOP_LEFT, 3, 640-64, -4);
 
 
 	end_frame_buffer(res_pack);
 }
 
 void render_level_ortho(res_pack_t *res_pack, level_t *level, enum ortho_view orientation, float zoom) {
-	// start_frame_buffer();
+	start_frame_buffer(res_pack);
 
 	// glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	clear(res_pack->editor_color);
@@ -350,6 +354,8 @@ void render_level_ortho(res_pack_t *res_pack, level_t *level, enum ortho_view or
     float top = ortho_height;
 
     glm_ortho(left, right, bottom, top, 0.1f, 100.0f, projection);
+    // glm_ortho(left, right, bottom, top, -1.0f, 1.0f, projection);
+    // glm_ortho(0, right, bottom, top, 0.1f, 100.0f, projection);
 	
 	shader_set_mat4(ortho_shader, "projection", &projection);
 
@@ -385,5 +391,5 @@ void render_level_ortho(res_pack_t *res_pack, level_t *level, enum ortho_view or
 		}
 	}
 
-	// end_frame_buffer(res_pack);
+	end_frame_buffer(res_pack);
 }

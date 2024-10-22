@@ -429,7 +429,7 @@ int main(int argc, char *argv[]) {
 		}
 
 		if (edit_mode) {
-			editor_update();
+			editor_update(&level);
 		} else {
 			game_update(&ecs);
 		}
