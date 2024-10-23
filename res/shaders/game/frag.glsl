@@ -8,7 +8,8 @@ in float Visibility;
 uniform sampler2D texture1;
 uniform vec3 fogColor;
 
-const int colorLevels = 16;
+// const int colorLevels = 16;
+const int colorLevels = 32;
 
 float rand(vec2 co)
 {

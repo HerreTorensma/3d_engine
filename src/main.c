@@ -33,6 +33,7 @@ enum {
 	TEX_BIRCH,
 	TEX_DIRT,
 	TEX_CROSSHAIR,
+	TEX_WORMFISH,
 };
 
 enum {
@@ -208,8 +209,8 @@ int main(int argc, char *argv[]) {
 
 	res_pack_t res_pack = {0};
 	res_pack.render_width = 640;
-	// res_pack.render_height = 360;
-	res_pack.render_height = 480;
+	res_pack.render_height = 360;
+	// res_pack.render_height = 480;
 	res_pack.sky_color = (color_t){58, 49, 41, 255};
 	// res_pack.sky_color = (color_t){2, 9, 23, 255};
 	// res_pack.sky_color = (color_t){0, 0, 0, 255};
@@ -224,6 +225,7 @@ int main(int argc, char *argv[]) {
 	res_add_texture(&res_pack, TEX_BIRCH, load_tga("res/images/birch.tga", true));
 	res_add_texture(&res_pack, TEX_DIRT, load_tga("res/images/dirt.tga", true));
 	res_add_texture(&res_pack, TEX_CROSSHAIR, load_tga("res/images/crosshair.tga", true));
+	res_add_texture(&res_pack, TEX_WORMFISH, load_tga("res/images/wormfish.tga", true));
 
 	res_add_mesh_raw(&res_pack, MESH_QUAD, quad_vertices, sizeof(quad_vertices) / sizeof(vertex_t), quad_indices, sizeof(quad_indices) / sizeof(u32));
 	res_add_mesh(&res_pack, MESH_CUBE, load_mesh("res/meshes/cube.mesh"));
@@ -346,6 +348,16 @@ int main(int argc, char *argv[]) {
 		transform->position[2] = 5.0f + i;
 
 		ECS_SET(&ecs, tree, sprite_c, {TEX_BIRCH, true, 1.0f, 2.0f});
+	}
+
+	{
+		entity_t tree = ecs_new(&ecs);
+		transform_c *transform = ECS_SET(&ecs, tree, transform_c, {0});
+		transform->position[0] = 5.0f;
+		transform->position[1] = 0.0f;
+		transform->position[2] = 5.0f;
+
+		ECS_SET(&ecs, tree, sprite_c, {TEX_WORMFISH, true, 2.0f, 1.0f});
 	}
 
 	// Iron bars
