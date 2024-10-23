@@ -208,7 +208,8 @@ int main(int argc, char *argv[]) {
 
 	res_pack_t res_pack = {0};
 	res_pack.render_width = 640;
-	res_pack.render_height = 360;
+	// res_pack.render_height = 360;
+	res_pack.render_height = 480;
 	res_pack.sky_color = (color_t){58, 49, 41, 255};
 	// res_pack.sky_color = (color_t){2, 9, 23, 255};
 	// res_pack.sky_color = (color_t){0, 0, 0, 255};

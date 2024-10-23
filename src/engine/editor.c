@@ -1,5 +1,7 @@
 #include "editor.h"
 
+static float camera_speed = 0.2;
+
 static enum ortho_view orientation = 0;
 
 static f32 zoom = 10.0f;
@@ -8,6 +10,11 @@ i32 offset_x = 0;
 i32 offset_y = 0;
 
 mat4 top_view = {0};
+
+mat4 projection = {0};
+
+// vec3 pos = {2.0f, 0.0f, 0.0f};
+vec2 pos = {2.0f, 0.0f};
 
 void editor_init(void) {
     {
@@ -18,6 +25,41 @@ void editor_init(void) {
 	}
 }
 
+static void compute_projection(void) {
+	// Projection matrix
+	float aspect = (float)window_width / (float)window_height;
+
+	float left = -zoom + pos[0];
+	float right = zoom + pos[0];
+
+	float ortho_height = zoom / aspect;
+	float bottom = -ortho_height + pos[1];
+	float top = ortho_height + pos[1];
+
+	glm_ortho(left, right, bottom, top, 0.1f, 100.0f, projection);
+}
+
+static void get_tile_pos(i32 *x, i32 *y) {
+	float normalized_mouse_x = 0;
+	float normalized_mouse_y = 0;
+	get_normalized_mouse_pos(&normalized_mouse_x, &normalized_mouse_y);
+
+	vec4 normalized_mouse_pos = {
+		normalized_mouse_x,
+		normalized_mouse_y,
+		0.0f,
+		1.0f,
+	};
+
+	mat4 projection_inverse = {0};
+	glm_mat4_inv(projection, projection_inverse);
+	vec4 world_pos = {0};
+	glm_mat4_mulv(projection_inverse, normalized_mouse_pos, world_pos);
+
+	*x = (int)(roundf(world_pos[0]));
+	*y = -(int)(roundf(world_pos[1]));
+}
+
 void editor_update(level_t *level) {
     if (input_key_pressed(SDL_SCANCODE_1)) {
 		orientation = ORTHO_TOP;
@@ -26,113 +68,55 @@ void editor_update(level_t *level) {
 		orientation = ORTHO_FRONT;
     }
 
+	if (input_key_held(SDL_SCANCODE_D)) {
+		pos[0] += camera_speed;
+	}
+	if (input_key_held(SDL_SCANCODE_A)) {
+		pos[0] -= camera_speed;
+	}
+	if (input_key_held(SDL_SCANCODE_W)) {
+		pos[1] += camera_speed;
+	}
+	if (input_key_held(SDL_SCANCODE_S)) {
+		pos[1] -= camera_speed;
+	}
+
+	compute_projection();
+
+	i32 tile_x, tile_y;
+	get_tile_pos(&tile_x, &tile_y);
+	if (tile_x < 0 || tile_x >= level->width) {
+		return;
+	}
+	if (tile_y < 0 || tile_y >= level->height) {
+		return;
+	}
+
 	if (input_mouse_button_pressed(SDL_BUTTON_LEFT)) {
-		printf("mouse pressed\n");
-		int x, y;
-		SDL_GetMouseState(&x, &y);
-		printf("x: %d, y: %d\n", x, y);
+		for (int i = level->depth - 2; i >= 0; i--) {
+			if (level_get_tile_index(level, tile_x, i, tile_y) != 0) {
+				level_set_tile_index(level, 1, tile_x, i + 1, tile_y);
+				break;
+			}
 
-		// float aspect = window_width / window_height;
-		// printf("offset: %d %d", );
-		float aspect = (float)window_width / (float)window_height;
-		printf("aspect: %f\n", aspect);
-
-		float left = -zoom;
-		float right = zoom;
-
-		float ortho_height = zoom / aspect;
-		float bottom = -ortho_height;
-		float top = ortho_height;
-
-		// printf("left: %d\n", left);
-		// printf("thing: %f\n", (window_width / 4) * zoom);
-		// printf("thing: %f\n", zoom / aspect);
-
-		{
-			float mouse_ndc_x = (2.0f * x) / window_width - 1.0f;
-			float mouse_ndc_y = 1.0f - (2.0f * y) / window_height;
-			printf("mouse x: %f, y: %f\n", mouse_ndc_x, mouse_ndc_y);
-			
-			vec4 ndc = { (2.0f * x) / window_width - 1.0f, 
-             1.0f - (2.0f * y) / window_height, 
-             0.0f, 1.0f };  // Near plane depth
-
-			// Invert the view-projection matrix
-			mat4 view_projection_inverse;
-
-			mat4 projection = {0};
-			float aspect = (float)window_width / (float)window_height;
-
-			float left = -zoom;
-			float right = zoom;
-
-			float ortho_height = zoom / aspect;
-			float bottom = -ortho_height;
-			float top = ortho_height;
-
-			glm_ortho(left, right, bottom, top, 0.1f, 100.0f, projection);
-			// glm_ortho(left, right, bottom, top, -1.0f, 1.0f, projection);
-
-			mat4 view_projection = {0};
-			glm_mat4_mul(projection, top_view, view_projection);
-			// glm_mat4_inv(projection, view_projection_inverse);
-			// glm_mat4_inv(view_projection, view_projection_inverse);
-			glm_mat4_inv(projection, view_projection_inverse);
-
-			// Unproject to get world coordinates
-			vec4 world_pos;
-			glm_mat4_mulv(view_projection_inverse, ndc, world_pos);
-			// glm_mat4_mulv(projection, ndc, world_pos);
-
-			// Perform perspective divide
-			// world_pos[0] /= world_pos[3];
-			// world_pos[1] /= world_pos[3];
-
-			// Map world coordinates to tile indices
-			// int tileX = (int)(world_pos[0] + 0.5f);
-			// int tileY = (int)(world_pos[1] + 0.5f);
-			
-			// int tileX = (int)(floorf(world_pos[0]) + 0.5f);
-			// int tileY = (int)(floorf(world_pos[1]) + 0.5f);
-
-			// int tileX, tileY;
-
-			// if (world_pos[0] > 0) {
-			// 	tileX = (int)(world_pos[0] + 0.5f);
-			// } else {
-			// 	tileX = (int)(world_pos[0] - 0.5f);
-			// }
-			// if (world_pos[1] > 0) {
-			// 	tileX = (int)(world_pos[1] + 0.5f);
-			// } else {
-			// 	tileX = (int)(world_pos[1] - 0.5f);
-			// }
-			int tileX = (int)(roundf(world_pos[0]));
-			int tileY = -(int)(roundf(world_pos[1]));
-
-			printf("tile x: %d, y: %d\n", tileX, tileY);
-
-			// Go down from 7
-			for (int i = level->depth - 2; i >= 0; i--) {
-				// if (level_get_tile_index(level, tileX, tileY, i) != 0) {
-				// 	level_set_tile_index(level, 1, tileX, tileY, i + 1);
-				// 	printf("bello\n");
-				// 	break;
-				// }
-
-				if (level_get_tile_index(level, tileX, i, tileY) != 0) {
-					level_set_tile_index(level, 1, tileX, i + 1, tileY);
-					printf("bello\n");
-					break;
-				}
+			if (i == 0) {
+				level_set_tile_index(level, 1, tile_x, i, tile_y);
 			}
 		}
+	}
 
+	if (input_mouse_button_pressed(SDL_BUTTON_RIGHT)) {
+		for (int i = level->depth - 2; i >= 0; i--) {
+			if (level_get_tile_index(level, tile_x, i, tile_y) != 0) {
+				level_set_tile_index(level, 0, tile_x, i, tile_y);
+				break;
+			}
+		}
 	}
 }
 
 void editor_render(res_pack_t *res_pack, level_t *level) {
-	render_level_ortho(res_pack, level, orientation, zoom);
+	render_level_ortho(res_pack, level, orientation, zoom, &projection);
 }
 
 void editor_input(SDL_Event event) {
