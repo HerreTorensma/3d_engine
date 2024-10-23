@@ -20,3 +20,5 @@ texture_t load_tga(const char path[], bool flip);
 mesh_t load_mesh(const char path[]);
 
 void color_to_gl_color(color_t color, vec4 gl_color);
+
+void get_normalized_mouse_pos(float *x, float *y);

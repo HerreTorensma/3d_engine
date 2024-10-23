@@ -132,3 +132,15 @@ mesh_t load_mesh(const char path[]) {
 
 	return mesh;
 }
+
+// Returns the mouse position normalized to -1.0 to 1.0
+void get_normalized_mouse_pos(float *x, float *y) {
+	i32 window_x, window_y;
+	SDL_GetMouseState(&x, &y);
+
+	float x_normalized = (2.0f * window_x) / window_width - 1.0f;
+	float y_normalized = 1.0f - (2.0f * window_y) / window_height;
+
+	*x = x_normalized;
+	*y = y_normalized;
+}
