@@ -81,9 +81,22 @@ static void end_frame_buffer(res_pack_t *res_pack) {
 }
 
 void render_init(res_pack_t *res_pack) {
+	// {
+	// 	vec3 camera_pos = {10.0f, 10.0f, 10.0f};  // Camera position (above looking down)
+	// 	// vec3 camera_pos = {0.0f, 10.0f, 10.0f};  // Camera position (above looking down)
+	// 	vec3 target_pos = {0.0f, 0.0f, 0.0f};   // Looking at the origin
+	// 	vec3 up_vector  = {0.0f, 1.0f, 0.0f};  // Up vector (in Blender's coordinate system)
+
+	// 	camera_pos[0] *= cosf(glm_rad(45.0f));
+	// 	camera_pos[1] *= sinf(glm_rad(30.0f));
+	// 	camera_pos[2] *= sinf(glm_rad(45.0f));
+
+	// 	glm_lookat(camera_pos, target_pos, up_vector, isometric_view);
+	// }
 	{
-		vec3 camera_pos = {10.0f, 10.0f, 10.0f};  // Camera position (above looking down)
+		// vec3 camera_pos = {1.0f, 1.0f, 1.0f};  // Camera position (above looking down)
 		// vec3 camera_pos = {0.0f, 10.0f, 10.0f};  // Camera position (above looking down)
+		vec3 camera_pos = {0.0f, 20.0f, 20.0f};  // Camera position (above looking down)
 		vec3 target_pos = {0.0f, 0.0f, 0.0f};   // Looking at the origin
 		vec3 up_vector  = {0.0f, 1.0f, 0.0f};  // Up vector (in Blender's coordinate system)
 
@@ -231,7 +244,37 @@ static void render_image(res_pack_t *res_pack, enum pivot pivot, size_t texture_
 	shader_set_mat4(gui_shader, "model", &model);
 	shader_set_mat4(gui_shader, "projection", &projection);
 
+	// mat4 view = {0};
+	// glm_mat4_identity(view);
+	// shader_set_mat4(gui_shader, "view", &view);
+
 	render_mesh(res_pack, &res_pack->meshes[MESH_QUAD], texture_index);
+}
+
+static void render_mesh_isometric(res_pack_t *res_pack, mesh_t mesh, size_t texture_index, i32 x, i32 y) {
+	glEnable(GL_DEPTH_TEST);
+
+	glUseProgram(gui_shader);
+
+	mat4 projection = {0};
+	float aspect_ratio = window_width / window_height;
+	
+	glm_ortho(0.0f, res_pack->render_width, 0.0f, res_pack->render_height, 0.1f, 1024.0f, projection);
+
+	mat4 model = {0};
+	glm_mat4_identity(model);
+
+	glm_translate(model, (vec3){(float)x, (float)y, -512.0f});
+
+	glm_scale(model, (vec3){32.0f, 32.0f, 32.0f});
+
+	glm_rotate(model, glm_rad(35.264f), (vec3){1.0f, 0.0f, 0.0f});
+	glm_rotate(model, glm_rad(45.0f), (vec3){0.0f, 1.0f, 0.0f});
+
+	shader_set_mat4(gui_shader, "model", &model);
+	shader_set_mat4(gui_shader, "projection", &projection);
+
+	render_mesh(res_pack, &mesh, texture_index);
 }
 
 void render_game(res_pack_t *res_pack, level_t *level, ecs_world_t *ecs, camera_t *camera) {
@@ -318,12 +361,15 @@ void render_game(res_pack_t *res_pack, level_t *level, ecs_world_t *ecs, camera_
 
 	render_image(res_pack, PIVOT_CENTER, 6, res_pack->render_width / 2, res_pack->render_height / 2);
 
+
 	// render_image(res_pack, PIVOT_TOP_LEFT, 6, 1, 1);
 	render_image(res_pack, PIVOT_TOP_LEFT, 4, 0, 0);
 	render_image(res_pack, PIVOT_TOP_LEFT, 3, 0, -4);
 	render_image(res_pack, PIVOT_TOP_LEFT, 4, 640-64, 0);
 	render_image(res_pack, PIVOT_TOP_LEFT, 3, 640-64, -4);
 
+	render_mesh_isometric(res_pack, res_pack->meshes[2], 1, 100, 100);
+	render_mesh_isometric(res_pack, res_pack->meshes[3], 2, 200, 100);
 
 	end_frame_buffer(res_pack);
 }

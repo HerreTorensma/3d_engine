@@ -15,6 +15,8 @@
 
     - Remake the ECS without the fuckass macros and dict
     - Make a generic texture struct that also saves the pixels and whatnot
+    - Add support for normals (why didnt i do this in the first place...)
+    - Add flat shading to some stuff
     
 
 ## Dependencies
