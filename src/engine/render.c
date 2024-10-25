@@ -61,13 +61,13 @@ static void init_frame_buffer(res_pack_t *res_pack) {
 }
 
 
-static void start_frame_buffer(res_pack_t *res_pack) {
+void render_start_frame_buffer(res_pack_t *res_pack) {
 	// Frame buffer stuff
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	glViewport(0, 0, res_pack->render_width, res_pack->render_height);
 }
 
-static void end_frame_buffer(res_pack_t *res_pack) {
+void render_end_frame_buffer(res_pack_t *res_pack) {
 	// More framebuffer stuff
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);  // Bind default framebuffer
 	glViewport(0, 0, window_width, window_height);  // Set viewport back to full resolution
@@ -211,111 +211,11 @@ static void render_sprite_components(res_pack_t *res_pack, ecs_world_t *ecs, cam
 	}
 }
 
-static void render_level() {
-
-}
-
-enum pivot {
-	PIVOT_CENTER,
-	PIVOT_TOP_LEFT,
-};
-
-static void render_image(res_pack_t *res_pack, enum pivot pivot, size_t texture_index, i32 x, i32 y) {
-	glDisable(GL_DEPTH_TEST);
-
-	glUseProgram(gui_shader);
-
-	mat4 projection = {0};
-	glm_ortho(0.0f, res_pack->render_width, res_pack->render_height, 0.0f, -1.0f, 1.0f, projection);
-
-	texture_t texture = res_pack->textures[texture_index];
-
-	mat4 model = {0};
-	glm_mat4_identity(model);
-
-	glm_translate(model, (vec3){(float)x, (float)y, 0.0f});
-	
-	glm_scale(model, (vec3){(float)texture.width / 2.0f, (float)texture.height / 2.0f, 0.0f});
-
-	if (pivot == PIVOT_TOP_LEFT) {
-		glm_translate(model, (vec3){1.0f, 1.0f, 0.0f});
-	}
-
-	shader_set_mat4(gui_shader, "model", &model);
-	shader_set_mat4(gui_shader, "projection", &projection);
-
-	// mat4 view = {0};
-	// glm_mat4_identity(view);
-	// shader_set_mat4(gui_shader, "view", &view);
-
-	render_mesh(res_pack, &res_pack->meshes[MESH_QUAD], texture_index);
-}
-
-static void render_mesh_isometric(res_pack_t *res_pack, mesh_t mesh, size_t texture_index, i32 x, i32 y) {
-	glEnable(GL_DEPTH_TEST);
-
-	glUseProgram(gui_shader);
-
-	mat4 projection = {0};
-	float aspect_ratio = window_width / window_height;
-	
-	glm_ortho(0.0f, res_pack->render_width, 0.0f, res_pack->render_height, 0.1f, 1024.0f, projection);
-
-	mat4 model = {0};
-	glm_mat4_identity(model);
-
-	glm_translate(model, (vec3){(float)x, (float)y, -512.0f});
-
-	glm_scale(model, (vec3){32.0f, 32.0f, 32.0f});
-
-	glm_rotate(model, glm_rad(35.264f), (vec3){1.0f, 0.0f, 0.0f});
-	glm_rotate(model, glm_rad(45.0f), (vec3){0.0f, 1.0f, 0.0f});
-
-	shader_set_mat4(gui_shader, "model", &model);
-	shader_set_mat4(gui_shader, "projection", &projection);
-
-	render_mesh(res_pack, &mesh, texture_index);
-}
-
-void render_game(res_pack_t *res_pack, level_t *level, ecs_world_t *ecs, camera_t *camera) {
-	// Frame buffer stuff
-	start_frame_buffer(res_pack);
-
-	global_camera = camera;
-	global_ecs = ecs;
-
-	clear(res_pack->sky_color);
-	
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    glUseProgram(game_shader);
-
-	// View matrix
-	mat4 view = {0};
-	vec3 temp = {0};
-	glm_vec3_add(camera->position, camera->front, temp);
-	glm_lookat(camera->position, temp, camera->up, view);
-	shader_set_mat4(game_shader, "view", &view);
-
-	// Projection matrix
-	mat4 projection = {0};
-	// glm_perspective(glm_rad(45.0f), (float)window_width / (float)window_height, 0.1f, 100.0f, projection);
-	glm_perspective(glm_rad(60.0f), (float)window_width / (float)window_height, 0.1f, 100.0f, projection);
-	
-	shader_set_mat4(game_shader, "projection", &projection);
-
-	shader_set_int(game_shader, "texture1", 0);
-
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-	for (i32 z = 0; z < level->depth; z++) {
-		for (i32 y = 0; y < level->height; y++) {
-			for (i32 x = 0; x < level->width; x++) {
-				size_t tile_index = level_get_tile_index(level, x, y, z);
+static void render_grid(res_pack_t *res_pack, grid_t *grid) {
+	for (i32 z = 0; z < grid->depth; z++) {
+		for (i32 y = 0; y < grid->height; y++) {
+			for (i32 x = 0; x < grid->width; x++) {
+				size_t tile_index = grid_get_cell(grid, x, y, z);
                 if (tile_index == 0) {
                     continue;
                 }
@@ -353,29 +253,123 @@ void render_game(res_pack_t *res_pack, level_t *level, ecs_world_t *ecs, camera_
 			}
 		}
 	}
+}
+
+void render_image(res_pack_t *res_pack, enum pivot pivot, size_t texture_index, i32 x, i32 y) {
+	glDisable(GL_DEPTH_TEST);
+
+	glUseProgram(gui_shader);
+
+	mat4 projection = {0};
+	glm_ortho(0.0f, res_pack->render_width, res_pack->render_height, 0.0f, -1.0f, 1.0f, projection);
+
+	texture_t texture = res_pack->textures[texture_index];
+
+	mat4 model = {0};
+	glm_mat4_identity(model);
+
+	glm_translate(model, (vec3){(float)x, (float)y, 0.0f});
+	
+	glm_scale(model, (vec3){(float)texture.width / 2.0f, (float)texture.height / 2.0f, 0.0f});
+
+	if (pivot == PIVOT_TOP_LEFT) {
+		glm_translate(model, (vec3){1.0f, 1.0f, 0.0f});
+	}
+
+	shader_set_mat4(gui_shader, "model", &model);
+	shader_set_mat4(gui_shader, "projection", &projection);
+
+	// mat4 view = {0};
+	// glm_mat4_identity(view);
+	// shader_set_mat4(gui_shader, "view", &view);
+
+	render_mesh(res_pack, &res_pack->meshes[MESH_QUAD], texture_index);
+}
+
+void render_mesh_isometric(res_pack_t *res_pack, mesh_t mesh, size_t texture_index, i32 x, i32 y) {
+	glEnable(GL_DEPTH_TEST);
+
+	glUseProgram(gui_shader);
+
+	mat4 projection = {0};
+	
+	glm_ortho(0.0f, res_pack->render_width, 0.0f, res_pack->render_height, 0.1f, 1024.0f, projection);
+
+	mat4 model = {0};
+	glm_mat4_identity(model);
+
+	glm_translate(model, (vec3){(float)x, (float)y, -512.0f});
+
+	glm_scale(model, (vec3){32.0f, 32.0f, 32.0f});
+
+	glm_rotate(model, glm_rad(35.264f), (vec3){1.0f, 0.0f, 0.0f});
+	glm_rotate(model, glm_rad(45.0f), (vec3){0.0f, 1.0f, 0.0f});
+
+	shader_set_mat4(gui_shader, "model", &model);
+	shader_set_mat4(gui_shader, "projection", &projection);
+
+	render_mesh(res_pack, &mesh, texture_index);
+}
+
+void render_game(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, camera_t *camera) {
+	// Frame buffer stuff
+	// render_start_frame_buffer(res_pack);
+
+	global_camera = camera;
+	global_ecs = ecs;
+
+	clear(res_pack->sky_color);
+	
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glUseProgram(game_shader);
+
+	// View matrix
+	mat4 view = {0};
+	vec3 temp = {0};
+	glm_vec3_add(camera->position, camera->front, temp);
+	glm_lookat(camera->position, temp, camera->up, view);
+	shader_set_mat4(game_shader, "view", &view);
+
+	// Projection matrix
+	mat4 projection = {0};
+	// glm_perspective(glm_rad(45.0f), (float)window_width / (float)window_height, 0.1f, 100.0f, projection);
+	glm_perspective(glm_rad(60.0f), (float)window_width / (float)window_height, 0.1f, 100.0f, projection);
+	
+	shader_set_mat4(game_shader, "projection", &projection);
+
+	shader_set_int(game_shader, "texture1", 0);
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+	render_grid(res_pack, grid);
 
 	render_mesh_components(res_pack, ecs);
 
 	render_sprite_components(res_pack, ecs, camera);
 
 
-	render_image(res_pack, PIVOT_CENTER, 6, res_pack->render_width / 2, res_pack->render_height / 2);
+	// render_image(res_pack, PIVOT_CENTER, 6, res_pack->render_width / 2, res_pack->render_height / 2);
 
 
-	// render_image(res_pack, PIVOT_TOP_LEFT, 6, 1, 1);
-	render_image(res_pack, PIVOT_TOP_LEFT, 4, 0, 0);
-	render_image(res_pack, PIVOT_TOP_LEFT, 3, 0, -4);
-	render_image(res_pack, PIVOT_TOP_LEFT, 4, 640-64, 0);
-	render_image(res_pack, PIVOT_TOP_LEFT, 3, 640-64, -4);
+	// // render_image(res_pack, PIVOT_TOP_LEFT, 6, 1, 1);
+	// render_image(res_pack, PIVOT_TOP_LEFT, 4, 0, 0);
+	// render_image(res_pack, PIVOT_TOP_LEFT, 3, 0, -4);
+	// render_image(res_pack, PIVOT_TOP_LEFT, 4, 640-64, 0);
+	// render_image(res_pack, PIVOT_TOP_LEFT, 3, 640-64, -4);
 
-	render_mesh_isometric(res_pack, res_pack->meshes[2], 1, 100, 100);
-	render_mesh_isometric(res_pack, res_pack->meshes[3], 2, 200, 100);
+	// render_mesh_isometric(res_pack, res_pack->meshes[2], 1, 100, 100);
+	// render_mesh_isometric(res_pack, res_pack->meshes[3], 2, 200, 100);
 
-	end_frame_buffer(res_pack);
+	// render_end_frame_buffer(res_pack);
 }
 
-void render_level_ortho(res_pack_t *res_pack, level_t *level, enum ortho_view orientation, float zoom, mat4 *projection) {
-	// start_frame_buffer(res_pack);
+void render_grid_ortho(res_pack_t *res_pack, grid_t *grid, enum ortho_view orientation, float zoom, mat4 *projection) {
+	// render_start_frame_buffer(res_pack);
 
 	// glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	clear(res_pack->editor_color);
@@ -395,10 +389,10 @@ void render_level_ortho(res_pack_t *res_pack, level_t *level, enum ortho_view or
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	for (i32 z = 0; z < level->depth; z++) {
-		for (i32 y = 0; y < level->height; y++) {
-			for (i32 x = 0; x < level->width; x++) {
-				size_t tile_index = level_get_tile_index(level, x, y, z);
+	for (i32 z = 0; z < grid->depth; z++) {
+		for (i32 y = 0; y < grid->height; y++) {
+			for (i32 x = 0; x < grid->width; x++) {
+				size_t tile_index = grid_get_cell(grid, x, y, z);
                 if (tile_index == 0) {
                     continue;
                 }
@@ -423,5 +417,5 @@ void render_level_ortho(res_pack_t *res_pack, level_t *level, enum ortho_view or
 		}
 	}
 
-	// end_frame_buffer(res_pack);
+	// render_end_frame_buffer(res_pack);
 }

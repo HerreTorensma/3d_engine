@@ -1,7 +1,7 @@
 #pragma once
 
 #include "global.h"
-#include "mesh.h"
+#include "core.h"
 #include "util.h"
 
 typedef struct tile {

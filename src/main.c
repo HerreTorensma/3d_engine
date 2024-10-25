@@ -286,43 +286,43 @@ int main(int argc, char *argv[]) {
 		.rotation = {0},
 	};
 
-	level_t level = {0};
-	level.width = 16;
-	level.height = 16;
-	level.depth = 16;
+	grid_t grid = {0};
+	grid.width = 16;
+	grid.height = 16;
+	grid.depth = 16;
 
 	for (int z = 0; z < 16; z++) {
 		for (int x = 0; x < 16; x++) {
-			level_set_tile_index(&level, TILE_DIRT_FLOOR, x, 0, z);
+			grid_set_cell(&grid, TILE_DIRT_FLOOR, x, 0, z);
 		}
 	}
 
-	level_set_tile_index(&level, TILE_BRICK_CUBE, 0, 0, 0);
-	level_set_tile_index(&level, TILE_BRICK_CUBE, 1, 0, 0);
-	// level_set_tile_index(&level, TILE_BRICK_CUBE, 2, 0, 0);
-	level_set_tile_index(&level, TILE_BRICK_CUBE, 3, 0, 0);
-	level_set_tile_index(&level, TILE_BRICK_CUBE, 4, 0, 0);
-	level_set_tile_index(&level, TILE_BRICK_CUBE, 5, 0, 0);
-	level_set_tile_index(&level, TILE_BRICK_CUBE, 6, 0, 0);
-	level_set_tile_index(&level, TILE_BRICK_CUBE, 7, 0, 0);
-	level_set_tile_index(&level, TILE_BRICK_CUBE, 8, 0, 0);
-	level_set_tile_index(&level, TILE_BRICK_CUBE, 9, 0, 0);
+	grid_set_cell(&grid, TILE_BRICK_CUBE, 0, 0, 0);
+	grid_set_cell(&grid, TILE_BRICK_CUBE, 1, 0, 0);
+	// grid_set_cell(&grid, TILE_BRICK_CUBE, 2, 0, 0);
+	grid_set_cell(&grid, TILE_BRICK_CUBE, 3, 0, 0);
+	grid_set_cell(&grid, TILE_BRICK_CUBE, 4, 0, 0);
+	grid_set_cell(&grid, TILE_BRICK_CUBE, 5, 0, 0);
+	grid_set_cell(&grid, TILE_BRICK_CUBE, 6, 0, 0);
+	grid_set_cell(&grid, TILE_BRICK_CUBE, 7, 0, 0);
+	grid_set_cell(&grid, TILE_BRICK_CUBE, 8, 0, 0);
+	grid_set_cell(&grid, TILE_BRICK_CUBE, 9, 0, 0);
 
-	level_set_tile_index(&level, TILE_BRICK_CUBE, 7, 1, 0);
-	level_set_tile_index(&level, TILE_BRICK_CUBE, 8, 1, 0);
-	level_set_tile_index(&level, TILE_BRICK_CUBE, 9, 1, 0);
+	grid_set_cell(&grid, TILE_BRICK_CUBE, 7, 1, 0);
+	grid_set_cell(&grid, TILE_BRICK_CUBE, 8, 1, 0);
+	grid_set_cell(&grid, TILE_BRICK_CUBE, 9, 1, 0);
 
-	level_set_tile_index(&level, TILE_BRICK_CUBE, 9, 0, 1);
-	level_set_tile_index(&level, TILE_BRICK_CUBE, 9, 0, 2);
-	level_set_tile_index(&level, TILE_BRICK_CUBE, 9, 0, 3);
-	level_set_tile_index(&level, TILE_BRICK_CUBE, 9, 0, 4);
+	grid_set_cell(&grid, TILE_BRICK_CUBE, 9, 0, 1);
+	grid_set_cell(&grid, TILE_BRICK_CUBE, 9, 0, 2);
+	grid_set_cell(&grid, TILE_BRICK_CUBE, 9, 0, 3);
+	grid_set_cell(&grid, TILE_BRICK_CUBE, 9, 0, 4);
 	
-	level_set_tile_index(&level, TILE_BRICK_SLOPE, 10, 0, 4);
-	level_set_tile_index(&level, TILE_BRICK_FLOOR, 11, 0, 4);
-	level_set_tile_index(&level, TILE_BRICK_PYRAMID, 12, 0, 4);
-	level_set_tile_index(&level, TILE_BRICK_SLAB, 13, 0, 4);
-	level_set_tile_index(&level, TILE_BRICK_CORNER, 14, 0, 4);
-	level_set_tile_index(&level, TILE_BRICK_MONKEY, 15, 0, 4);
+	grid_set_cell(&grid, TILE_BRICK_SLOPE, 10, 0, 4);
+	grid_set_cell(&grid, TILE_BRICK_FLOOR, 11, 0, 4);
+	grid_set_cell(&grid, TILE_BRICK_PYRAMID, 12, 0, 4);
+	grid_set_cell(&grid, TILE_BRICK_SLAB, 13, 0, 4);
+	grid_set_cell(&grid, TILE_BRICK_CORNER, 14, 0, 4);
+	grid_set_cell(&grid, TILE_BRICK_MONKEY, 15, 0, 4);
 
 	camera = create_camera();
 
@@ -340,7 +340,7 @@ int main(int argc, char *argv[]) {
 	ECS_REGISTER_COMPONENT(&ecs, mesh_c);
 	ECS_REGISTER_COMPONENT(&ecs, rotating_c);
 
-	for (int i = 0; i < 10000; i++) {
+	for (int i = 0; i < 100; i++) {
 		entity_t tree = ecs_new(&ecs);
 		transform_c *transform = ECS_SET(&ecs, tree, transform_c, {0});
 		transform->position[0] = 10.0f;
@@ -442,15 +442,31 @@ int main(int argc, char *argv[]) {
 		}
 
 		if (edit_mode) {
-			editor_update(&level);
+			editor_update(&grid);
 		} else {
 			game_update(&ecs);
 		}
 
 		if (edit_mode) {
-			editor_render(&res_pack, &level);
+			editor_render(&res_pack, &grid);
 		} else {
-			render_game(&res_pack, &level, &ecs, &camera);
+			render_start_frame_buffer(&res_pack);
+
+			render_game(&res_pack, &grid, &ecs, &camera);
+
+			// Crosshair
+			render_image(&res_pack, PIVOT_CENTER, 6, res_pack.render_width / 2, res_pack.render_height / 2);
+
+			// render_image(res_pack, PIVOT_TOP_LEFT, 6, 1, 1);
+			render_image(&res_pack, PIVOT_TOP_LEFT, 4, 0, 0);
+			render_image(&res_pack, PIVOT_TOP_LEFT, 3, 0, -4);
+			render_image(&res_pack, PIVOT_TOP_LEFT, 4, 640-64, 0);
+			render_image(&res_pack, PIVOT_TOP_LEFT, 3, 640-64, -4);
+
+			render_mesh_isometric(&res_pack, res_pack.meshes[MESH_CUBE], 1, 100, 100);
+			render_mesh_isometric(&res_pack, res_pack.meshes[MESH_SLAB], 2, 200, 100);
+
+			render_end_frame_buffer(&res_pack);
 		}
 
 		SDL_GL_SwapWindow(window);

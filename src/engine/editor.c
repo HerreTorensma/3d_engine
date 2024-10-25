@@ -60,7 +60,7 @@ static void get_tile_pos(i32 *x, i32 *y) {
 	*y = -(int)(roundf(world_pos[1]));
 }
 
-void editor_update(level_t *level) {
+void editor_update(grid_t *level) {
     if (input_key_pressed(SDL_SCANCODE_1)) {
 		orientation = ORTHO_TOP;
     }
@@ -94,29 +94,29 @@ void editor_update(level_t *level) {
 
 	if (input_mouse_button_pressed(SDL_BUTTON_LEFT)) {
 		for (int i = level->depth - 2; i >= 0; i--) {
-			if (level_get_tile_index(level, tile_x, i, tile_y) != 0) {
-				level_set_tile_index(level, 1, tile_x, i + 1, tile_y);
+			if (grid_get_cell(level, tile_x, i, tile_y) != 0) {
+				grid_set_cell(level, 1, tile_x, i + 1, tile_y);
 				break;
 			}
 
 			if (i == 0) {
-				level_set_tile_index(level, 1, tile_x, i, tile_y);
+				grid_set_cell(level, 1, tile_x, i, tile_y);
 			}
 		}
 	}
 
 	if (input_mouse_button_pressed(SDL_BUTTON_RIGHT)) {
 		for (int i = level->depth - 2; i >= 0; i--) {
-			if (level_get_tile_index(level, tile_x, i, tile_y) != 0) {
-				level_set_tile_index(level, 0, tile_x, i, tile_y);
+			if (grid_get_cell(level, tile_x, i, tile_y) != 0) {
+				grid_set_cell(level, 0, tile_x, i, tile_y);
 				break;
 			}
 		}
 	}
 }
 
-void editor_render(res_pack_t *res_pack, level_t *level) {
-	render_level_ortho(res_pack, level, orientation, zoom, &projection);
+void editor_render(res_pack_t *res_pack, grid_t *level) {
+	render_grid_ortho(res_pack, level, orientation, zoom, &projection);
 }
 
 void editor_input(SDL_Event event) {

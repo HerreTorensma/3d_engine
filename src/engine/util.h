@@ -1,7 +1,7 @@
 #pragma once
 
 #include "global.h"
-#include "mesh.h"
+#include "core.h"
 
 extern i32 window_width;
 extern i32 window_height;
