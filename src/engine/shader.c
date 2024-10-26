@@ -82,3 +82,7 @@ void shader_set_int(u32 id, const char name[], int value) {
 void shader_set_vec3(u32 id, const char name[], vec3 *value) {
 	glUniform3fv(glGetUniformLocation(id, name), 1, (const GLfloat*)value);
 }
+
+void shader_set_vec2(u32 id, const char name[], vec2 *value) {
+	glUniform2fv(glGetUniformLocation(id, name), 1, (const GLfloat*)value);
+}

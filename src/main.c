@@ -3,6 +3,7 @@
 #include "engine/util.h"
 #include "engine/editor.h"
 #include "engine/ecs.h"
+#include "engine/gui.h"
 
 static vertex_t quad_vertices[] = {
     {{1.0f,  1.0f, 0.0f}, {1.0f, 1.0f}},  // top right
@@ -34,6 +35,8 @@ enum {
 	TEX_DIRT,
 	TEX_CROSSHAIR,
 	TEX_WORMFISH,
+	TEX_COBBLE,
+	TEX_FONT,
 };
 
 enum {
@@ -226,6 +229,8 @@ int main(int argc, char *argv[]) {
 	res_add_texture(&res_pack, TEX_DIRT, load_tga("res/images/dirt.tga", true));
 	res_add_texture(&res_pack, TEX_CROSSHAIR, load_tga("res/images/crosshair.tga", true));
 	res_add_texture(&res_pack, TEX_WORMFISH, load_tga("res/images/wormfish.tga", true));
+	res_add_texture(&res_pack, TEX_COBBLE, load_tga("res/images/cobble.tga", false));
+	res_add_texture(&res_pack, TEX_FONT, load_tga("res/images/font.tga", false));
 
 	res_add_mesh_raw(&res_pack, MESH_QUAD, quad_vertices, sizeof(quad_vertices) / sizeof(vertex_t), quad_indices, sizeof(quad_indices) / sizeof(u32));
 	res_add_mesh(&res_pack, MESH_CUBE, load_mesh("res/meshes/cube.mesh"));
@@ -239,7 +244,8 @@ int main(int argc, char *argv[]) {
 
 	res_pack.tiles[TILE_BRICK_CUBE] = (tile_t) {
 		.mesh_index = MESH_CUBE,
-		.texture_index = TEX_BRICKS,
+		// .texture_index = TEX_BRICKS,
+		.texture_index = TEX_COBBLE,
 		.rotation = {0},
 	};
 	
@@ -285,6 +291,9 @@ int main(int argc, char *argv[]) {
 		.texture_index = TEX_DIRT,
 		.rotation = {0},
 	};
+
+	font_t font = {0};
+	font_init(&font, &res_pack, TEX_FONT);
 
 	grid_t grid = {0};
 	grid.width = 16;
@@ -465,6 +474,13 @@ int main(int argc, char *argv[]) {
 
 			render_mesh_isometric(&res_pack, res_pack.meshes[MESH_CUBE], 1, 100, 100);
 			render_mesh_isometric(&res_pack, res_pack.meshes[MESH_SLAB], 2, 200, 100);
+
+			render_image_ex(&res_pack, TEX_COBBLE, PIVOT_TOP_LEFT, (rect_t){16, 16, 16, 16}, 0, 0, 50.0f, (vec2){1.0f, 1.0f});
+
+			// gui_print(&res_pack, &font, "JATOCCHHH DIT IS EEN STUK TEXT YES HET KANKERWERKTS", 0, 0);
+			// gui_print(&res_pack, &font, "hier nog een paar kleine letters", 0, 0);
+			gui_print(&res_pack, &font, "DREAM SIMULATOR v0.1", 1, 0);
+			// gui_print(&res_pack, &font, "!@#$%^&*()-=", 0, 0);
 
 			render_end_frame_buffer(&res_pack);
 		}

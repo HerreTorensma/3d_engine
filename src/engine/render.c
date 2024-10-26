@@ -279,9 +279,50 @@ void render_image(res_pack_t *res_pack, enum pivot pivot, size_t texture_index, 
 	shader_set_mat4(gui_shader, "model", &model);
 	shader_set_mat4(gui_shader, "projection", &projection);
 
-	// mat4 view = {0};
-	// glm_mat4_identity(view);
-	// shader_set_mat4(gui_shader, "view", &view);
+	shader_set_vec2(gui_shader, "tex_scale", (vec2){1.0f, 1.0f});
+	shader_set_vec2(gui_shader, "tex_offset", (vec2){0.0f, 0.0f});
+
+	render_mesh(res_pack, &res_pack->meshes[MESH_QUAD], texture_index);
+}
+
+// Extended version
+void render_image_ex(res_pack_t *res_pack, size_t texture_index, enum pivot pivot, rect_t src, i32 x, i32 y, float rotation, vec2 scale) {
+	glDisable(GL_DEPTH_TEST);
+
+	glUseProgram(gui_shader);
+
+	mat4 projection = {0};
+	glm_ortho(0.0f, res_pack->render_width, res_pack->render_height, 0.0f, -1.0f, 1.0f, projection);
+
+	texture_t texture = res_pack->textures[texture_index];
+
+	mat4 model = {0};
+	glm_mat4_identity(model);
+
+	glm_translate(model, (vec3){(float)x, (float)y, 0.0f});
+
+	vec2 tex_scale = {
+		(float)src.w / (float)texture.width,
+		(float)src.h / (float)texture.height,
+	};
+	vec2 tex_offset = {
+		(float)src.x / (float)texture.width,
+		(float)src.y / (float)texture.height,
+	};
+	
+	glm_scale(model, (vec3){(float)texture.width / 2.0f, (float)texture.height / 2.0f, 0.0f});
+	glm_scale(model, (vec3){tex_scale[0], tex_scale[1], 0.0f});
+
+	if (pivot == PIVOT_TOP_LEFT) {
+		glm_translate(model, (vec3){1.0f, 1.0f, 0.0f});
+	}
+
+
+	shader_set_mat4(gui_shader, "model", &model);
+	shader_set_mat4(gui_shader, "projection", &projection);
+	
+	shader_set_vec2(gui_shader, "tex_scale", &tex_scale);
+	shader_set_vec2(gui_shader, "tex_offset", &tex_offset);
 
 	render_mesh(res_pack, &res_pack->meshes[MESH_QUAD], texture_index);
 }

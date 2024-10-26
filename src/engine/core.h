@@ -30,3 +30,10 @@ typedef struct texture {
 
 	u32 id;
 } texture_t;
+
+typedef struct rect {
+	i32 x;
+	i32 y;
+	i32 w;
+	i32 h;
+} rect_t;
