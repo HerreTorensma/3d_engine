@@ -7,6 +7,7 @@
 #include "shader.h"
 #include "input.h"
 #include "render.h"
+#include "gui.h"
 
 void editor_init(void);
 

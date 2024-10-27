@@ -37,6 +37,8 @@ enum {
 	TEX_WORMFISH,
 	TEX_COBBLE,
 	TEX_FONT,
+	TEX_BUTTON,
+	TEX_BUTTON_PRESSED
 };
 
 enum {
@@ -232,6 +234,11 @@ int main(int argc, char *argv[]) {
 	res_add_texture(&res_pack, TEX_COBBLE, load_tga("res/images/cobble.tga", false));
 	res_add_texture(&res_pack, TEX_FONT, load_tga("res/images/font.tga", false));
 
+	res_add_texture(&res_pack, TEX_BUTTON, load_tga("res/images/button.tga", false));
+	res_add_texture(&res_pack, TEX_BUTTON_PRESSED, load_tga("res/images/button_pressed.tga", false));
+	res_pack.button_tex_index = TEX_BUTTON;
+	res_pack.button_pressed_tex_index = TEX_BUTTON_PRESSED;
+
 	res_add_mesh_raw(&res_pack, MESH_QUAD, quad_vertices, sizeof(quad_vertices) / sizeof(vertex_t), quad_indices, sizeof(quad_indices) / sizeof(u32));
 	res_add_mesh(&res_pack, MESH_CUBE, load_mesh("res/meshes/cube.mesh"));
 	res_add_mesh(&res_pack, MESH_FLOOR, load_mesh("res/meshes/floor.mesh"));
@@ -292,8 +299,8 @@ int main(int argc, char *argv[]) {
 		.rotation = {0},
 	};
 
-	font_t font = {0};
-	font_init(&font, &res_pack, TEX_FONT);
+	// font_t font = {0};
+	font_init(&res_pack.font, &res_pack, TEX_FONT);
 
 	grid_t grid = {0};
 	grid.width = 16;
@@ -457,7 +464,11 @@ int main(int argc, char *argv[]) {
 		}
 
 		if (edit_mode) {
+			// render_start_frame_buffer(&res_pack);
+
 			editor_render(&res_pack, &grid);
+
+			// render_end_frame_buffer(&res_pack);
 		} else {
 			render_start_frame_buffer(&res_pack);
 
@@ -479,7 +490,7 @@ int main(int argc, char *argv[]) {
 
 			// gui_print(&res_pack, &font, "JATOCCHHH DIT IS EEN STUK TEXT YES HET KANKERWERKTS", 0, 0);
 			// gui_print(&res_pack, &font, "hier nog een paar kleine letters", 0, 0);
-			gui_print(&res_pack, &font, "DREAM SIMULATOR v0.1", 1, 0);
+			gui_print(&res_pack, &res_pack.font, "DREAM SIMULATOR v0.1", 1, 0);
 			// gui_print(&res_pack, &font, "!@#$%^&*()-=", 0, 0);
 
 			render_end_frame_buffer(&res_pack);

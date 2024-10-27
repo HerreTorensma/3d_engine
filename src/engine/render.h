@@ -22,11 +22,6 @@ typedef struct renderer {
     ecs_world_t *ecs;
 } renderer_t;
 
-enum pivot {
-	PIVOT_CENTER,
-	PIVOT_TOP_LEFT,
-};
-
 void render_init(res_pack_t *res_pack);
 
 void render_game(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, camera_t *camera);

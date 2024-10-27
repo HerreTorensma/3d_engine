@@ -286,6 +286,9 @@ void render_image(res_pack_t *res_pack, enum pivot pivot, size_t texture_index, 
 }
 
 // Extended version
+// TODO: add effective rotation, scale and color
+// TODO: screen anchor system for GUI
+// TODO: maybe make the GUI rendering work with any render resolution aspect ratio???
 void render_image_ex(res_pack_t *res_pack, size_t texture_index, enum pivot pivot, rect_t src, i32 x, i32 y, float rotation, vec2 scale) {
 	glDisable(GL_DEPTH_TEST);
 

@@ -37,3 +37,26 @@ typedef struct rect {
 	i32 w;
 	i32 h;
 } rect_t;
+
+enum screen_anchor {
+    ANCHOR_CENTER,
+    ANCHOR_TOP,
+    ANCHOR_BOTTOM,
+    ANCHOR_LEFT,
+    ANCHOR_RIGHT,
+    ANCHOR_TOPLEFT,
+    ANCHOR_TOPRIGHT,
+    ANCHOR_BOTTOMLEFT,
+    ANCHOR_BOTTOMRIGHT,
+};
+
+enum pivot {
+	PIVOT_CENTER,
+	PIVOT_TOP_LEFT,
+};
+
+typedef struct font {
+    size_t texture_index;
+    rect_t rects[256];
+    u32 horizontal_spacing;
+} font_t;

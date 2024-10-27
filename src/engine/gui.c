@@ -46,3 +46,37 @@ void gui_print(res_pack_t *res_pack, font_t *font, const char text[], i32 x, i32
         index++;
     }
 }
+
+// TODO: tiny tilemap system for buttons
+bool gui_button(res_pack_t *res_pack, const char text[], i32 x, i32 y) {
+    size_t tex_index = res_pack->button_tex_index;
+
+    i32 mouse_x, mouse_y;
+    SDL_GetMouseState(&mouse_x, &mouse_y);
+
+    mouse_x /= (window_width / res_pack->render_width);
+    mouse_y /= (window_height / res_pack->render_height);
+
+    rect_t rect = {
+        .x = x,
+        .y = y,
+        .w = res_pack->textures[res_pack->button_tex_index].width,
+        .h = res_pack->textures[res_pack->button_tex_index].height,
+    };
+
+    bool released;
+	if (mouse_x >= rect.x && mouse_x < rect.x + rect.w && mouse_y >= rect.y && mouse_y < rect.y + rect.h) {
+        if (input_mouse_button_held(SDL_BUTTON_LEFT)) {
+			tex_index = res_pack->button_pressed_tex_index;
+		}
+
+		if (input_mouse_button_released(SDL_BUTTON_LEFT)) {
+			released = true;
+		}
+    }
+
+    render_image(res_pack, PIVOT_TOP_LEFT, tex_index, x, y);
+    gui_print(res_pack, &res_pack->font, text, x+2, y+4);
+
+    return released;
+}

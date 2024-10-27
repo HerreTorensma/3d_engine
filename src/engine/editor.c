@@ -117,6 +117,8 @@ void editor_update(grid_t *level) {
 
 void editor_render(res_pack_t *res_pack, grid_t *level) {
 	render_grid_ortho(res_pack, level, orientation, zoom, &projection);
+
+	gui_button(res_pack, "TEST", 0, 0);
 }
 
 void editor_input(SDL_Event event) {

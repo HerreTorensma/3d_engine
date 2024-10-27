@@ -20,8 +20,12 @@ typedef struct res_pack {
 
     mesh_t meshes[256];
 	texture_t textures[256];
+	size_t button_tex_index;
+	size_t button_pressed_tex_index;
 
 	tile_t tiles[256];
+
+	font_t font;
 } res_pack_t;
 
 void res_add_mesh(res_pack_t *res_pack, size_t index, mesh_t mesh);
