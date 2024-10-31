@@ -47,8 +47,7 @@ void gui_print(res_pack_t *res_pack, font_t *font, const char text[], i32 x, i32
     }
 }
 
-// TODO: tiny tilemap system for buttons
-bool gui_button(res_pack_t *res_pack, const char text[], i32 x, i32 y) {
+bool gui_button(res_pack_t *res_pack, const char text[], rect_t rect) {
     size_t tex_index = res_pack->button_tex_index;
 
     i32 mouse_x, mouse_y;
@@ -57,15 +56,15 @@ bool gui_button(res_pack_t *res_pack, const char text[], i32 x, i32 y) {
     mouse_x /= (window_width / res_pack->render_width);
     mouse_y /= (window_height / res_pack->render_height);
 
-    rect_t rect = {
-        .x = x,
-        .y = y,
-        .w = res_pack->textures[res_pack->button_tex_index].width,
-        .h = res_pack->textures[res_pack->button_tex_index].height,
+    rect_t global_rect = {
+        .x = rect.x * res_pack->gui_tile_size,
+        .y = rect.y * res_pack->gui_tile_size,
+        .w = rect.w * res_pack->gui_tile_size,
+        .h = rect.h * res_pack->gui_tile_size,
     };
 
-    bool released;
-	if (mouse_x >= rect.x && mouse_x < rect.x + rect.w && mouse_y >= rect.y && mouse_y < rect.y + rect.h) {
+    bool released = false;
+	if (mouse_x >= global_rect.x && mouse_x < global_rect.x + global_rect.w && mouse_y >= global_rect.y && mouse_y < global_rect.y + global_rect.h) {
         if (input_mouse_button_held(SDL_BUTTON_LEFT)) {
 			tex_index = res_pack->button_pressed_tex_index;
 		}
@@ -75,8 +74,34 @@ bool gui_button(res_pack_t *res_pack, const char text[], i32 x, i32 y) {
 		}
     }
 
-    render_image(res_pack, PIVOT_TOP_LEFT, tex_index, x, y);
-    gui_print(res_pack, &res_pack->font, text, x+2, y+4);
+    for (u16 y = 0; y < rect.h; y++) {
+        for (u16 x = 0; x < rect.w; x++) {
+            rect_t src = {
+                .x = res_pack->gui_tile_size,
+                .y = res_pack->gui_tile_size,
+                .w = res_pack->gui_tile_size,
+                .h = res_pack->gui_tile_size, 
+            };
+
+            if (x == 0) {
+                src.x = 0;
+            }
+            if (y == 0) {
+                src.y = 0;
+            }
+            if (x == rect.w - 1) {
+                src.x = 2 * res_pack->gui_tile_size;
+            }
+            if (y == rect.h - 1) {
+                src.y = 2 * res_pack->gui_tile_size;
+            }
+
+            render_image_ex(res_pack, tex_index, PIVOT_TOP_LEFT, src, global_rect.x + x * res_pack->gui_tile_size, global_rect.y + y * res_pack->gui_tile_size, 0, (vec2){1.0f, 1.0f});
+        }
+    }
+
+    // gui_print(res_pack, &res_pack->font, text, x+2, y+4);
+    gui_print(res_pack, &res_pack->font, text, global_rect.x, global_rect.y);
 
     return released;
 }

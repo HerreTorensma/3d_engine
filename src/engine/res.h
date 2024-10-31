@@ -22,6 +22,7 @@ typedef struct res_pack {
 	texture_t textures[256];
 	size_t button_tex_index;
 	size_t button_pressed_tex_index;
+	u32 gui_tile_size;
 
 	tile_t tiles[256];
 

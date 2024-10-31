@@ -38,4 +38,5 @@ void render_start_frame_buffer(res_pack_t *res_pack);
 
 void render_end_frame_buffer(res_pack_t *res_pack);
 
-void render_mesh_isometric(res_pack_t *res_pack, mesh_t mesh, size_t texture_index, i32 x, i32 y);
+void render_mesh_isometric(res_pack_t *res_pack, mesh_t mesh, size_t texture_index, i32 x, i32 y, float scale);
+// void render_mesh_isometric(res_pack_t *res_pack, mesh_t mesh, size_t texture_index, i32 x, i32 y);

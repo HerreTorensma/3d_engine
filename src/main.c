@@ -41,6 +41,20 @@ enum {
 	TEX_BUTTON_PRESSED
 };
 
+// enum {
+// 	TEX_BRICKS = 1,
+// 	TEX_IRON_BARS,
+// 	TEX_DIRT,
+// 	TEX_COBBLE,
+// 	TEX_TREE,
+// 	TEX_BIRCH,
+// 	TEX_CROSSHAIR,
+// 	TEX_WORMFISH,
+// 	TEX_FONT,
+// 	TEX_BUTTON,
+// 	TEX_BUTTON_PRESSED
+// };
+
 enum {
 	TILE_BRICK_CUBE = 1,
 	TILE_BRICK_SLAB,
@@ -234,10 +248,11 @@ int main(int argc, char *argv[]) {
 	res_add_texture(&res_pack, TEX_COBBLE, load_tga("res/images/cobble.tga", false));
 	res_add_texture(&res_pack, TEX_FONT, load_tga("res/images/font.tga", false));
 
-	res_add_texture(&res_pack, TEX_BUTTON, load_tga("res/images/button.tga", false));
-	res_add_texture(&res_pack, TEX_BUTTON_PRESSED, load_tga("res/images/button_pressed.tga", false));
+	res_add_texture(&res_pack, TEX_BUTTON, load_tga("res/images/button_sheet.tga", false));
+	res_add_texture(&res_pack, TEX_BUTTON_PRESSED, load_tga("res/images/button_pressed_sheet.tga", false));
 	res_pack.button_tex_index = TEX_BUTTON;
 	res_pack.button_pressed_tex_index = TEX_BUTTON_PRESSED;
+	res_pack.gui_tile_size = 8;
 
 	res_add_mesh_raw(&res_pack, MESH_QUAD, quad_vertices, sizeof(quad_vertices) / sizeof(vertex_t), quad_indices, sizeof(quad_indices) / sizeof(u32));
 	res_add_mesh(&res_pack, MESH_CUBE, load_mesh("res/meshes/cube.mesh"));
@@ -475,7 +490,8 @@ int main(int argc, char *argv[]) {
 			render_game(&res_pack, &grid, &ecs, &camera);
 
 			// Crosshair
-			render_image(&res_pack, PIVOT_CENTER, 6, res_pack.render_width / 2, res_pack.render_height / 2);
+			// render_image(&res_pack, PIVOT_CENTER, 6, res_pack.render_width / 2, res_pack.render_height / 2);
+			render_image(&res_pack, PIVOT_CENTER, TEX_CROSSHAIR, res_pack.render_width / 2, res_pack.render_height / 2);
 
 			// render_image(res_pack, PIVOT_TOP_LEFT, 6, 1, 1);
 			render_image(&res_pack, PIVOT_TOP_LEFT, 4, 0, 0);
@@ -483,8 +499,8 @@ int main(int argc, char *argv[]) {
 			render_image(&res_pack, PIVOT_TOP_LEFT, 4, 640-64, 0);
 			render_image(&res_pack, PIVOT_TOP_LEFT, 3, 640-64, -4);
 
-			render_mesh_isometric(&res_pack, res_pack.meshes[MESH_CUBE], 1, 100, 100);
-			render_mesh_isometric(&res_pack, res_pack.meshes[MESH_SLAB], 2, 200, 100);
+			render_mesh_isometric(&res_pack, res_pack.meshes[MESH_CUBE], 1, 100, 100, 32.0f);
+			render_mesh_isometric(&res_pack, res_pack.meshes[MESH_SLAB], 2, 200, 100, 32.0f);
 
 			render_image_ex(&res_pack, TEX_COBBLE, PIVOT_TOP_LEFT, (rect_t){16, 16, 16, 16}, 0, 0, 50.0f, (vec2){1.0f, 1.0f});
 

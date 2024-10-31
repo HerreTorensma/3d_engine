@@ -330,7 +330,7 @@ void render_image_ex(res_pack_t *res_pack, size_t texture_index, enum pivot pivo
 	render_mesh(res_pack, &res_pack->meshes[MESH_QUAD], texture_index);
 }
 
-void render_mesh_isometric(res_pack_t *res_pack, mesh_t mesh, size_t texture_index, i32 x, i32 y) {
+void render_mesh_isometric(res_pack_t *res_pack, mesh_t mesh, size_t texture_index, i32 x, i32 y, float scale) {
 	glEnable(GL_DEPTH_TEST);
 
 	glUseProgram(gui_shader);
@@ -342,9 +342,14 @@ void render_mesh_isometric(res_pack_t *res_pack, mesh_t mesh, size_t texture_ind
 	mat4 model = {0};
 	glm_mat4_identity(model);
 
-	glm_translate(model, (vec3){(float)x, (float)y, -512.0f});
+	glm_translate(model, (vec3){(float)x, res_pack->render_height - (float)y, -512.0f});
+	// glm_translate(model, (vec3){(float)x, (float)y, -512.0f});
+	// glm_translate(model, (vec3){(float)x, (float)y, 0});
 
-	glm_scale(model, (vec3){32.0f, 32.0f, 32.0f});
+	// glm_scale(model, (vec3){32.0f, 32.0f, 32.0f});
+	glm_scale(model, (vec3){scale, scale, scale});
+
+	// glm_translate(model, (vec3){1.0f, -1.0f, 0.0f});
 
 	glm_rotate(model, glm_rad(35.264f), (vec3){1.0f, 0.0f, 0.0f});
 	glm_rotate(model, glm_rad(45.0f), (vec3){0.0f, 1.0f, 0.0f});

@@ -16,6 +16,8 @@ mat4 projection = {0};
 // vec3 pos = {2.0f, 0.0f, 0.0f};
 vec2 pos = {2.0f, 0.0f};
 
+static size_t selected_mesh_index = 2;
+
 void editor_init(void) {
     {
 		vec3 camera_pos = {0.0f, 10.0f, 0.0f};  // Camera position (above looking down)
@@ -95,12 +97,12 @@ void editor_update(grid_t *level) {
 	if (input_mouse_button_pressed(SDL_BUTTON_LEFT)) {
 		for (int i = level->depth - 2; i >= 0; i--) {
 			if (grid_get_cell(level, tile_x, i, tile_y) != 0) {
-				grid_set_cell(level, 1, tile_x, i + 1, tile_y);
+				grid_set_cell(level, selected_mesh_index, tile_x, i + 1, tile_y);
 				break;
 			}
 
 			if (i == 0) {
-				grid_set_cell(level, 1, tile_x, i, tile_y);
+				grid_set_cell(level, selected_mesh_index, tile_x, i, tile_y);
 			}
 		}
 	}
@@ -115,10 +117,50 @@ void editor_update(grid_t *level) {
 	}
 }
 
+static bool mesh_button(res_pack_t *res_pack, size_t mesh_index, size_t texture_index, rect_t rect) {
+	bool released = false;
+	released = gui_button(res_pack, "", rect);
+
+	render_mesh_isometric(res_pack, res_pack->meshes[mesh_index], texture_index, rect.x * res_pack->gui_tile_size + (rect.w / 2) * res_pack->gui_tile_size, rect.y * res_pack->gui_tile_size + (rect.h / 2) * res_pack->gui_tile_size, 8.0f);
+
+	return released;
+}
+
+static bool texture_button(res_pack_t *res_pack, size_t texture_index, rect_t rect) {
+	bool released = false;
+	released = gui_button(res_pack, "", rect);
+
+	// render_mesh_isometric(res_pack, res_pack->meshes[mesh_index], texture_index, rect.x * res_pack->gui_tile_size + (rect.w / 2) * res_pack->gui_tile_size, rect.y * res_pack->gui_tile_size + (rect.h / 2) * res_pack->gui_tile_size, 8.0f);
+	// render_image(res_pack, PIVOT_TOP_LEFT, texture_index, rect.x, rect.y);
+	render_image_ex(res_pack, texture_index, PIVOT_CENTER, (rect_t){0, 0, 64, 64}, rect.x * res_pack->gui_tile_size, rect.y * res_pack->gui_tile_size, 0, (vec2){1.0f, 1.0f});
+
+	return released;
+}
+
 void editor_render(res_pack_t *res_pack, grid_t *level) {
+	// render_start_frame_buffer(res_pack);
+
 	render_grid_ortho(res_pack, level, orientation, zoom, &projection);
 
-	gui_button(res_pack, "TEST", 0, 0);
+	if (gui_button(res_pack, "SAVE", (rect_t){0, 0, 4, 2})) {
+		printf("SAVE\n");
+	}
+	
+	if (gui_button(res_pack, "LOAD", (rect_t){4, 0, 4, 2})) {
+		printf("LOAD\n");
+	}
+
+	for (i32 i = 1; i < 10; i++) {
+		if (mesh_button(res_pack, i, 1, (rect_t){0, i * 4, 4, 4})) {
+			selected_mesh_index = i - 1;
+		}
+	}
+
+	for (i32 i = 1; i < 4; i++) {
+		// texture_button(res_pack, i, (rect_t){4, i * 4, 4, 4});
+	}
+
+	// render_end_frame_buffer(res_pack);
 }
 
 void editor_input(SDL_Event event) {
