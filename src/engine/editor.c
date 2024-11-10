@@ -142,11 +142,11 @@ void editor_render(res_pack_t *res_pack, grid_t *level) {
 
 	render_grid_ortho(res_pack, level, orientation, zoom, &projection);
 
-	if (gui_button(res_pack, "SAVE", (rect_t){0, 0, 4, 2})) {
+	if (gui_button(res_pack, "SAVED", (rect_t){0, 0, 4, 4})) {
 		printf("SAVE\n");
 	}
 	
-	if (gui_button(res_pack, "LOAD", (rect_t){4, 0, 4, 2})) {
+	if (gui_button(res_pack, "LOADER", (rect_t){4, 0, 8, 2})) {
 		printf("LOAD\n");
 	}
 

@@ -227,8 +227,13 @@ int main(int argc, char *argv[]) {
 	glViewport(0, 0, window_width, window_height);
 
 	res_pack_t res_pack = {0};
+	
 	res_pack.render_width = 640;
 	res_pack.render_height = 360;
+
+	// res_pack.render_width = 800;
+	// res_pack.render_height = 450;
+
 	// res_pack.render_height = 480;
 	res_pack.sky_color = (color_t){58, 49, 41, 255};
 	// res_pack.sky_color = (color_t){2, 9, 23, 255};
@@ -316,6 +321,7 @@ int main(int argc, char *argv[]) {
 
 	// font_t font = {0};
 	font_init(&res_pack.font, &res_pack, TEX_FONT);
+	res_pack.font.y_center = -4;
 
 	grid_t grid = {0};
 	grid.width = 16;

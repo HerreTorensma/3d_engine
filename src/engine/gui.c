@@ -47,6 +47,18 @@ void gui_print(res_pack_t *res_pack, font_t *font, const char text[], i32 x, i32
     }
 }
 
+static i32 gui_get_text_width(res_pack_t *res_pack, font_t *font, const char text[]) {
+    i32 index = 0;
+    i32 current_x = 0;
+
+    while (text[index] != '\0') {
+        current_x += font->rects[text[index]].w + font->horizontal_spacing;
+        index++;
+    }
+
+    return current_x;
+}
+
 bool gui_button(res_pack_t *res_pack, const char text[], rect_t rect) {
     size_t tex_index = res_pack->button_tex_index;
 
@@ -100,8 +112,17 @@ bool gui_button(res_pack_t *res_pack, const char text[], rect_t rect) {
         }
     }
 
+    i32 text_width = gui_get_text_width(res_pack, &res_pack->font, text);
+
+    i32 text_x = global_rect.x + (global_rect.w / 2) - (text_width / 2) - 1;
+    // i32 text_y = global_rect.y + (global_rect.h / 2) + res_pack->font.y_center;
+    i32 text_y = global_rect.y + (global_rect.h / 2) - (res_pack->textures[res_pack->font.texture_index].height / 2) - 1;
+
     // gui_print(res_pack, &res_pack->font, text, x+2, y+4);
-    gui_print(res_pack, &res_pack->font, text, global_rect.x, global_rect.y);
+    // gui_print(res_pack, &res_pack->font, text, global_rect.x, global_rect.y);
+    // gui_print(res_pack, &res_pack->font, text, global_rect.x, text_y);
+    // gui_print(res_pack, &res_pack->font, text, global_rect.x - text_width / 2, text_y);
+    gui_print(res_pack, &res_pack->font, text, text_x, text_y);
 
     return released;
 }

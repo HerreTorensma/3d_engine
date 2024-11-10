@@ -59,4 +59,5 @@ typedef struct font {
     size_t texture_index;
     rect_t rects[256];
     u32 horizontal_spacing;
+    i32 y_center;
 } font_t;
