@@ -146,6 +146,7 @@ void editor_render(res_pack_t *res_pack, grid_t *level) {
 		printf("SAVE\n");
 	}
 	
+	// if (gui_button(res_pack, "LOADER EN DE PODER EN AL DIE DINGEN", (rect_t){4, 0, 8, 2})) {
 	if (gui_button(res_pack, "LOADER", (rect_t){4, 0, 8, 2})) {
 		printf("LOAD\n");
 	}

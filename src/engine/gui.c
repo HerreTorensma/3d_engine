@@ -59,7 +59,7 @@ static i32 gui_get_text_width(res_pack_t *res_pack, font_t *font, const char tex
     return current_x;
 }
 
-bool gui_button(res_pack_t *res_pack, const char text[], rect_t rect) {
+bool gui_button(res_pack_t *res_pack, const char text[], rect_t tile_rect) {
     size_t tex_index = res_pack->button_tex_index;
 
     i32 mouse_x, mouse_y;
@@ -69,10 +69,10 @@ bool gui_button(res_pack_t *res_pack, const char text[], rect_t rect) {
     mouse_y /= (window_height / res_pack->render_height);
 
     rect_t global_rect = {
-        .x = rect.x * res_pack->gui_tile_size,
-        .y = rect.y * res_pack->gui_tile_size,
-        .w = rect.w * res_pack->gui_tile_size,
-        .h = rect.h * res_pack->gui_tile_size,
+        .x = tile_rect.x * res_pack->gui_tile_size,
+        .y = tile_rect.y * res_pack->gui_tile_size,
+        .w = tile_rect.w * res_pack->gui_tile_size,
+        .h = tile_rect.h * res_pack->gui_tile_size,
     };
 
     bool released = false;
@@ -86,8 +86,8 @@ bool gui_button(res_pack_t *res_pack, const char text[], rect_t rect) {
 		}
     }
 
-    for (u16 y = 0; y < rect.h; y++) {
-        for (u16 x = 0; x < rect.w; x++) {
+    for (u16 y = 0; y < tile_rect.h; y++) {
+        for (u16 x = 0; x < tile_rect.w; x++) {
             rect_t src = {
                 .x = res_pack->gui_tile_size,
                 .y = res_pack->gui_tile_size,
@@ -101,10 +101,10 @@ bool gui_button(res_pack_t *res_pack, const char text[], rect_t rect) {
             if (y == 0) {
                 src.y = 0;
             }
-            if (x == rect.w - 1) {
+            if (x == tile_rect.w - 1) {
                 src.x = 2 * res_pack->gui_tile_size;
             }
-            if (y == rect.h - 1) {
+            if (y == tile_rect.h - 1) {
                 src.y = 2 * res_pack->gui_tile_size;
             }
 
