@@ -38,7 +38,9 @@ enum {
 	TEX_COBBLE,
 	TEX_FONT,
 	TEX_BUTTON,
-	TEX_BUTTON_PRESSED
+	TEX_BUTTON_PRESSED,
+	TEX_FRAME,
+	TEX_GRASS
 };
 
 // enum {
@@ -259,6 +261,9 @@ int main(int argc, char *argv[]) {
 	res_pack.button_pressed_tex_index = TEX_BUTTON_PRESSED;
 	res_pack.gui_tile_size = 8;
 
+	res_add_texture(&res_pack, TEX_FRAME, load_tga("res/images/frame_new.tga", false));
+	res_add_texture(&res_pack, TEX_GRASS, load_tga("res/images/grass.tga", false));
+
 	res_add_mesh_raw(&res_pack, MESH_QUAD, quad_vertices, sizeof(quad_vertices) / sizeof(vertex_t), quad_indices, sizeof(quad_indices) / sizeof(u32));
 	res_add_mesh(&res_pack, MESH_CUBE, load_mesh("res/meshes/cube.mesh"));
 	res_add_mesh(&res_pack, MESH_FLOOR, load_mesh("res/meshes/floor.mesh"));
@@ -315,7 +320,8 @@ int main(int argc, char *argv[]) {
 	res_pack.tiles[TILE_DIRT_FLOOR] = (tile_t) {
 		.mesh_index = MESH_FLOOR,
 		// .mesh_index = MESH_MUSHROOM,
-		.texture_index = TEX_DIRT,
+		// .texture_index = TEX_DIRT,
+		.texture_index = TEX_GRASS,
 		.rotation = {0},
 	};
 
@@ -514,6 +520,8 @@ int main(int argc, char *argv[]) {
 			// gui_print(&res_pack, &font, "hier nog een paar kleine letters", 0, 0);
 			gui_print(&res_pack, &res_pack.font, "DREAM SIMULATOR v0.1", 1, 0);
 			// gui_print(&res_pack, &font, "!@#$%^&*()-=", 0, 0);
+
+			render_image(&res_pack, PIVOT_TOP_LEFT, TEX_FRAME, 0, 0);
 
 			render_end_frame_buffer(&res_pack);
 		}

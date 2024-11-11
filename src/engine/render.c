@@ -58,6 +58,7 @@ static void init_frame_buffer(res_pack_t *res_pack) {
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 }
 
 
@@ -68,6 +69,8 @@ void render_start_frame_buffer(res_pack_t *res_pack) {
 }
 
 void render_end_frame_buffer(res_pack_t *res_pack) {
+	// glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+
 	// More framebuffer stuff
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);  // Bind default framebuffer
 	glViewport(0, 0, window_width, window_height);  // Set viewport back to full resolution
@@ -78,6 +81,7 @@ void render_end_frame_buffer(res_pack_t *res_pack) {
 	render_mesh(res_pack, &(res_pack->meshes[MESH_QUAD]), fbo_tex);
 	
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 }
 
 void render_init(res_pack_t *res_pack) {

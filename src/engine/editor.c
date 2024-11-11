@@ -18,6 +18,8 @@ vec2 pos = {2.0f, 0.0f};
 
 static size_t selected_mesh_index = 2;
 
+static char idk_buffer[32] = "test";
+
 void editor_init(void) {
     {
 		vec3 camera_pos = {0.0f, 10.0f, 0.0f};  // Camera position (above looking down)
@@ -150,6 +152,8 @@ void editor_render(res_pack_t *res_pack, grid_t *level) {
 	if (gui_button(res_pack, "LOADER", (rect_t){4, 0, 8, 2})) {
 		printf("LOAD\n");
 	}
+
+	gui_text_edit(res_pack, idk_buffer, 32, (rect_t){4, 4, 4, 4});
 
 	for (i32 i = 1; i < 10; i++) {
 		if (mesh_button(res_pack, i, 1, (rect_t){0, i * 4, 4, 4})) {

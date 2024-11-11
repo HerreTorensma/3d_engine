@@ -17,6 +17,22 @@
     - Make a generic texture struct that also saves the pixels and whatnot
     - Add support for normals (why didnt i do this in the first place...)
     - Add flat shading to some stuff
+
+    - The big refactor
+        - Clean up renderer
+            - Clean up sprite rendering functions
+            - Also colored drawing for the fonts
+            - Probably forget about the screen anchors since I have a tile system which is gonna make that very difficult
+        - Make a theme struct and read the gui things from that
+        - Make length-based strings for easier modification
+        - Make the isometric rendering not affected by the other 3d things
+        - Create a generic pool data structure
+            - Use for ECS
+        - Remove the dictionary shit from the ecs
+        - Rethink what should be in core.h and global.h
+        - Also load BMPs by just loading it to SDL_Surface and putting that into my custom texture format
+        - Make text wrap system for the text edit stuff
+        - Make dialogue system
     
 
 ## Dependencies
