@@ -97,23 +97,31 @@ void editor_update(grid_t *level) {
 		return;
 	}
 
+	// Just create it every frame based on the mesh and texture
+	tile_t selected_tile = {
+		.occupied = true,
+		.mesh_index = selected_mesh_index,
+		.texture_index = selected_texture_index,
+	};
+
 	if (input_mouse_button_pressed(SDL_BUTTON_LEFT)) {
 		for (int i = level->depth - 2; i >= 0; i--) {
-			if (grid_get_cell(level, tile_x, i, tile_y) != 0) {
-				grid_set_cell(level, selected_mesh_index, tile_x, i + 1, tile_y);
+			if (grid_get_cell(level, tile_x, i, tile_y).occupied) {
+				grid_set_cell(level, selected_tile, tile_x, i + 1, tile_y);
 				break;
 			}
 
 			if (i == 0) {
-				grid_set_cell(level, selected_mesh_index, tile_x, i, tile_y);
+				grid_set_cell(level, selected_tile, tile_x, i, tile_y);
 			}
 		}
 	}
 
 	if (input_mouse_button_pressed(SDL_BUTTON_RIGHT)) {
 		for (int i = level->depth - 2; i >= 0; i--) {
-			if (grid_get_cell(level, tile_x, i, tile_y) != 0) {
-				grid_set_cell(level, 0, tile_x, i, tile_y);
+			if (grid_get_cell(level, tile_x, i, tile_y).occupied) {
+				tile_t empty_tile = {0};
+				grid_set_cell(level, empty_tile, tile_x, i, tile_y);
 				break;
 			}
 		}
@@ -160,16 +168,15 @@ void editor_render(res_pack_t *res_pack, grid_t *level) {
 	
 	gui_text_edit(res_pack, idk_buffer, 32, (rect_t){4, 4, 4, 4});
 
-	for (i32 i = 0; i < 10; i++) {
-		if (mesh_button(res_pack, i, 1, (rect_t){0, 2 + i * 4, 4, 4})) {
-			// selected_mesh_index = i - 1;
+	for (i32 i = 2; i < 10; i++) {
+		if (mesh_button(res_pack, i, 1, (rect_t){0, -4 + i * 4, 4, 4})) {
 			selected_mesh_index = i;
 		}
 	}
 
-	for (i32 i = 0; i < 4; i++) {
+	for (i32 i = 1; i < 13; i++) {
 		// Right edge of the screen
-		if (texture_button(res_pack, i, (rect_t){76, 2 + i * 4, 4, 4})) {
+		if (texture_button(res_pack, i, (rect_t){76, i * 4, 4, 4})) {
 			selected_texture_index = i;
 			printf("selected a texture\n");
 		}

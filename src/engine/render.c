@@ -61,42 +61,7 @@ static void init_frame_buffer(res_pack_t *res_pack) {
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 }
 
-
-void render_start_frame_buffer(res_pack_t *res_pack) {
-	// Frame buffer stuff
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-	glViewport(0, 0, res_pack->render_width, res_pack->render_height);
-}
-
-void render_end_frame_buffer(res_pack_t *res_pack) {
-	// glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-
-	// More framebuffer stuff
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);  // Bind default framebuffer
-	glViewport(0, 0, window_width, window_height);  // Set viewport back to full resolution
-	glDisable(GL_DEPTH_TEST);
-
-	glUseProgram(basic_shader);
-
-	render_mesh(res_pack, &(res_pack->meshes[MESH_QUAD]), fbo_tex);
-	
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-}
-
 void render_init(res_pack_t *res_pack) {
-	// {
-	// 	vec3 camera_pos = {10.0f, 10.0f, 10.0f};  // Camera position (above looking down)
-	// 	// vec3 camera_pos = {0.0f, 10.0f, 10.0f};  // Camera position (above looking down)
-	// 	vec3 target_pos = {0.0f, 0.0f, 0.0f};   // Looking at the origin
-	// 	vec3 up_vector  = {0.0f, 1.0f, 0.0f};  // Up vector (in Blender's coordinate system)
-
-	// 	camera_pos[0] *= cosf(glm_rad(45.0f));
-	// 	camera_pos[1] *= sinf(glm_rad(30.0f));
-	// 	camera_pos[2] *= sinf(glm_rad(45.0f));
-
-	// 	glm_lookat(camera_pos, target_pos, up_vector, isometric_view);
-	// }
 	{
 		// vec3 camera_pos = {1.0f, 1.0f, 1.0f};  // Camera position (above looking down)
 		// vec3 camera_pos = {0.0f, 10.0f, 10.0f};  // Camera position (above looking down)
@@ -140,7 +105,29 @@ void render_init(res_pack_t *res_pack) {
 	init_frame_buffer(res_pack);
 }
 
-int compare_by_distance(const void *a, const void *b) {
+void render_start_frame_buffer(res_pack_t *res_pack) {
+	// Frame buffer stuff
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glViewport(0, 0, res_pack->render_width, res_pack->render_height);
+}
+
+void render_end_frame_buffer(res_pack_t *res_pack) {
+	// glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+
+	// More framebuffer stuff
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);  // Bind default framebuffer
+	glViewport(0, 0, window_width, window_height);  // Set viewport back to full resolution
+	glDisable(GL_DEPTH_TEST);
+
+	glUseProgram(basic_shader);
+
+	render_mesh(res_pack, &(res_pack->meshes[MESH_QUAD]), fbo_tex);
+	
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+}
+
+static i32 compare_by_distance(const void *a, const void *b) {
 	entity_t entity1 = *(entity_t *)a;
 	entity_t entity2 = *(entity_t *)b;
 
@@ -219,18 +206,10 @@ static void render_grid(res_pack_t *res_pack, grid_t *grid) {
 	for (i32 z = 0; z < grid->depth; z++) {
 		for (i32 y = 0; y < grid->height; y++) {
 			for (i32 x = 0; x < grid->width; x++) {
-				size_t tile_index = grid_get_cell(grid, x, y, z);
-                if (tile_index == 0) {
-                    continue;
-                }
-
-				// References an entity and not a tile
-				// It wil get collected later anyway so we can skip it
-				if (tile_index > 255) {
+				tile_t tile = grid_get_cell(grid, x, y, z);
+				if (!tile.occupied) {
 					continue;
 				}
-
-				tile_t tile = res_pack->tiles[tile_index];
 
 				mesh_t mesh = res_pack->meshes[tile.mesh_index];
                 
@@ -239,10 +218,6 @@ static void render_grid(res_pack_t *res_pack, grid_t *grid) {
 				glm_mat4_identity(model);
 				glm_translate(model, (vec3){x, y, z});
 				glm_scale(model, (vec3){0.5f, 0.5f, 0.5f});
-				// glm_translate(model, (vec3){x * 2.0, y * 2.0, z * 2.0});
-				glm_rotate(model, glm_rad(tile.rotation[0]), (vec3){1.0f, 0.0f, 0.0f});
-				glm_rotate(model, glm_rad(tile.rotation[1]), (vec3){0.0f, 1.0f, 0.0f});
-				glm_rotate(model, glm_rad(tile.rotation[2]), (vec3){0.0f, 0.0f, 1.0f});
 				shader_set_mat4(game_shader, "model", &model);
 				
 				// vec3 fog_color = {1.0f, 0.0f, 0.0f};
@@ -363,10 +338,49 @@ void render_mesh_isometric(res_pack_t *res_pack, mesh_t mesh, size_t texture_ind
 	render_mesh(res_pack, &mesh, texture_index);
 }
 
-void render_game(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, camera_t *camera) {
-	// Frame buffer stuff
-	// render_start_frame_buffer(res_pack);
+void render_grid_ortho(res_pack_t *res_pack, grid_t *grid, enum ortho_view orientation, float zoom, mat4 *projection) {
+	// glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+	clear(res_pack->editor_color);
+	// glClearColor(res_pack->editor_color.gl_color[0], res_pack->editor_color.gl_color[1], res_pack->editor_color.gl_color[2], res_pack->editor_color.gl_color[3]);
 
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+
+    glUseProgram(ortho_shader);
+
+    shader_set_mat4(ortho_shader, "view", &ortho_views[orientation]);
+    // shader_set_mat4(ortho_shader, "view", &isometric_view);
+	
+	shader_set_mat4(ortho_shader, "projection", projection);
+
+	shader_set_int(ortho_shader, "texture1", 0);
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	for (i32 z = 0; z < grid->depth; z++) {
+		for (i32 y = 0; y < grid->height; y++) {
+			for (i32 x = 0; x < grid->width; x++) {
+				tile_t tile = grid_get_cell(grid, x, y, z);
+				if (!tile.occupied) {
+					continue;
+				}
+
+				mesh_t mesh = res_pack->meshes[tile.mesh_index];
+
+                // Model matrix
+				mat4 model;
+				glm_mat4_identity(model);
+				glm_translate(model, (vec3){x, y, z});
+				glm_scale(model, (vec3){0.5f, 0.5f, 0.5f});
+				shader_set_mat4(ortho_shader, "model", &model);
+				
+				render_mesh(res_pack, &mesh, tile.texture_index);
+			}
+		}
+	}
+}
+
+void render_game(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, camera_t *camera) {
 	global_camera = camera;
 	global_ecs = ecs;
 
@@ -403,71 +417,4 @@ void render_game(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, camera_t 
 	render_mesh_components(res_pack, ecs);
 
 	render_sprite_components(res_pack, ecs, camera);
-
-
-	// render_image(res_pack, PIVOT_CENTER, 6, res_pack->render_width / 2, res_pack->render_height / 2);
-
-
-	// // render_image(res_pack, PIVOT_TOP_LEFT, 6, 1, 1);
-	// render_image(res_pack, PIVOT_TOP_LEFT, 4, 0, 0);
-	// render_image(res_pack, PIVOT_TOP_LEFT, 3, 0, -4);
-	// render_image(res_pack, PIVOT_TOP_LEFT, 4, 640-64, 0);
-	// render_image(res_pack, PIVOT_TOP_LEFT, 3, 640-64, -4);
-
-	// render_mesh_isometric(res_pack, res_pack->meshes[2], 1, 100, 100);
-	// render_mesh_isometric(res_pack, res_pack->meshes[3], 2, 200, 100);
-
-	// render_end_frame_buffer(res_pack);
-}
-
-void render_grid_ortho(res_pack_t *res_pack, grid_t *grid, enum ortho_view orientation, float zoom, mat4 *projection) {
-	// render_start_frame_buffer(res_pack);
-
-	// glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-	clear(res_pack->editor_color);
-	// glClearColor(res_pack->editor_color.gl_color[0], res_pack->editor_color.gl_color[1], res_pack->editor_color.gl_color[2], res_pack->editor_color.gl_color[3]);
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
-
-    glUseProgram(ortho_shader);
-
-    shader_set_mat4(ortho_shader, "view", &ortho_views[orientation]);
-    // shader_set_mat4(ortho_shader, "view", &isometric_view);
-	
-	shader_set_mat4(ortho_shader, "projection", projection);
-
-	shader_set_int(ortho_shader, "texture1", 0);
-
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-	for (i32 z = 0; z < grid->depth; z++) {
-		for (i32 y = 0; y < grid->height; y++) {
-			for (i32 x = 0; x < grid->width; x++) {
-				size_t tile_index = grid_get_cell(grid, x, y, z);
-                if (tile_index == 0) {
-                    continue;
-                }
-
-				tile_t tile = res_pack->tiles[tile_index];
-
-				mesh_t mesh = res_pack->meshes[tile.mesh_index];
-
-                // Model matrix
-				mat4 model;
-				glm_mat4_identity(model);
-				glm_translate(model, (vec3){x, y, z});
-				glm_scale(model, (vec3){0.5f, 0.5f, 0.5f});
-				// glm_translate(model, (vec3){x * 2.0, y * 2.0, z * 2.0});
-				glm_rotate(model, glm_rad(tile.rotation[0]), (vec3){1.0f, 0.0f, 0.0f});
-				glm_rotate(model, glm_rad(tile.rotation[1]), (vec3){0.0f, 1.0f, 0.0f});
-				glm_rotate(model, glm_rad(tile.rotation[2]), (vec3){0.0f, 0.0f, 1.0f});
-				shader_set_mat4(ortho_shader, "model", &model);
-				
-				render_mesh(res_pack, &mesh, tile.texture_index);
-			}
-		}
-	}
-
-	// render_end_frame_buffer(res_pack);
 }

@@ -26,16 +26,16 @@ typedef struct renderer {
 
 void render_init(res_pack_t *res_pack);
 
-void render_game(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, camera_t *camera);
+void render_start_frame_buffer(res_pack_t *res_pack);
 
-void render_grid_ortho(res_pack_t *res_pack, grid_t *grid, enum ortho_view orientation, float zoom, mat4 *projection);
+void render_end_frame_buffer(res_pack_t *res_pack);
 
 void render_image(res_pack_t *res_pack, size_t texture_index, i32 x, i32 y, color_t color);
 
 void render_image_rect(res_pack_t *res_pack, size_t texture_index, rect_t src, rect_t dst, color_t color);
 
-void render_start_frame_buffer(res_pack_t *res_pack);
-
-void render_end_frame_buffer(res_pack_t *res_pack);
-
 void render_mesh_isometric(res_pack_t *res_pack, mesh_t mesh, size_t texture_index, i32 x, i32 y, float scale);
+
+void render_grid_ortho(res_pack_t *res_pack, grid_t *grid, enum ortho_view orientation, float zoom, mat4 *projection);
+
+void render_game(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, camera_t *camera);

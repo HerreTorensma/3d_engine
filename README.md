@@ -39,6 +39,7 @@
         - Remove the dictionary shit from the ecs
             - Actually remove the dict completely
         - [x] Rethink what should be in core.h and global.h
+        - Instead of returning structs in create functions, make init function that have a pointer to a struct as a paramter. This way you can decide per case if the struct should be statically or dynamically allocated.
 
     - Add sound with SDL2_Mixer
     - Add collision

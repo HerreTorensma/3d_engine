@@ -61,17 +61,6 @@ enum {
 // 	TEX_BUTTON_PRESSED
 // };
 
-enum {
-	TILE_BRICK_CUBE = 1,
-	TILE_BRICK_SLAB,
-	TILE_BRICK_CORNER,
-	TILE_BRICK_FLOOR,
-	TILE_BRICK_PYRAMID,
-	TILE_BRICK_SLOPE,
-	TILE_BRICK_MONKEY,
-	TILE_DIRT_FLOOR,
-};
-
 static camera_t create_camera() {
 	camera_t camera = {0};
 
@@ -278,57 +267,6 @@ int main(int argc, char *argv[]) {
 	res_add_mesh(&res_pack, MESH_MONKEY, load_mesh("res/meshes/monkey.mesh"));
 	res_add_mesh(&res_pack, MESH_MUSHROOM, load_mesh("res/meshes/mushroom.mesh"));
 
-	res_pack.tiles[TILE_BRICK_CUBE] = (tile_t) {
-		.mesh_index = MESH_CUBE,
-		// .texture_index = TEX_BRICKS,
-		.texture_index = TEX_COBBLE,
-		.rotation = {0},
-	};
-	
-	res_pack.tiles[TILE_BRICK_FLOOR] = (tile_t) {
-		.mesh_index = MESH_FLOOR,
-		.texture_index = TEX_BRICKS,
-		.rotation = {0},
-	};
-
-	res_pack.tiles[TILE_BRICK_SLAB] = (tile_t) {
-		.mesh_index = MESH_SLAB,
-		.texture_index = TEX_BRICKS,
-		.rotation = {0},
-	};
-
-	res_pack.tiles[TILE_BRICK_SLOPE] = (tile_t) {
-		.mesh_index = MESH_SLOPE,
-		.texture_index = TEX_BRICKS,
-		.rotation = {0},
-	};
-
-	res_pack.tiles[TILE_BRICK_PYRAMID] = (tile_t) {
-		.mesh_index = MESH_PYRAMID,
-		.texture_index = TEX_BRICKS,
-		.rotation = {0},
-	};
-
-	res_pack.tiles[TILE_BRICK_CORNER] = (tile_t) {
-		.mesh_index = MESH_CORNER,
-		.texture_index = TEX_BRICKS,
-		.rotation = {0},
-	};
-
-	res_pack.tiles[TILE_BRICK_MONKEY] = (tile_t) {
-		.mesh_index = MESH_MONKEY,
-		.texture_index = TEX_BRICKS,
-		.rotation = {0},
-	};
-
-	res_pack.tiles[TILE_DIRT_FLOOR] = (tile_t) {
-		.mesh_index = MESH_FLOOR,
-		// .mesh_index = MESH_MUSHROOM,
-		// .texture_index = TEX_DIRT,
-		.texture_index = TEX_GRASS,
-		.rotation = {0},
-	};
-
 	// font_t font = {0};
 	font_init(&res_pack.font, &res_pack, TEX_FONT);
 	res_pack.font.y_center = -4;
@@ -339,38 +277,38 @@ int main(int argc, char *argv[]) {
 	grid.height = 16;
 	grid.depth = 16;
 
-	for (int z = 0; z < 16; z++) {
-		for (int x = 0; x < 16; x++) {
-			grid_set_cell(&grid, TILE_DIRT_FLOOR, x, 0, z);
-		}
-	}
+	// for (int z = 0; z < 16; z++) {
+	// 	for (int x = 0; x < 16; x++) {
+	// 		grid_set_cell(&grid, TILE_DIRT_FLOOR, x, 0, z);
+	// 	}
+	// }
 
-	grid_set_cell(&grid, TILE_BRICK_CUBE, 0, 0, 0);
-	grid_set_cell(&grid, TILE_BRICK_CUBE, 1, 0, 0);
-	// grid_set_cell(&grid, TILE_BRICK_CUBE, 2, 0, 0);
-	grid_set_cell(&grid, TILE_BRICK_CUBE, 3, 0, 0);
-	grid_set_cell(&grid, TILE_BRICK_CUBE, 4, 0, 0);
-	grid_set_cell(&grid, TILE_BRICK_CUBE, 5, 0, 0);
-	grid_set_cell(&grid, TILE_BRICK_CUBE, 6, 0, 0);
-	grid_set_cell(&grid, TILE_BRICK_CUBE, 7, 0, 0);
-	grid_set_cell(&grid, TILE_BRICK_CUBE, 8, 0, 0);
-	grid_set_cell(&grid, TILE_BRICK_CUBE, 9, 0, 0);
+	// grid_set_cell(&grid, TILE_BRICK_CUBE, 0, 0, 0);
+	// grid_set_cell(&grid, TILE_BRICK_CUBE, 1, 0, 0);
+	// // grid_set_cell(&grid, TILE_BRICK_CUBE, 2, 0, 0);
+	// grid_set_cell(&grid, TILE_BRICK_CUBE, 3, 0, 0);
+	// grid_set_cell(&grid, TILE_BRICK_CUBE, 4, 0, 0);
+	// grid_set_cell(&grid, TILE_BRICK_CUBE, 5, 0, 0);
+	// grid_set_cell(&grid, TILE_BRICK_CUBE, 6, 0, 0);
+	// grid_set_cell(&grid, TILE_BRICK_CUBE, 7, 0, 0);
+	// grid_set_cell(&grid, TILE_BRICK_CUBE, 8, 0, 0);
+	// grid_set_cell(&grid, TILE_BRICK_CUBE, 9, 0, 0);
 
-	grid_set_cell(&grid, TILE_BRICK_CUBE, 7, 1, 0);
-	grid_set_cell(&grid, TILE_BRICK_CUBE, 8, 1, 0);
-	grid_set_cell(&grid, TILE_BRICK_CUBE, 9, 1, 0);
+	// grid_set_cell(&grid, TILE_BRICK_CUBE, 7, 1, 0);
+	// grid_set_cell(&grid, TILE_BRICK_CUBE, 8, 1, 0);
+	// grid_set_cell(&grid, TILE_BRICK_CUBE, 9, 1, 0);
 
-	grid_set_cell(&grid, TILE_BRICK_CUBE, 9, 0, 1);
-	grid_set_cell(&grid, TILE_BRICK_CUBE, 9, 0, 2);
-	grid_set_cell(&grid, TILE_BRICK_CUBE, 9, 0, 3);
-	grid_set_cell(&grid, TILE_BRICK_CUBE, 9, 0, 4);
+	// grid_set_cell(&grid, TILE_BRICK_CUBE, 9, 0, 1);
+	// grid_set_cell(&grid, TILE_BRICK_CUBE, 9, 0, 2);
+	// grid_set_cell(&grid, TILE_BRICK_CUBE, 9, 0, 3);
+	// grid_set_cell(&grid, TILE_BRICK_CUBE, 9, 0, 4);
 	
-	grid_set_cell(&grid, TILE_BRICK_SLOPE, 10, 0, 4);
-	grid_set_cell(&grid, TILE_BRICK_FLOOR, 11, 0, 4);
-	grid_set_cell(&grid, TILE_BRICK_PYRAMID, 12, 0, 4);
-	grid_set_cell(&grid, TILE_BRICK_SLAB, 13, 0, 4);
-	grid_set_cell(&grid, TILE_BRICK_CORNER, 14, 0, 4);
-	grid_set_cell(&grid, TILE_BRICK_MONKEY, 15, 0, 4);
+	// grid_set_cell(&grid, TILE_BRICK_SLOPE, 10, 0, 4);
+	// grid_set_cell(&grid, TILE_BRICK_FLOOR, 11, 0, 4);
+	// grid_set_cell(&grid, TILE_BRICK_PYRAMID, 12, 0, 4);
+	// grid_set_cell(&grid, TILE_BRICK_SLAB, 13, 0, 4);
+	// grid_set_cell(&grid, TILE_BRICK_CORNER, 14, 0, 4);
+	// grid_set_cell(&grid, TILE_BRICK_MONKEY, 15, 0, 4);
 
 	camera = create_camera();
 

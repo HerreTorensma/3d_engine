@@ -61,27 +61,27 @@ typedef struct theme {
 	u32 tile_size;
 } theme_t;
 
+typedef struct tile {
+    u8 occupied;
+	u8 mesh_index;
+	u8 texture_index;
+} tile_t;
+
 typedef struct grid {
 	u32 width;
 	u32 height;
 	u32 depth;
 
-	u64 map[4096];
+	tile_t map[4096];
 } grid_t;
 
-inline size_t grid_get_cell(grid_t *level, u32 x, u32 y, u32 z) {
+inline tile_t grid_get_cell(grid_t *level, u32 x, u32 y, u32 z) {
 	return level->map[z * level->width * level->height + y * level->width + x];
 }
 
-inline void grid_set_cell(grid_t *level, size_t index, u32 x, u32 y, u32 z) {
-	level->map[z * level->width * level->height + y * level->width + x] = index;
+inline void grid_set_cell(grid_t *level, tile_t tile, u32 x, u32 y, u32 z) {
+	level->map[z * level->width * level->height + y * level->width + x] = tile;
 }
-
-typedef struct tile {
-	size_t mesh_index;
-	size_t texture_index;
-	vec3 rotation;
-} tile_t;
 
 typedef struct res_pack {
 	color_t fog_color;
@@ -93,11 +93,10 @@ typedef struct res_pack {
 
     mesh_t meshes[256];
 	texture_t textures[256];
+
 	size_t button_tex_index;
 	size_t button_pressed_tex_index;
 	u32 gui_tile_size;
-
-	tile_t tiles[256];
 
 	font_t font;
 } res_pack_t;
