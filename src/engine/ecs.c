@@ -3,10 +3,7 @@
 #define INITIAL_CAPACITY 1024
 
 void ecs_init(ecs_world_t *ecs) {
-	// Start at 256
-	ecs->current_entity_id = 256;
-
-	// ecs->component_ids = dict_create();
+	ecs->current_entity_id = 0;
 
 	// Malloc 1 because we don't know how big an entity is gonna be yet
 	// but the compiler won't wine when we realloc
@@ -19,7 +16,7 @@ void ecs_init(ecs_world_t *ecs) {
 	ecs->entity_masks = malloc(ecs->capacity * sizeof(u64));
 }
 
-void ecs_register_component(ecs_world_t *ecs, size_t size, u64 id) {
+void ecs_register_component(ecs_world_t *ecs, size_t size, i32 id) {
 	ecs->component_offsets[id] = ecs->block_size;
 	ecs->block_size += size;
 
@@ -47,40 +44,33 @@ entity_t ecs_new(ecs_world_t *ecs) {
 	return ecs->current_entity_id++;
 }
 
-void *ecs_get(ecs_world_t *ecs, entity_t entity, u64 id) {
+void *ecs_get(ecs_world_t *ecs, entity_t entity, i32 id) {
 	size_t offset = ecs->component_offsets[id];
 	return (void *)((u8 *)ecs->data + (entity * ecs->block_size + offset));
 }
 
-// void *ecs_set(ecs_world_t *ecs, entity_t entity, u64 id, size_t size) {
-void *ecs_set(ecs_world_t *ecs, entity_t entity, u64 id) {
+void *ecs_set(ecs_world_t *ecs, entity_t entity, i32 id) {
 	void *component_ptr = ecs_get(ecs, entity, id);
 	
-	// memset(component_ptr, 0, size);
-
 	ecs->entity_masks[entity] |= (1 << id);
 
 	return component_ptr;
 }
 
-void ecs_remove(ecs_world_t *ecs, entity_t entity, u64 id) {
+void ecs_remove(ecs_world_t *ecs, entity_t entity, i32 id) {
 	ecs->entity_masks[entity] &= ~(1 << id);
 }
 
-bool ecs_has(ecs_world_t *ecs, entity_t entity, i64 id, ...) {
+bool ecs_has(ecs_world_t *ecs, entity_t entity, i32 id, ...) {
 	u64 mask = 0;
-	
+
 	va_list args;
 	va_start(args, id);
-	// printf("id: %ld\n", id);
 
 	while (id != -1) {
-		// u64 good_idea = id;
-		mask |= (1ULL << id);
-		// mask |= (1ULL << good_idea);
+		mask |= (1 << id);
 
-
-		id = va_arg(args, i64);
+		id = va_arg(args, i32);
 	}
 
 	va_end(args);
@@ -97,53 +87,33 @@ void ecs_destroy(ecs_world_t *ecs, entity_t entity) {
 	ecs->entity_masks[entity] = 0;
 }
 
-// static ecs_query_t ecs_query(ecs_world_t *ecs, ecs_query_t *query, u64 mask) {
-// 	query->length = 0;
-
-// 	for (size_t e = 0; e < ecs->current_entity_id; e++) {
-// 		if (mask == (ecs->entity_masks[e] & mask)) {
-// 			query->entities[query->length] = e;
-// 			query->length++;
-// 		}
-// 	}
-
-// 	return *query;
-// }
-
-ecs_query_t ecs_query(ecs_world_t *ecs, i64 id, ...) {
+ecs_query_t ecs_query(ecs_world_t *ecs, i32 id, ...) {
 	u64 mask = 0;
-	
+
 	va_list args;
 	va_start(args, id);
-	printf("id: %ld\n", id);
 
 	while (id != -1) {
-		// u64 good_id = id;
-		mask |= (1ULL << id);
-		// mask |= (1ULL << good_id);
+		mask |= (1 << id);
 
-		id = va_arg(args, i64);
-
-		printf("id: %ld\n", id);
+		id = va_arg(args, i32);
 	}
 
 	va_end(args);
 
-	ecs->query.length = 0;
+	ecs->query.len = 0;
 
 	for (size_t e = 0; e < ecs->current_entity_id; e++) {
 		if (mask == (ecs->entity_masks[e] & mask)) {
-			ecs->query.entities[ecs->query.length] = e;
-			ecs->query.length++;
+			ecs->query.entities[ecs->query.len] = e;
+			ecs->query.len++;
 		}
 	}
 
 	return ecs->query;
-
-	// return ecs_query(ecs, &(ecs->query), mask);
 }
 
-void ecs_free(ecs_world_t *ecs)     {
+void ecs_free(ecs_world_t *ecs) {
 	free(ecs->entity_masks);
 	free(ecs->data);
 	free(ecs->query.entities);

@@ -109,7 +109,7 @@ const int ROTATING_C = 3;
 
 static void rotating_system(ecs_world_t *ecs) {
 	ecs_query_t query = ecs_query(ecs, TRANSFORM_C, ROTATING_C, -1);
-	for (size_t i = 0; i < query.length; i++) {
+	for (size_t i = 0; i < query.len; i++) {
 		transform_c *transform = ecs_get(ecs, query.entities[i], TRANSFORM_C);
 		rotating_c *rotating = ecs_get(ecs, query.entities[i], ROTATING_C);
 
@@ -171,7 +171,7 @@ void game_update(ecs_world_t *ecs) {
 		glm_vec3_add(camera.position, temp2, camera.position);
 	}
 
-	// rotating_system(ecs);
+	rotating_system(ecs);
 }
 
 #define FPS 120
@@ -331,40 +331,43 @@ int main(int argc, char *argv[]) {
 	ECS_REGISTER(&ecs, rotating_c, ROTATING_C);
 
 	for (int i = 0; i < 100; i++) {
-		entity_t tree = ecs_new(&ecs);
-		transform_c *transform = ecs_set(&ecs, tree, TRANSFORM_C);
+		entity_t tree_e = ecs_new(&ecs);
+		transform_c *transform = ecs_set(&ecs, tree_e, TRANSFORM_C);
 		transform->position[0] = 10.0f;
 		transform->position[1] = 0.0f;
-		transform->position[2] = 5.0f + i;
+		transform->position[2] = 5.0f + (float)i;
 
 		// ECS_SET(&ecs, tree, sprite_c, {TEX_BIRCH, true, 1.0f, 2.0f});
-		sprite_c *sprite = ecs_set(&ecs, tree, SPRITE_C);
+		sprite_c *sprite = ecs_set(&ecs, tree_e, SPRITE_C);
 		sprite->texture_index = TEX_BIRCH;
 		sprite->billboard = true;
 		sprite->x_scale = 1.0f;
 		sprite->y_scale = 2.0f;
 	}
 
-	// {
-	// 	entity_t tree = ecs_new(&ecs);
-	// 	transform_c *transform = ECS_SET(&ecs, tree, transform_c, {0});
-	// 	transform->position[0] = 5.0f;
-	// 	transform->position[1] = 0.0f;
-	// 	transform->position[2] = 5.0f;
+	{
+		entity_t worm_e = ecs_new(&ecs);
+		transform_c *transform = ecs_set(&ecs, worm_e, TRANSFORM_C);
+		transform->position[0] = 5.0f;
+		transform->position[1] = 0.0f;
+		transform->position[2] = 5.0f;
 
-	// 	ECS_SET(&ecs, tree, sprite_c, {TEX_WORMFISH, true, 2.0f, 1.0f});
-	// }
+		// ECS_SET(&ecs, worm_e, sprite_c, {TEX_WORMFISH, true, 2.0f, 1.0f});
+		sprite_c *sprite = ecs_set(&ecs, worm_e, SPRITE_C);
+		sprite->texture_index = TEX_WORMFISH;
+		sprite->billboard = true;
+		sprite->x_scale = 2.0f;
+		sprite->y_scale = 1.0f;
+	}
 
 	// Iron bars
-	for (int i = 0; i < 1; i++) {
+	{
 		entity_t bars = ecs_new(&ecs);
 		transform_c *transform = ecs_set(&ecs, bars, TRANSFORM_C);
 		transform->position[0] = 2.0f;
 		transform->position[1] = 0.0f;
-		transform->position[2] = 0.0f + i;
+		transform->position[2] = 0.0f;
 
-		// transform->rotation[1] = 90.0f;
-		// ECS_SET(&ecs, bars, sprite_c, {TEX_IRON_BARS, false, 1.0f, 1.0f});
 		sprite_c *sprite = ecs_set(&ecs, bars, SPRITE_C);
 		sprite->texture_index = TEX_IRON_BARS;
 		sprite->billboard = false;
@@ -373,25 +376,25 @@ int main(int argc, char *argv[]) {
 
 	}
 
-	// {
-	// 	entity_t monke = ecs_new(&ecs);
-	// 	transform_c *transform = ECS_SET(&ecs, monke, transform_c, {0});
-	// 	mesh_c *mesh = ECS_SET(&ecs, monke, mesh_c, {0});
-	// 	rotating_c *rotating = ECS_SET(&ecs, monke, rotating_c, {0});
+	{
+		entity_t monke = ecs_new(&ecs);
+		transform_c *transform = ecs_set(&ecs, monke, TRANSFORM_C);
+		mesh_c *mesh = ecs_set(&ecs, monke, MESH_C);
+		rotating_c *rotating = ecs_set(&ecs, monke, ROTATING_C);
 
-	// 	rotating->speed[0] = 1.0f;
-	// 	// rotating->speed[1] = 1.0f;
-	// 	// rotating->speed[2] = 1.0f;
+		rotating->speed[0] = 1.0f;
+		// rotating->speed[1] = 1.0f;
+		// rotating->speed[2] = 1.0f;
 
-	// 	transform->position[0] = 1.0f;
-	// 	transform->position[1] = 1.0f;
-	// 	transform->position[2] = 1.0f;
+		transform->position[0] = 1.0f;
+		transform->position[1] = 1.0f;
+		transform->position[2] = 1.0f;
 
-	// 	transform->rotation[1] = 45.0f;
+		transform->rotation[1] = 45.0f;
 
-	// 	mesh->mesh_index = MESH_MONKEY;
-	// 	mesh->texture_index = TEX_BRICKS;
-	// }
+		mesh->mesh_index = MESH_MONKEY;
+		mesh->texture_index = TEX_BRICKS;
+	}
 
 	render_init(&res_pack);
 	editor_init();
