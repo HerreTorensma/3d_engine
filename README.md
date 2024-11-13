@@ -38,8 +38,17 @@
             - Use for ECS
         - Remove the dictionary shit from the ecs
             - Actually remove the dict completely
+            - Also zero-initialize components when setting (or when creating a new entity)
+            - And remove the weird passing a struct va args macro to ECS_SET
         - [x] Rethink what should be in core.h and global.h
         - Instead of returning structs in create functions, make init function that have a pointer to a struct as a paramter. This way you can decide per case if the struct should be statically or dynamically allocated.
+
+        - Move util to core
+
+        - Put all meshes in one vbo/vao
+        - Automatically create texture atlas???
+
+        - Do the rotation of the billboard sprites on the GPU via a shader
 
     - Add sound with SDL2_Mixer
     - Add collision

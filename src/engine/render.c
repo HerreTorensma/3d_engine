@@ -131,8 +131,8 @@ static i32 compare_by_distance(const void *a, const void *b) {
 	entity_t entity1 = *(entity_t *)a;
 	entity_t entity2 = *(entity_t *)b;
 
-	transform_c *transform1 = ECS_GET(global_ecs, entity1, transform_c);
-	transform_c *transform2 = ECS_GET(global_ecs, entity2, transform_c);
+	transform_c *transform1 = ecs_get(global_ecs, entity1, TRANSFORM_C);
+	transform_c *transform2 = ecs_get(global_ecs, entity2, TRANSFORM_C);
 
 	float distance1 = ((global_camera->position[0] - transform1->position[0]) * (global_camera->position[0] - transform1->position[0])) + ((global_camera->position[1] - transform1->position[1]) * (global_camera->position[1] - transform1->position[1])) + ((global_camera->position[2] - transform1->position[2]) * (global_camera->position[2] - transform1->position[2]));
 	float distance2 = ((global_camera->position[0] - transform2->position[0]) * (global_camera->position[0] - transform2->position[0])) + ((global_camera->position[1] - transform2->position[1]) * (global_camera->position[1] - transform2->position[1])) + ((global_camera->position[2] - transform2->position[2]) * (global_camera->position[2] - transform2->position[2]));
@@ -147,10 +147,10 @@ static i32 compare_by_distance(const void *a, const void *b) {
 }
 
 static void render_mesh_components(res_pack_t *res_pack, ecs_world_t *ecs) {
-	ecs_query_t query = ecs_query1(ecs, "transform_c", "mesh_c", NULL);
+	ecs_query_t query = ecs_query(ecs, TRANSFORM_C, MESH_C, -1);
 	for (size_t i = 0; i < query.length; i++) {
-		mesh_c *mesh_component = ECS_GET(ecs, query.entities[i], mesh_c);
-		transform_c *transform = ECS_GET(ecs, query.entities[i], transform_c);
+		mesh_c *mesh_component = ecs_get(ecs, query.entities[i], MESH_C);
+		transform_c *transform = ecs_get(ecs, query.entities[i], TRANSFORM_C);
 
 		mesh_t mesh = res_pack->meshes[mesh_component->mesh_index];
 
@@ -171,11 +171,11 @@ static void render_mesh_components(res_pack_t *res_pack, ecs_world_t *ecs) {
 
 static void render_sprite_components(res_pack_t *res_pack, ecs_world_t *ecs, camera_t *camera) {
 	// Transparent stuff
-	ecs_query_t query = ecs_query1(ecs, "transform_c", "sprite_c", NULL);
+	ecs_query_t query = ecs_query(ecs, TRANSFORM_C, SPRITE_C, -1);
 	qsort(query.entities, query.length, sizeof(entity_t), compare_by_distance);
 	for (size_t i = 0; i < query.length; i++) {
-		sprite_c *sprite = ECS_GET(ecs, query.entities[i], sprite_c);
-		transform_c *transform = ECS_GET(ecs, query.entities[i], transform_c);
+		sprite_c *sprite = ecs_get(ecs, query.entities[i], SPRITE_C);
+		transform_c *transform = ecs_get(ecs, query.entities[i], SPRITE_C);
 
 		mesh_t mesh = res_pack->meshes[MESH_QUAD];
 

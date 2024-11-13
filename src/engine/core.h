@@ -155,3 +155,9 @@ typedef struct {
     size_t mesh_index;
     size_t texture_index;
 } mesh_c;
+
+enum {
+    TRANSFORM_C = 0,
+    SPRITE_C = 1,
+    MESH_C = 2,
+};
