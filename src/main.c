@@ -4,6 +4,7 @@
 #include "engine/editor.h"
 #include "engine/ecs.h"
 #include "engine/gui.h"
+#include "engine/grid.h"
 
 static vertex_t quad_vertices[] = {
     {{1.0f,  1.0f, 0.0f}, {1.0f, 1.0f}},  // top right
@@ -33,13 +34,13 @@ enum {
 
 enum {
 	TEX_BRICKS = 1,
+	TEX_DIRT,
+	TEX_COBBLE,
 	TEX_IRON_BARS,
 	TEX_TREE,
 	TEX_BIRCH,
-	TEX_DIRT,
 	TEX_CROSSHAIR,
 	TEX_WORMFISH,
-	TEX_COBBLE,
 	TEX_FONT,
 	TEX_BUTTON,
 	TEX_BUTTON_PRESSED,
@@ -241,13 +242,13 @@ int main(int argc, char *argv[]) {
 	// render_init(&res_pack);
 
 	res_add_texture(&res_pack, TEX_BRICKS, load_tga("res/images/bricks.tga", true));
+	res_add_texture(&res_pack, TEX_DIRT, load_tga("res/images/dirt.tga", true));
+	res_add_texture(&res_pack, TEX_COBBLE, load_tga("res/images/cobble.tga", false));
 	res_add_texture(&res_pack, TEX_IRON_BARS, load_tga("res/images/iron_bars.tga", true));
 	res_add_texture(&res_pack, TEX_TREE, load_tga("res/images/tree.tga", true));
 	res_add_texture(&res_pack, TEX_BIRCH, load_tga("res/images/birch.tga", true));
-	res_add_texture(&res_pack, TEX_DIRT, load_tga("res/images/dirt.tga", true));
 	res_add_texture(&res_pack, TEX_CROSSHAIR, load_tga("res/images/crosshair.tga", true));
 	res_add_texture(&res_pack, TEX_WORMFISH, load_tga("res/images/wormfish.tga", true));
-	res_add_texture(&res_pack, TEX_COBBLE, load_tga("res/images/cobble.tga", false));
 	res_add_texture(&res_pack, TEX_FONT, load_tga("res/images/font.tga", false));
 
 	res_add_texture(&res_pack, TEX_BUTTON, load_tga("res/images/button_sheet.tga", false));
@@ -275,9 +276,12 @@ int main(int argc, char *argv[]) {
 	res_pack.font.color = COLOR_BLACK;
 
 	grid_t grid = {0};
-	grid.width = 16;
-	grid.height = 16;
-	grid.depth = 16;
+	// grid.width = 16;
+	// grid.height = 16;
+	// grid.depth = 16;
+	// grid_init(&grid, 128, 128, 8);
+	grid_init(&grid, 64, 64, 64);
+	// grid_init(&grid, 16, 16, 16);
 
 	// for (int z = 0; z < 16; z++) {
 	// 	for (int x = 0; x < 16; x++) {
@@ -465,10 +469,10 @@ int main(int argc, char *argv[]) {
 			render_image(&res_pack, TEX_CROSSHAIR, res_pack.render_width / 2 - 4, res_pack.render_height / 2 - 4, COLOR_WHITE);
 
 			// render_image(res_pack, PIVOT_TOP_LEFT, 6, 1, 1);
-			render_image(&res_pack, 4, 0, 0, COLOR_WHITE);
-			render_image(&res_pack, 3, 0, -4, COLOR_WHITE);
-			render_image(&res_pack, 4, 640-64, 0, COLOR_WHITE);
-			render_image(&res_pack, 3, 640-64, -4, COLOR_WHITE);
+			render_image(&res_pack, TEX_TREE, 0, 0, COLOR_WHITE);
+			// render_image(&res_pack, TEX_BIRCH, 0, -4, COLOR_WHITE);
+			render_image(&res_pack, TEX_TREE, 640-64, 0, COLOR_WHITE);
+			// render_image(&res_pack, TEX_BIRCH, 640-64, -4, COLOR_WHITE);
 
 			render_image(&res_pack, TEX_FRAME, 0, 0, COLOR_WHITE);
 			// render_mesh_isometric(&res_pack, res_pack.meshes[MESH_CUBE], 1, 100, 100, 32.0f);

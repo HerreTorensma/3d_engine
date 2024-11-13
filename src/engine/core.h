@@ -55,10 +55,10 @@ typedef struct font {
 } font_t;
 
 typedef struct theme {
+	u32 tile_size;
 	font_t font;
 	size_t button_index;
 	size_t button_pressed_index;
-	u32 tile_size;
 } theme_t;
 
 typedef struct tile {
@@ -72,15 +72,18 @@ typedef struct grid {
 	u32 height;
 	u32 depth;
 
-	tile_t map[4096];
+	// tile_t map[4096];
+    tile_t *map;
 } grid_t;
 
 inline tile_t grid_get_cell(grid_t *level, u32 x, u32 y, u32 z) {
-	return level->map[z * level->width * level->height + y * level->width + x];
+	// return level->map[z * level->width * level->height + y * level->width + x];
+	return level->map[x + y * level->width + z * (level->width * level->height)];
 }
 
 inline void grid_set_cell(grid_t *level, tile_t tile, u32 x, u32 y, u32 z) {
-	level->map[z * level->width * level->height + y * level->width + x] = tile;
+	// level->map[z * level->width * level->height + y * level->width + x] = tile;
+	level->map[x + y * level->width + z * (level->width * level->height)] = tile;
 }
 
 typedef struct res_pack {

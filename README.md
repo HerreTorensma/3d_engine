@@ -55,7 +55,7 @@
     - Make dialogue system
     - Make text wrap system for the text edit stuff
     - Also load BMPs by just loading it to SDL_Surface and putting that into my custom texture format
-    
+    - Implement delta time
 
 ## Dependencies
 - SDL2
