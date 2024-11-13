@@ -57,6 +57,10 @@
     - Also load BMPs by just loading it to SDL_Surface and putting that into my custom texture format
     - Implement delta time
 
+    - GUI
+        - Text edit (for dialogue editor)
+        - Slider with snap (for editing specific levels in the grid)
+
 ## Dependencies
 - SDL2
 - SDL_mixer

@@ -68,22 +68,21 @@ typedef struct tile {
 } tile_t;
 
 typedef struct grid {
+    // Height refers to the vertical height, so not depth.
+    // Also the 0 start at the "bottom", so y coord 0 will be eye level and 16 up in the sky.
 	u32 width;
 	u32 height;
 	u32 depth;
 
-	// tile_t map[4096];
     tile_t *map;
 } grid_t;
 
-inline tile_t grid_get_cell(grid_t *level, u32 x, u32 y, u32 z) {
-	// return level->map[z * level->width * level->height + y * level->width + x];
-	return level->map[x + y * level->width + z * (level->width * level->height)];
+inline tile_t grid_get_cell(grid_t *grid, u32 x, u32 y, u32 z) {
+	return grid->map[z * grid->width * grid->height + y * grid->width + x];
 }
 
-inline void grid_set_cell(grid_t *level, tile_t tile, u32 x, u32 y, u32 z) {
-	// level->map[z * level->width * level->height + y * level->width + x] = tile;
-	level->map[x + y * level->width + z * (level->width * level->height)] = tile;
+inline void grid_set_cell(grid_t *grid, tile_t tile, u32 x, u32 y, u32 z) {
+	grid->map[z * grid->width * grid->height + y * grid->width + x] = tile;
 }
 
 typedef struct res_pack {

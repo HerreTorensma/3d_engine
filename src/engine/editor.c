@@ -93,7 +93,7 @@ void editor_update(grid_t *level) {
 	if (tile_x < 0 || tile_x >= level->width) {
 		return;
 	}
-	if (tile_y < 0 || tile_y >= level->height) {
+	if (tile_y < 0 || tile_y >= level->depth) {
 		return;
 	}
 
@@ -105,7 +105,7 @@ void editor_update(grid_t *level) {
 	};
 
 	if (input_mouse_button_pressed(SDL_BUTTON_LEFT)) {
-		for (int i = level->depth - 2; i >= 0; i--) {
+		for (int i = level->height - 2; i >= 0; i--) {
 			if (grid_get_cell(level, tile_x, i, tile_y).occupied) {
 				grid_set_cell(level, selected_tile, tile_x, i + 1, tile_y);
 				break;
@@ -118,7 +118,7 @@ void editor_update(grid_t *level) {
 	}
 
 	if (input_mouse_button_pressed(SDL_BUTTON_RIGHT)) {
-		for (int i = level->depth - 2; i >= 0; i--) {
+		for (int i = level->height - 2; i >= 0; i--) {
 			if (grid_get_cell(level, tile_x, i, tile_y).occupied) {
 				tile_t empty_tile = {0};
 				grid_set_cell(level, empty_tile, tile_x, i, tile_y);

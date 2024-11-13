@@ -276,11 +276,8 @@ int main(int argc, char *argv[]) {
 	res_pack.font.color = COLOR_BLACK;
 
 	grid_t grid = {0};
-	// grid.width = 16;
-	// grid.height = 16;
-	// grid.depth = 16;
-	// grid_init(&grid, 128, 128, 8);
-	grid_init(&grid, 64, 64, 64);
+	grid_init(&grid, 512, 16, 512);
+	// grid_init(&grid, 64, 64, 64);
 	// grid_init(&grid, 16, 16, 16);
 
 	// for (int z = 0; z < 16; z++) {

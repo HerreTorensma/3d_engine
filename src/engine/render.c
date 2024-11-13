@@ -203,9 +203,9 @@ static void render_sprite_components(res_pack_t *res_pack, ecs_world_t *ecs, cam
 }
 
 static void render_grid(res_pack_t *res_pack, grid_t *grid) {
-	for (i32 z = 0; z < grid->depth; z++) {
-		for (i32 y = 0; y < grid->height; y++) {
-			for (i32 x = 0; x < grid->width; x++) {
+	for (u32 z = 0; z < grid->depth; z++) {
+		for (u32 y = 0; y < grid->height; y++) {
+			for (u32 x = 0; x < grid->width; x++) {
 				tile_t tile = grid_get_cell(grid, x, y, z);
 				if (!tile.occupied) {
 					continue;
@@ -357,9 +357,9 @@ void render_grid_ortho(res_pack_t *res_pack, grid_t *grid, enum ortho_view orien
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	for (i32 z = 0; z < grid->depth; z++) {
-		for (i32 y = 0; y < grid->height; y++) {
-			for (i32 x = 0; x < grid->width; x++) {
+	for (u32 z = 0; z < grid->depth; z++) {
+		for (u32 y = 0; y < grid->height; y++) {
+			for (u32 x = 0; x < grid->width; x++) {
 				tile_t tile = grid_get_cell(grid, x, y, z);
 				if (!tile.occupied) {
 					continue;
