@@ -1,36 +1,23 @@
+/*
+This header and source file contain functions related to the resource pack system.
+*/
 #pragma once
 
 #include "global.h"
 #include "core.h"
 #include "util.h"
 
-typedef struct tile {
-	size_t mesh_index;
-	size_t texture_index;
-	vec3 rotation;
-} tile_t;
-
-typedef struct res_pack {
-	color_t fog_color;
-	color_t sky_color;
-	color_t editor_color;
-
-	u32 render_width;
-	u32 render_height;
-
-    mesh_t meshes[256];
-	texture_t textures[256];
-	size_t button_tex_index;
-	size_t button_pressed_tex_index;
-	u32 gui_tile_size;
-
-	tile_t tiles[256];
-
-	font_t font;
-} res_pack_t;
-
 void res_add_mesh(res_pack_t *res_pack, size_t index, mesh_t mesh);
 
 void res_add_mesh_raw(res_pack_t *res_pack, size_t index, vertex_t *vertices, u32 vertex_count, u32 *indices, u32 index_count);
 
 void res_add_texture(res_pack_t *res_pack, size_t index, texture_t texture);
+
+inline rect_t tex_get_default_src(res_pack_t *res_pack, size_t texture_index) {
+	return (rect_t){
+		.x = 0,
+		.y = 0,
+		.w = res_pack->textures[texture_index].width,
+		.h = res_pack->textures[texture_index].height,
+	};
+}

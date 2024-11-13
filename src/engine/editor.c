@@ -17,6 +17,7 @@ mat4 projection = {0};
 vec2 pos = {2.0f, 0.0f};
 
 static size_t selected_mesh_index = 2;
+static size_t selected_texture_index = 1;
 
 static char idk_buffer[32] = "test";
 
@@ -128,13 +129,22 @@ static bool mesh_button(res_pack_t *res_pack, size_t mesh_index, size_t texture_
 	return released;
 }
 
-static bool texture_button(res_pack_t *res_pack, size_t texture_index, rect_t rect) {
+static bool texture_button(res_pack_t *res_pack, size_t texture_index, rect_t tile_rect) {
 	bool released = false;
-	released = gui_button(res_pack, "", rect);
+	released = gui_button(res_pack, "", tile_rect);
 
 	// render_mesh_isometric(res_pack, res_pack->meshes[mesh_index], texture_index, rect.x * res_pack->gui_tile_size + (rect.w / 2) * res_pack->gui_tile_size, rect.y * res_pack->gui_tile_size + (rect.h / 2) * res_pack->gui_tile_size, 8.0f);
 	// render_image(res_pack, PIVOT_TOP_LEFT, texture_index, rect.x, rect.y);
-	render_image_ex(res_pack, texture_index, PIVOT_CENTER, (rect_t){0, 0, 64, 64}, rect.x * res_pack->gui_tile_size, rect.y * res_pack->gui_tile_size, 0, (vec2){1.0f, 1.0f});
+	// render_image_ex(res_pack, texture_index, PIVOT_CENTER, (rect_t){0, 0, 64, 64}, rect.x * res_pack->gui_tile_size, rect.y * res_pack->gui_tile_size, 0, (vec2){1.0f, 1.0f}, COLOR_WHITE);
+
+	rect_t dst = {
+		.x = tile_rect.x * res_pack->gui_tile_size + 2,
+		.y = tile_rect.y * res_pack->gui_tile_size + 2,
+		.w = tile_rect.w * res_pack->gui_tile_size - 5,
+		.h = tile_rect.h * res_pack->gui_tile_size - 5,
+	};
+
+	render_image_rect(res_pack, texture_index, tex_get_default_src(res_pack, texture_index), dst, COLOR_WHITE);
 
 	return released;
 }
@@ -144,25 +154,25 @@ void editor_render(res_pack_t *res_pack, grid_t *level) {
 
 	render_grid_ortho(res_pack, level, orientation, zoom, &projection);
 
-	if (gui_button(res_pack, "SAVED", (rect_t){0, 0, 4, 4})) {
+	if (gui_button(res_pack, "SAVE", (rect_t){0, 0, 4, 2})) {
 		printf("SAVE\n");
 	}
 	
-	// if (gui_button(res_pack, "LOADER EN DE PODER EN AL DIE DINGEN", (rect_t){4, 0, 8, 2})) {
-	if (gui_button(res_pack, "LOADER", (rect_t){4, 0, 8, 2})) {
-		printf("LOAD\n");
-	}
-
 	gui_text_edit(res_pack, idk_buffer, 32, (rect_t){4, 4, 4, 4});
 
-	for (i32 i = 1; i < 10; i++) {
-		if (mesh_button(res_pack, i, 1, (rect_t){0, i * 4, 4, 4})) {
-			selected_mesh_index = i - 1;
+	for (i32 i = 0; i < 10; i++) {
+		if (mesh_button(res_pack, i, 1, (rect_t){0, 2 + i * 4, 4, 4})) {
+			// selected_mesh_index = i - 1;
+			selected_mesh_index = i;
 		}
 	}
 
-	for (i32 i = 1; i < 4; i++) {
-		// texture_button(res_pack, i, (rect_t){4, i * 4, 4, 4});
+	for (i32 i = 0; i < 4; i++) {
+		// Right edge of the screen
+		if (texture_button(res_pack, i, (rect_t){76, 2 + i * 4, 4, 4})) {
+			selected_texture_index = i;
+			printf("selected a texture\n");
+		}
 	}
 
 	// render_end_frame_buffer(res_pack);

@@ -19,6 +19,14 @@
     - Add flat shading to some stuff
 
     - The big refactor
+        - Make rotation work for render_image_ex
+            - Actually no
+        - Think if i want to have a dst rect for render_image_ex
+        - In render_image make pivot TOP_LEFT by default, remove parameter
+        
+        - Remove the 'tile system' and just save a mesh and texture index directly in the grid
+        - Implement memory arenas in a lot of places
+        - Choose convention for shaders
         - Clean up renderer
             - Clean up sprite rendering functions
             - Also colored drawing for the fonts
@@ -29,10 +37,14 @@
         - Create a generic pool data structure
             - Use for ECS
         - Remove the dictionary shit from the ecs
-        - Rethink what should be in core.h and global.h
-        - Also load BMPs by just loading it to SDL_Surface and putting that into my custom texture format
-        - Make text wrap system for the text edit stuff
-        - Make dialogue system
+            - Actually remove the dict completely
+        - [x] Rethink what should be in core.h and global.h
+
+    - Add sound with SDL2_Mixer
+    - Add collision
+    - Make dialogue system
+    - Make text wrap system for the text edit stuff
+    - Also load BMPs by just loading it to SDL_Surface and putting that into my custom texture format
     
 
 ## Dependencies

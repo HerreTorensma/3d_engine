@@ -16,6 +16,10 @@ static u32 quad_indices[] = {  // note that we start from 0!
     1, 2, 3    // second triangle
 };
 
+typedef struct {
+    vec3 speed;
+} rotating_c;
+
 enum {
 	MESH_CUBE = 2,
 	MESH_SLAB,
@@ -328,6 +332,7 @@ int main(int argc, char *argv[]) {
 	// font_t font = {0};
 	font_init(&res_pack.font, &res_pack, TEX_FONT);
 	res_pack.font.y_center = -4;
+	res_pack.font.color = COLOR_BLACK;
 
 	grid_t grid = {0};
 	grid.width = 16;
@@ -502,26 +507,22 @@ int main(int argc, char *argv[]) {
 			render_game(&res_pack, &grid, &ecs, &camera);
 
 			// Crosshair
-			// render_image(&res_pack, PIVOT_CENTER, 6, res_pack.render_width / 2, res_pack.render_height / 2);
-			render_image(&res_pack, PIVOT_CENTER, TEX_CROSSHAIR, res_pack.render_width / 2, res_pack.render_height / 2);
+			render_image(&res_pack, TEX_CROSSHAIR, res_pack.render_width / 2 - 4, res_pack.render_height / 2 - 4, COLOR_WHITE);
 
 			// render_image(res_pack, PIVOT_TOP_LEFT, 6, 1, 1);
-			render_image(&res_pack, PIVOT_TOP_LEFT, 4, 0, 0);
-			render_image(&res_pack, PIVOT_TOP_LEFT, 3, 0, -4);
-			render_image(&res_pack, PIVOT_TOP_LEFT, 4, 640-64, 0);
-			render_image(&res_pack, PIVOT_TOP_LEFT, 3, 640-64, -4);
+			render_image(&res_pack, 4, 0, 0, COLOR_WHITE);
+			render_image(&res_pack, 3, 0, -4, COLOR_WHITE);
+			render_image(&res_pack, 4, 640-64, 0, COLOR_WHITE);
+			render_image(&res_pack, 3, 640-64, -4, COLOR_WHITE);
 
-			render_mesh_isometric(&res_pack, res_pack.meshes[MESH_CUBE], 1, 100, 100, 32.0f);
-			render_mesh_isometric(&res_pack, res_pack.meshes[MESH_SLAB], 2, 200, 100, 32.0f);
+			render_image(&res_pack, TEX_FRAME, 0, 0, COLOR_WHITE);
+			// render_mesh_isometric(&res_pack, res_pack.meshes[MESH_CUBE], 1, 100, 100, 32.0f);
+			// render_mesh_isometric(&res_pack, res_pack.meshes[MESH_SLAB], 2, 200, 100, 32.0f);
 
-			render_image_ex(&res_pack, TEX_COBBLE, PIVOT_TOP_LEFT, (rect_t){16, 16, 16, 16}, 0, 0, 50.0f, (vec2){1.0f, 1.0f});
+			// render_image_rect(&res_pack, TEX_COBBLE, (rect_t){0, 0, 16, 16}, (rect_t){16, 16, 128, 128}, COLOR_WHITE);
 
-			// gui_print(&res_pack, &font, "JATOCCHHH DIT IS EEN STUK TEXT YES HET KANKERWERKTS", 0, 0);
-			// gui_print(&res_pack, &font, "hier nog een paar kleine letters", 0, 0);
 			gui_print(&res_pack, &res_pack.font, "DREAM SIMULATOR v0.1", 1, 0);
-			// gui_print(&res_pack, &font, "!@#$%^&*()-=", 0, 0);
 
-			render_image(&res_pack, PIVOT_TOP_LEFT, TEX_FRAME, 0, 0);
 
 			render_end_frame_buffer(&res_pack);
 		}

@@ -1,3 +1,6 @@
+/*
+This header and source file contain utility helper functions.
+*/
 #pragma once
 
 #include "global.h"
@@ -5,13 +8,6 @@
 
 extern i32 window_width;
 extern i32 window_height;
-
-typedef struct color {
-	u8 r;
-	u8 g;
-	u8 b;
-	u8 a;
-} color_t;
 
 char *load_file_to_string(const char path[]);
 

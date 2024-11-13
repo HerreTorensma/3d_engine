@@ -1,3 +1,7 @@
+/*
+This file contains library imports as well as typedefs for integer types.
+Should be included everywhere
+*/
 #pragma once
 
 // Standard library
@@ -26,37 +30,3 @@ typedef int64_t i64;
 
 typedef float f32;
 typedef double f64;
-
-enum ortho_view {
-    ORTHO_TOP,
-    ORTHO_BOTTOM,
-    ORTHO_FRONT,
-    ORTHO_BACK,
-    ORTHO_LEFT,
-    ORTHO_RIGHT,
-};
-
-typedef struct transform {
-	vec3 position;
-	vec3 rotation;
-	vec3 scale;
-} transform_t;
-
-typedef transform_t transform_c;
-
-typedef struct {
-	size_t texture_index;
-	bool billboard;
-
-    float x_scale;
-    float y_scale;
-} sprite_c;
-
-typedef struct {
-    size_t mesh_index;
-    size_t texture_index;
-} mesh_c;
-
-typedef struct {
-    vec3 speed;
-} rotating_c;

@@ -1,3 +1,7 @@
+/*
+This header and source file contains an input wrapper around SDL2.
+TODO: support for key rebinding
+*/
 #pragma once
 
 #include "global.h"

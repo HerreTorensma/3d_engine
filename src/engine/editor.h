@@ -3,7 +3,6 @@
 #include "global.h"
 #include "util.h"
 #include "res.h"
-#include "grid.h"
 #include "shader.h"
 #include "input.h"
 #include "render.h"

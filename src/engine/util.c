@@ -1,7 +1,7 @@
 #include "util.h"
 
-i32 window_width = 640;
-i32 window_height = 480;
+i32 window_width = 0;
+i32 window_height = 0;
 
 // Loads a text file to a char array
 // The char array is dynamically allocated so the user is responsible for freeing it

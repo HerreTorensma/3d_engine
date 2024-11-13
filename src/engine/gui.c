@@ -41,7 +41,15 @@ void gui_print(res_pack_t *res_pack, font_t *font, const char text[], i32 x, i32
     i32 current_x = x;
     while (text[index] != '\0') {
         vec2 scale = {1.0f, 1.0f};
-        render_image_ex(res_pack, font->texture_index, PIVOT_TOP_LEFT, font->rects[text[index]], current_x, y, 0.0f, scale);
+        // render_image_ex(res_pack, font->texture_index, PIVOT_TOP_LEFT, font->rects[text[index]], current_x, y, 0.0f, scale, res_pack->font.color);
+        rect_t dst = {
+            .x = current_x,
+            .y = y,
+            .w = font->rects[text[index]].w,
+            .h = font->rects[text[index]].h,
+        };
+        
+        render_image_rect(res_pack, font->texture_index, font->rects[text[index]], dst, res_pack->font.color);
         
         current_x += font->rects[text[index]].w + font->horizontal_spacing;
         
@@ -114,7 +122,14 @@ bool gui_button(res_pack_t *res_pack, const char text[], rect_t tile_rect) {
                 src.y = 2 * res_pack->gui_tile_size;
             }
 
-            render_image_ex(res_pack, tex_index, PIVOT_TOP_LEFT, src, global_rect.x + x * res_pack->gui_tile_size, global_rect.y + y * res_pack->gui_tile_size, 0, (vec2){1.0f, 1.0f});
+            rect_t dst = {
+                .x = global_rect.x + x * res_pack->gui_tile_size,
+                .y = global_rect.y + y * res_pack->gui_tile_size,
+                .w = res_pack->gui_tile_size,
+                .h = res_pack->gui_tile_size,
+            };
+
+            render_image_rect(res_pack, tex_index, src, dst, COLOR_WHITE);
         }
     }
 

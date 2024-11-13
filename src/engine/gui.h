@@ -1,3 +1,6 @@
+/*
+This header and source file contains the immediate-mode gui library made for this engine.
+*/
 #pragma once
 
 #include "global.h"

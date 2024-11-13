@@ -259,7 +259,7 @@ static void render_grid(res_pack_t *res_pack, grid_t *grid) {
 	}
 }
 
-void render_image(res_pack_t *res_pack, enum pivot pivot, size_t texture_index, i32 x, i32 y) {
+void render_image(res_pack_t *res_pack, size_t texture_index, i32 x, i32 y, color_t color) {
 	glDisable(GL_DEPTH_TEST);
 
 	glUseProgram(gui_shader);
@@ -276,9 +276,7 @@ void render_image(res_pack_t *res_pack, enum pivot pivot, size_t texture_index, 
 	
 	glm_scale(model, (vec3){(float)texture.width / 2.0f, (float)texture.height / 2.0f, 0.0f});
 
-	if (pivot == PIVOT_TOP_LEFT) {
-		glm_translate(model, (vec3){1.0f, 1.0f, 0.0f});
-	}
+	glm_translate(model, (vec3){1.0f, 1.0f, 0.0f});
 
 	shader_set_mat4(gui_shader, "model", &model);
 	shader_set_mat4(gui_shader, "projection", &projection);
@@ -286,14 +284,14 @@ void render_image(res_pack_t *res_pack, enum pivot pivot, size_t texture_index, 
 	shader_set_vec2(gui_shader, "tex_scale", (vec2){1.0f, 1.0f});
 	shader_set_vec2(gui_shader, "tex_offset", (vec2){0.0f, 0.0f});
 
+	vec4 gl_color = {0};
+	color_to_gl_color(color, gl_color);
+	shader_set_vec4(gui_shader, "color1", &gl_color);
+
 	render_mesh(res_pack, &res_pack->meshes[MESH_QUAD], texture_index);
 }
 
-// Extended version
-// TODO: add effective rotation, scale and color
-// TODO: screen anchor system for GUI
-// TODO: maybe make the GUI rendering work with any render resolution aspect ratio???
-void render_image_ex(res_pack_t *res_pack, size_t texture_index, enum pivot pivot, rect_t src, i32 x, i32 y, float rotation, vec2 scale) {
+void render_image_rect(res_pack_t *res_pack, size_t texture_index, rect_t src, rect_t dst, color_t color) {
 	glDisable(GL_DEPTH_TEST);
 
 	glUseProgram(gui_shader);
@@ -306,7 +304,16 @@ void render_image_ex(res_pack_t *res_pack, size_t texture_index, enum pivot pivo
 	mat4 model = {0};
 	glm_mat4_identity(model);
 
-	glm_translate(model, (vec3){(float)x, (float)y, 0.0f});
+	glm_translate(model, (vec3){(float)dst.x, (float)dst.y, 0.0f});
+	
+	// Scale according to the dst rect
+	glm_scale(model, (vec3){(float)dst.w / 2.0f, (float)dst.h / 2.0f, 0.0f});
+
+	// Draw from top left instead of center
+	glm_translate(model, (vec3){1.0f, 1.0f, 0.0f});
+
+	shader_set_mat4(gui_shader, "model", &model);
+	shader_set_mat4(gui_shader, "projection", &projection);
 
 	vec2 tex_scale = {
 		(float)src.w / (float)texture.width,
@@ -316,20 +323,12 @@ void render_image_ex(res_pack_t *res_pack, size_t texture_index, enum pivot pivo
 		(float)src.x / (float)texture.width,
 		(float)src.y / (float)texture.height,
 	};
-	
-	glm_scale(model, (vec3){(float)texture.width / 2.0f, (float)texture.height / 2.0f, 0.0f});
-	glm_scale(model, (vec3){tex_scale[0], tex_scale[1], 0.0f});
-
-	if (pivot == PIVOT_TOP_LEFT) {
-		glm_translate(model, (vec3){1.0f, 1.0f, 0.0f});
-	}
-
-
-	shader_set_mat4(gui_shader, "model", &model);
-	shader_set_mat4(gui_shader, "projection", &projection);
-	
 	shader_set_vec2(gui_shader, "tex_scale", &tex_scale);
 	shader_set_vec2(gui_shader, "tex_offset", &tex_offset);
+
+	vec4 gl_color = {0};
+	color_to_gl_color(color, gl_color);
+	shader_set_vec4(gui_shader, "color1", &gl_color);
 
 	render_mesh(res_pack, &res_pack->meshes[MESH_QUAD], texture_index);
 }
