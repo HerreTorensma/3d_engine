@@ -163,7 +163,8 @@ void editor_render(res_pack_t *res_pack, grid_t *level) {
 	render_grid_ortho(res_pack, level, orientation, zoom, &projection);
 
 	if (gui_button(res_pack, "SAVE", (rect_t){0, 0, 4, 2})) {
-		printf("SAVE\n");
+		// printf("SAVE\n");
+		grid_save(level, "test.grid");
 	}
 	
 	gui_text_edit(res_pack, idk_buffer, 32, (rect_t){4, 4, 4, 4});

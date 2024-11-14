@@ -276,7 +276,9 @@ int main(int argc, char *argv[]) {
 	res_pack.font.color = COLOR_BLACK;
 
 	grid_t grid = {0};
-	grid_init(&grid, 512, 16, 512);
+	// grid_init(&grid, 512, 16, 512);
+	grid_load(&grid, "test.grid");
+
 	// grid_init(&grid, 64, 64, 64);
 	// grid_init(&grid, 16, 16, 16);
 

@@ -7,6 +7,7 @@
 #include "input.h"
 #include "render.h"
 #include "gui.h"
+#include "grid.h"
 
 void editor_init(void);
 
