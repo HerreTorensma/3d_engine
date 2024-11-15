@@ -338,7 +338,7 @@ void render_mesh_isometric(res_pack_t *res_pack, mesh_t mesh, size_t texture_ind
 	render_mesh(res_pack, &mesh, texture_index);
 }
 
-void render_grid_layers_ortho(res_pack_t *res_pack, grid_t *grid, enum ortho_view orientation, float zoom, mat4 *projection, i32 min_y, i32 max_y) {
+void render_grid_ortho(res_pack_t *res_pack, grid_t *grid, enum ortho_view orientation, float zoom, mat4 *projection, i32 min_y, i32 max_y) {
 	// glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	clear(res_pack->editor_color);
 	// glClearColor(res_pack->editor_color.gl_color[0], res_pack->editor_color.gl_color[1], res_pack->editor_color.gl_color[2], res_pack->editor_color.gl_color[3]);

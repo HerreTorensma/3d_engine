@@ -175,8 +175,8 @@ void editor_render(res_pack_t *res_pack, grid_t *level) {
 	// render_start_frame_buffer(res_pack);
 
 	// render_grid_ortho(res_pack, level, orientation, zoom, &projection);
-	// render_grid_layers_ortho(res_pack, level, orientation, zoom, &projection, min_y_level, min_y_level);
-	render_grid_layers_ortho(res_pack, level, orientation, zoom, &projection, min_y_level, level->height - 1);
+	// render_grid_ortho(res_pack, level, orientation, zoom, &projection, min_y_level, min_y_level);
+	render_grid_ortho(res_pack, level, orientation, zoom, &projection, min_y_level, level->height - 1);
 
 	if (gui_button(res_pack, "SAVE", (rect_t){0, 0, 4, 2})) {
 		grid_save(level, "test.grid");
