@@ -24,7 +24,7 @@
         - Think if i want to have a dst rect for render_image_ex
         - In render_image make pivot TOP_LEFT by default, remove parameter
         
-        - Remove the 'tile system' and just save a mesh and texture index directly in the grid
+        - [x] Remove the 'tile system' and just save a mesh and texture index directly in the grid
         - Implement memory arenas in a lot of places
         - Choose convention for shaders
         - Clean up renderer
@@ -36,7 +36,7 @@
         - Make the isometric rendering not affected by the other 3d things
         - Create a generic pool data structure
             - Use for ECS
-        - Remove the dictionary shit from the ecs
+        - [x] Remove the dictionary shit from the ecs
             - Actually remove the dict completely
             - Also zero-initialize components when setting (or when creating a new entity)
             - And remove the weird passing a struct va args macro to ECS_SET

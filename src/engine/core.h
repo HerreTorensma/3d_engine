@@ -56,9 +56,13 @@ typedef struct font {
 
 typedef struct theme {
 	u32 tile_size;
-	font_t font;
+	
+    font_t font;
+
 	size_t button_index;
 	size_t button_pressed_index;
+
+    size_t slider_index;
 } theme_t;
 
 typedef struct tile {

@@ -21,6 +21,8 @@ static size_t selected_texture_index = 1;
 
 static char idk_buffer[32] = "test";
 
+static u32 min_y_level = 0;
+
 void editor_init(void) {
     {
 		vec3 camera_pos = {0.0f, 10.0f, 0.0f};  // Camera position (above looking down)
@@ -86,6 +88,18 @@ void editor_update(grid_t *level) {
 		pos[1] -= camera_speed;
 	}
 
+	if (input_key_pressed(SDL_SCANCODE_MINUS)) {
+		if (min_y_level > 0) {
+			min_y_level--;
+		}
+	}
+
+	if (input_key_pressed(SDL_SCANCODE_EQUALS)) {
+		if (min_y_level < level->height - 1) {
+			min_y_level++;
+		}
+	}
+
 	compute_projection();
 
 	i32 tile_x, tile_y;
@@ -105,20 +119,20 @@ void editor_update(grid_t *level) {
 	};
 
 	if (input_mouse_button_pressed(SDL_BUTTON_LEFT)) {
-		for (int i = level->height - 2; i >= 0; i--) {
+		for (int i = level->height - 2; i >= min_y_level; i--) {
 			if (grid_get_cell(level, tile_x, i, tile_y).occupied) {
 				grid_set_cell(level, selected_tile, tile_x, i + 1, tile_y);
 				break;
 			}
 
-			if (i == 0) {
+			if (i == min_y_level) {
 				grid_set_cell(level, selected_tile, tile_x, i, tile_y);
 			}
 		}
 	}
 
 	if (input_mouse_button_pressed(SDL_BUTTON_RIGHT)) {
-		for (int i = level->height - 2; i >= 0; i--) {
+		for (int i = level->height - 2; i >= min_y_level; i--) {
 			if (grid_get_cell(level, tile_x, i, tile_y).occupied) {
 				tile_t empty_tile = {0};
 				grid_set_cell(level, empty_tile, tile_x, i, tile_y);
@@ -182,6 +196,10 @@ void editor_render(res_pack_t *res_pack, grid_t *level) {
 			printf("selected a texture\n");
 		}
 	}
+
+	char y_level_buffer[8];
+	sprintf(y_level_buffer, "%d", min_y_level);
+	gui_print(res_pack, &res_pack->font, y_level_buffer, 16, 16);
 
 	// render_end_frame_buffer(res_pack);
 }
