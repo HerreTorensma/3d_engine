@@ -36,7 +36,7 @@ void font_init(font_t *font, res_pack_t *res_pack, size_t texture_index) {
     // }
 }
 
-void gui_print(res_pack_t *res_pack, font_t *font, const char text[], i32 x, i32 y) {
+void gui_print(res_pack_t *res_pack, font_t *font, const char text[], i32 x, i32 y, color_t color) {
     i32 index = 0;
     i32 current_x = x;
     while (text[index] != '\0') {
@@ -49,7 +49,7 @@ void gui_print(res_pack_t *res_pack, font_t *font, const char text[], i32 x, i32
             .h = font->rects[text[index]].h,
         };
         
-        render_image_rect(res_pack, font->texture_index, font->rects[text[index]], dst, res_pack->font.color);
+        render_image_rect(res_pack, font->texture_index, font->rects[text[index]], dst, color);
         
         current_x += font->rects[text[index]].w + font->horizontal_spacing;
         
@@ -143,7 +143,7 @@ bool gui_button(res_pack_t *res_pack, const char text[], rect_t tile_rect) {
     // gui_print(res_pack, &res_pack->font, text, global_rect.x, global_rect.y);
     // gui_print(res_pack, &res_pack->font, text, global_rect.x, text_y);
     // gui_print(res_pack, &res_pack->font, text, global_rect.x - text_width / 2, text_y);
-    gui_print(res_pack, &res_pack->font, text, text_x, text_y);
+    gui_print(res_pack, &res_pack->font, text, text_x, text_y, COLOR_BLACK);
 
     return released;
 }
@@ -273,7 +273,7 @@ static inline sdl_scancode_to_char(SDL_Scancode scancode) {
 void gui_text_edit(res_pack_t *res_pack, char text[], size_t buffer_size, rect_t tile_rect) {
     rect_t global_rect = tile_to_global(res_pack, tile_rect);
 
-    gui_print(res_pack, &res_pack->font, text, global_rect.x, global_rect.y);
+    gui_print(res_pack, &res_pack->font, text, global_rect.x, global_rect.y, COLOR_WHITE);
 
     size_t current_index = strlen(text);
 

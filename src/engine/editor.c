@@ -201,8 +201,8 @@ void editor_render(res_pack_t *res_pack, grid_t *level) {
 	}
 
 	char y_level_buffer[8];
-	sprintf(y_level_buffer, "%d", min_y_level);
-	gui_print(res_pack, &res_pack->font, y_level_buffer, 16, 16);
+	sprintf(y_level_buffer, "MIN Y: %d", min_y_level);
+	gui_print(res_pack, &res_pack->font, y_level_buffer, 0, 16, COLOR_WHITE);
 
 	// render_end_frame_buffer(res_pack);
 }

@@ -273,7 +273,7 @@ int main(int argc, char *argv[]) {
 	// font_t font = {0};
 	font_init(&res_pack.font, &res_pack, TEX_FONT);
 	res_pack.font.y_center = -4;
-	res_pack.font.color = COLOR_BLACK;
+	// res_pack.font.color = COLOR_BLACK;
 
 	grid_t grid = {0};
 	// grid_init(&grid, 512, 16, 512);
@@ -479,7 +479,7 @@ int main(int argc, char *argv[]) {
 
 			// render_image_rect(&res_pack, TEX_COBBLE, (rect_t){0, 0, 16, 16}, (rect_t){16, 16, 128, 128}, COLOR_WHITE);
 
-			gui_print(&res_pack, &res_pack.font, "DREAM SIMULATOR v0.1", 1, 0);
+			gui_print(&res_pack, &res_pack.font, "DREAM SIMULATOR v0.1", 1, 0, COLOR_WHITE);
 
 
 			render_end_frame_buffer(&res_pack);

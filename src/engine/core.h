@@ -51,7 +51,6 @@ typedef struct font {
     rect_t rects[256];
     u32 horizontal_spacing;
     i32 y_center;
-    color_t color;
 } font_t;
 
 typedef struct theme {
