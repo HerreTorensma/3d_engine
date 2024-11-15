@@ -18,3 +18,5 @@ mesh_t load_mesh(const char path[]);
 void color_to_gl_color(color_t color, vec4 gl_color);
 
 void get_normalized_mouse_pos(float *x, float *y);
+
+void debug_log(const char *format, ...);

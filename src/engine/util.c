@@ -1,5 +1,7 @@
 #include "util.h"
 
+#define DEBUG
+
 i32 window_width = 0;
 i32 window_height = 0;
 
@@ -94,7 +96,7 @@ void color_to_gl_color(color_t color, vec4 gl_color) {
 }
 
 mesh_t load_mesh(const char path[]) {
-	printf("Loading model %s...\n", path);
+	debug_log("Loading model %s...\n", path);
 
 	mesh_t mesh = {0};
 
@@ -102,7 +104,7 @@ mesh_t load_mesh(const char path[]) {
 
 	// Vertex count
 	fread(&mesh.vertex_count, sizeof(u32), 1, file);
-	printf("Vertex count: %u\n", mesh.vertex_count);
+	debug_log("  Vertex count: %u\n", mesh.vertex_count);
 	
 	// Allocate memory for vertices and read them
 	mesh.vertices = calloc(mesh.vertex_count, sizeof(vertex_t));
@@ -122,7 +124,7 @@ mesh_t load_mesh(const char path[]) {
 	
 	// mesh.index_count *= 3;
 
-	printf("Index count: %u\n", mesh.index_count);
+	debug_log("  Index count: %u\n", mesh.index_count);
 
 	mesh.indices = calloc(mesh.index_count, sizeof(u32));
 	
@@ -140,4 +142,13 @@ void get_normalized_mouse_pos(float *x, float *y) {
 
 	*x = (2.0f * window_x) / window_width - 1.0f;
 	*y = 1.0f - (2.0f * window_y) / window_height;
+}
+
+void debug_log(const char *format, ...) {
+	#ifdef DEBUG
+		va_list args;
+		va_start(args, format);
+		vprintf(format, args);
+		va_end(args);
+	#endif
 }

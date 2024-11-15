@@ -184,7 +184,7 @@ int main(int argc, char *argv[]) {
 
 	// Initialize SDL2
 	if (SDL_Init(SDL_INIT_EVENTS) < 0) {
-		printf("Failed to initialize SDL2: %s\n", SDL_GetError());
+		debug_log("Failed to initialize SDL2: %s\n", SDL_GetError());
 		return EXIT_FAILURE;
 	}
 
@@ -202,25 +202,25 @@ int main(int argc, char *argv[]) {
 	);
 
 	if (!window) {
-		printf("Failed to create window: %s\n", SDL_GetError());
+		debug_log("Failed to create window: %s\n", SDL_GetError());
 		return EXIT_FAILURE;
 	}
 
 	// Make an OpenGL context
 	SDL_GLContext context = SDL_GL_CreateContext(window);
     if (!context) {
-		printf("Failed to create OpenGL context: %s\n", SDL_GetError());
+		debug_log("Failed to create OpenGL context: %s\n", SDL_GetError());
 		return EXIT_FAILURE;
 	}
 	if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
-		printf("Failed to load OpenGL: %s\n", SDL_GetError());
+		debug_log("Failed to load OpenGL: %s\n", SDL_GetError());
 		return EXIT_FAILURE;
 	}
 
-	printf("OpenGL loaded\n");
-	printf("Vendor: %s\n", glGetString(GL_VENDOR));
-	printf("Renderer: %s\n", glGetString(GL_RENDERER));
-	printf("Version: %s\n", glGetString(GL_VERSION));
+	debug_log("OpenGL loaded\n");
+	debug_log("Vendor: %s\n", glGetString(GL_VENDOR));
+	debug_log("Renderer: %s\n", glGetString(GL_RENDERER));
+	debug_log("Version: %s\n", glGetString(GL_VERSION));
 	
 	glViewport(0, 0, window_width, window_height);
 
@@ -490,7 +490,7 @@ int main(int argc, char *argv[]) {
 		// SDL_Delay(1000/FPS);
 	}
 
-	printf("Quitting\n");
+	debug_log("Quitting\n");
 
 	SDL_GL_DeleteContext(context);
 	SDL_DestroyWindow(window);

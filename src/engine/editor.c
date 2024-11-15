@@ -21,7 +21,7 @@ static size_t selected_texture_index = 1;
 
 static char idk_buffer[32] = "test";
 
-static u32 min_y_level = 0;
+static i32 min_y_level = 0;
 
 void editor_init(void) {
     {
@@ -119,7 +119,7 @@ void editor_update(grid_t *level) {
 	};
 
 	if (input_mouse_button_pressed(SDL_BUTTON_LEFT)) {
-		for (int i = level->height - 2; i >= min_y_level; i--) {
+		for (i32 i = level->height - 2; i >= min_y_level; i--) {
 			if (grid_get_cell(level, tile_x, i, tile_y).occupied) {
 				grid_set_cell(level, selected_tile, tile_x, i + 1, tile_y);
 				break;
@@ -132,7 +132,7 @@ void editor_update(grid_t *level) {
 	}
 
 	if (input_mouse_button_pressed(SDL_BUTTON_RIGHT)) {
-		for (int i = level->height - 2; i >= min_y_level; i--) {
+		for (i32 i = level->height - 2; i >= min_y_level; i--) {
 			if (grid_get_cell(level, tile_x, i, tile_y).occupied) {
 				tile_t empty_tile = {0};
 				grid_set_cell(level, empty_tile, tile_x, i, tile_y);
@@ -177,8 +177,8 @@ void editor_render(res_pack_t *res_pack, grid_t *level) {
 	render_grid_ortho(res_pack, level, orientation, zoom, &projection);
 
 	if (gui_button(res_pack, "SAVE", (rect_t){0, 0, 4, 2})) {
-		// printf("SAVE\n");
 		grid_save(level, "test.grid");
+		debug_log("Saved level test.grid\n");
 	}
 	
 	gui_text_edit(res_pack, idk_buffer, 32, (rect_t){4, 4, 4, 4});
@@ -186,6 +186,7 @@ void editor_render(res_pack_t *res_pack, grid_t *level) {
 	for (i32 i = 2; i < 10; i++) {
 		if (mesh_button(res_pack, i, 1, (rect_t){0, -4 + i * 4, 4, 4})) {
 			selected_mesh_index = i;
+			debug_log("Selected mesh %d\n", i);
 		}
 	}
 
@@ -193,7 +194,7 @@ void editor_render(res_pack_t *res_pack, grid_t *level) {
 		// Right edge of the screen
 		if (texture_button(res_pack, i, (rect_t){76, i * 4, 4, 4})) {
 			selected_texture_index = i;
-			printf("selected a texture\n");
+			debug_log("Selected texture %d\n", i);
 		}
 	}
 
