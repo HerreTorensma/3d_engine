@@ -338,7 +338,7 @@ void render_mesh_isometric(res_pack_t *res_pack, mesh_t mesh, size_t texture_ind
 	render_mesh(res_pack, &mesh, texture_index);
 }
 
-void render_grid_ortho(res_pack_t *res_pack, grid_t *grid, enum ortho_view orientation, float zoom, mat4 *projection, i32 min_y, i32 max_y) {
+void render_grid_ortho(res_pack_t *res_pack, grid_t *grid, enum ortho_view orientation, float zoom, mat4 *projection, i32 min_y, i32 max_y, bool enable_transparency) {
 	// glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	clear(res_pack->editor_color);
 	// glClearColor(res_pack->editor_color.gl_color[0], res_pack->editor_color.gl_color[1], res_pack->editor_color.gl_color[2], res_pack->editor_color.gl_color[3]);
@@ -354,6 +354,8 @@ void render_grid_ortho(res_pack_t *res_pack, grid_t *grid, enum ortho_view orien
 	shader_set_mat4(ortho_shader, "projection", projection);
 
 	shader_set_int(ortho_shader, "texture1", 0);
+
+	shader_set_int(ortho_shader, "enable_transparency", enable_transparency);
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 

@@ -21,7 +21,19 @@ static size_t selected_texture_index = 1;
 
 static char idk_buffer[32] = "test";
 
-static i32 min_y_level = 0;
+static i32 selected_y_level = 0;
+static bool show_stack = true;
+
+i32 start_tile_x = 0;
+i32 start_tile_z = 0;
+
+typedef enum {
+	DRAW_MODE_DRAG,
+	DRAW_MODE_STACK,
+	DRAW_MODE_RECT,
+} draw_mode_t;
+
+draw_mode_t draw_mode = DRAW_MODE_DRAG;
 
 void editor_init(void) {
     {
@@ -46,7 +58,7 @@ static void compute_projection(void) {
 	glm_ortho(left, right, bottom, top, 0.1f, 100.0f, projection);
 }
 
-static void get_tile_pos(i32 *x, i32 *y) {
+static void get_mouse_tile_pos(i32 *x, i32 *y) {
 	float normalized_mouse_x = 0;
 	float normalized_mouse_y = 0;
 	get_normalized_mouse_pos(&normalized_mouse_x, &normalized_mouse_y);
@@ -67,7 +79,23 @@ static void get_tile_pos(i32 *x, i32 *y) {
 	*y = -(int)(roundf(world_pos[1]));
 }
 
-void editor_update(grid_t *level) {
+static void clamp_tile_coords(grid_t *grid, i32 *tile_x, i32 *tile_z) {
+	if (*tile_x < 0) {
+		*tile_x = 0;
+	}
+	if (*tile_x >= grid->width) {
+		*tile_x = grid->width - 1;
+	}
+
+	if (*tile_z < 0) {
+		*tile_z = 0;
+	}
+	if (*tile_z >= grid->depth) {
+		*tile_z = grid->depth - 1;
+	}
+}
+
+void editor_update(grid_t *grid) {
     if (input_key_pressed(SDL_SCANCODE_1)) {
 		orientation = ORTHO_TOP;
     }
@@ -89,27 +117,18 @@ void editor_update(grid_t *level) {
 	}
 
 	if (input_key_pressed(SDL_SCANCODE_MINUS)) {
-		if (min_y_level > 0) {
-			min_y_level--;
+		if (selected_y_level > 0) {
+			selected_y_level--;
 		}
 	}
 
 	if (input_key_pressed(SDL_SCANCODE_EQUALS)) {
-		if (min_y_level < level->height - 1) {
-			min_y_level++;
+		if (selected_y_level < grid->height - 1) {
+			selected_y_level++;
 		}
 	}
 
 	compute_projection();
-
-	i32 tile_x, tile_y;
-	get_tile_pos(&tile_x, &tile_y);
-	if (tile_x < 0 || tile_x >= level->width) {
-		return;
-	}
-	if (tile_y < 0 || tile_y >= level->depth) {
-		return;
-	}
 
 	// Just create it every frame based on the mesh and texture
 	tile_t selected_tile = {
@@ -118,25 +137,88 @@ void editor_update(grid_t *level) {
 		.texture_index = selected_texture_index,
 	};
 
-	if (input_mouse_button_pressed(SDL_BUTTON_LEFT)) {
-		for (i32 i = level->height - 2; i >= min_y_level; i--) {
-			if (grid_get_cell(level, tile_x, i, tile_y).occupied) {
-				grid_set_cell(level, selected_tile, tile_x, i + 1, tile_y);
-				break;
+	if (draw_mode == DRAW_MODE_DRAG) {
+		i32 tile_x, tile_z;
+		get_mouse_tile_pos(&tile_x, &tile_z);
+		if (tile_x < 0 || tile_x >= grid->width) {
+			return;
+		}
+		if (tile_z < 0 || tile_z >= grid->depth) {
+			return;
+		}
+
+		if (input_mouse_button_held(SDL_BUTTON_LEFT)) {
+			grid_set_cell(grid, selected_tile, tile_x, selected_y_level, tile_z);
+		}
+
+		if (input_mouse_button_held(SDL_BUTTON_RIGHT)) {
+			tile_t empty_tile = {0};
+			grid_set_cell(grid, empty_tile, tile_x, selected_y_level, tile_z);
+		}
+	} else if (draw_mode == DRAW_MODE_RECT) {
+		if (input_mouse_button_pressed(SDL_BUTTON_LEFT)) {
+			get_mouse_tile_pos(&start_tile_x, &start_tile_z);
+		}
+
+		if (input_mouse_button_released(SDL_BUTTON_LEFT)) {
+			i32 end_tile_x, end_tile_z;
+			get_mouse_tile_pos(&end_tile_x, &end_tile_z);
+			end_tile_x++;
+			end_tile_z++;
+
+			clamp_tile_coords(grid, &start_tile_x, &start_tile_z);
+			clamp_tile_coords(grid, &end_tile_x, &end_tile_z);
+
+			i32 left_x = start_tile_x;
+			i32 right_x = end_tile_x;
+			if (start_tile_x > end_tile_x) {
+				left_x = end_tile_x;
+				right_x = start_tile_x;
+			}
+			
+			i32 top_y = start_tile_z;
+			i32 bottom_y = end_tile_z;
+			if (start_tile_z > end_tile_z) {
+				top_y = end_tile_z;
+				bottom_y = start_tile_z;
 			}
 
-			if (i == min_y_level) {
-				grid_set_cell(level, selected_tile, tile_x, i, tile_y);
+			for (i32 y = top_y; y < bottom_y; y++) {
+				for (i32 x = left_x; x < right_x; x++) {
+					grid_set_cell(grid, selected_tile, x, selected_y_level, y);
+				}
 			}
 		}
-	}
+	} else if (draw_mode == DRAW_MODE_STACK) {
+		i32 tile_x, tile_z;
+		get_mouse_tile_pos(&tile_x, &tile_z);
+		if (tile_x < 0 || tile_x >= grid->width) {
+			return;
+		}
+		if (tile_z < 0 || tile_z >= grid->depth) {
+			return;
+		}
 
-	if (input_mouse_button_pressed(SDL_BUTTON_RIGHT)) {
-		for (i32 i = level->height - 2; i >= min_y_level; i--) {
-			if (grid_get_cell(level, tile_x, i, tile_y).occupied) {
-				tile_t empty_tile = {0};
-				grid_set_cell(level, empty_tile, tile_x, i, tile_y);
-				break;
+		if (input_mouse_button_pressed(SDL_BUTTON_LEFT)) {
+			for (i32 i = grid->height - 2; i >= selected_y_level; i--) {
+				if (grid_get_cell(grid, tile_x, i, tile_z).occupied) {
+					grid_set_cell(grid, selected_tile, tile_x, i + 1, tile_z);
+					break;
+				}
+
+				if (i == selected_y_level) {
+					grid_set_cell(grid, selected_tile, tile_x, i, tile_z);
+				}
+			}
+		}
+
+		if (input_mouse_button_pressed(SDL_BUTTON_RIGHT)) {
+			for (i32 i = grid->height - 2; i >= selected_y_level; i--) {
+				if (grid_get_cell(grid, tile_x, i, tile_z).occupied) {
+					tile_t empty_tile = {0};
+					grid_set_cell(grid, empty_tile, tile_x, i, tile_z);
+					break;
+				}
 			}
 		}
 	}
@@ -171,19 +253,22 @@ static bool texture_button(res_pack_t *res_pack, size_t texture_index, rect_t ti
 	return released;
 }
 
-void editor_render(res_pack_t *res_pack, grid_t *level) {
+void editor_render(res_pack_t *res_pack, grid_t *grid) {
 	// render_start_frame_buffer(res_pack);
 
-	// render_grid_ortho(res_pack, level, orientation, zoom, &projection);
-	// render_grid_ortho(res_pack, level, orientation, zoom, &projection, min_y_level, min_y_level);
-	render_grid_ortho(res_pack, level, orientation, zoom, &projection, min_y_level, level->height - 1);
+	if (show_stack) {
+		// render_grid_ortho(res_pack, grid, orientation, zoom, &projection, selected_y_level, grid->height - 1);
+		render_grid_ortho(res_pack, grid, orientation, zoom, &projection, 0, grid->height - 1, true);
+	} else {
+		render_grid_ortho(res_pack, grid, orientation, zoom, &projection, selected_y_level, selected_y_level, false);
+	}
 
 	if (gui_button(res_pack, "SAVE", (rect_t){0, 0, 4, 2})) {
-		grid_save(level, "test.grid");
-		debug_log("Saved level test.grid\n");
+		grid_save(grid, "test.grid");
+		debug_log("Saved grid test.grid\n");
 	}
 	
-	gui_text_edit(res_pack, idk_buffer, 32, (rect_t){4, 4, 4, 4});
+	// gui_text_edit(res_pack, idk_buffer, 32, (rect_t){4, 4, 4, 4});
 
 	for (i32 i = 2; i < 10; i++) {
 		if (mesh_button(res_pack, i, 1, (rect_t){0, -4 + i * 4, 4, 4})) {
@@ -201,8 +286,41 @@ void editor_render(res_pack_t *res_pack, grid_t *level) {
 	}
 
 	char y_level_buffer[8];
-	sprintf(y_level_buffer, "MIN Y: %d", min_y_level);
-	gui_print(res_pack, &res_pack->font, y_level_buffer, 0, 16, COLOR_WHITE);
+	sprintf(y_level_buffer, "Y: %d", selected_y_level);
+	gui_print(res_pack, &res_pack->font, y_level_buffer, 32, 32, COLOR_WHITE);
+
+	if (show_stack) {
+		if (gui_button(res_pack, "VIEW MODE: STACK", (rect_t){4, 0, 10, 2})) {
+			show_stack = false;
+			return;
+		}
+	} else {
+		if (gui_button(res_pack, "VIEW MODE: LAYER", (rect_t){4, 0, 10, 2})) {
+			show_stack = true;
+			return;
+		}
+	}
+
+	if (draw_mode == DRAW_MODE_DRAG) {
+		if (gui_button(res_pack, "DRAW MODE: DRAG", (rect_t){0, 2, 10, 2})) {
+			draw_mode = DRAW_MODE_STACK;
+			return;
+		}
+	}
+
+	if (draw_mode == DRAW_MODE_STACK) {
+		if (gui_button(res_pack, "DRAW MODE: STACK", (rect_t){0, 2, 10, 2})) {
+			draw_mode = DRAW_MODE_RECT;
+			return;
+		}
+	}
+
+	if (draw_mode == DRAW_MODE_RECT) {
+		if (gui_button(res_pack, "DRAW MODE: RECT", (rect_t){0, 2, 10, 2})) {
+			draw_mode = DRAW_MODE_DRAG;
+			return;
+		}
+	}
 
 	// render_end_frame_buffer(res_pack);
 }

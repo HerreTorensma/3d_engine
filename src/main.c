@@ -36,6 +36,7 @@ enum {
 	TEX_BRICKS = 1,
 	TEX_DIRT,
 	TEX_COBBLE,
+	TEX_GRASS,
 	TEX_IRON_BARS,
 	TEX_TREE,
 	TEX_BIRCH,
@@ -45,7 +46,6 @@ enum {
 	TEX_BUTTON,
 	TEX_BUTTON_PRESSED,
 	TEX_FRAME,
-	TEX_GRASS,
 };
 
 // enum {
@@ -244,6 +244,7 @@ int main(int argc, char *argv[]) {
 	res_add_texture(&res_pack, TEX_BRICKS, load_tga("res/images/bricks.tga", true));
 	res_add_texture(&res_pack, TEX_DIRT, load_tga("res/images/dirt.tga", true));
 	res_add_texture(&res_pack, TEX_COBBLE, load_tga("res/images/cobble.tga", false));
+	res_add_texture(&res_pack, TEX_GRASS, load_tga("res/images/grass.tga", false));
 	res_add_texture(&res_pack, TEX_IRON_BARS, load_tga("res/images/iron_bars.tga", true));
 	res_add_texture(&res_pack, TEX_TREE, load_tga("res/images/tree.tga", true));
 	res_add_texture(&res_pack, TEX_BIRCH, load_tga("res/images/birch.tga", true));
@@ -258,7 +259,6 @@ int main(int argc, char *argv[]) {
 	res_pack.gui_tile_size = 8;
 
 	res_add_texture(&res_pack, TEX_FRAME, load_tga("res/images/frame_new.tga", false));
-	res_add_texture(&res_pack, TEX_GRASS, load_tga("res/images/grass.tga", false));
 
 	res_add_mesh_raw(&res_pack, MESH_QUAD, quad_vertices, sizeof(quad_vertices) / sizeof(vertex_t), quad_indices, sizeof(quad_indices) / sizeof(u32));
 	res_add_mesh(&res_pack, MESH_CUBE, load_mesh("res/meshes/cube.mesh"));
