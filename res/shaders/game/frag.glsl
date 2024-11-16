@@ -42,28 +42,28 @@ vec3 getNearestPaletteColor(vec3 color) {
     return nearestColor;
 }
 
-// void main()
-// {
-//     FragColor = texture(texture1, TexCoord);
-//     // if (FragColor != vec4(0)) {
-//         // FragColor = mix(vec4(fogColor, 1.0), FragColor, Visibility);
-//     // }
-
-//     // FragColor.rgb += vec3(rand(TexCoord - 0.5)) * 0.3;
-
-//     // FragColor = vec4(getNearestPaletteColor(FragColor.rgb), FragColor.a);
-
-//     float scale = float(colorLevels - 1);
-//     // float scale = float(colorLevels);
-//     // vec3 noise = vec3(rand(TexCoord) - 0.5) * 0.3;
-//     // vec3 quantizedColor = floor((FragColor.rgb + noise) * scale + 0.5) / scale;
-//     vec3 quantizedColor = floor(FragColor.rgb * scale + 0.5) / scale;
-//     FragColor = vec4(quantizedColor, FragColor.a);
-
-//     // FragColor = round(FragColor / colors_amount) * colors_amount;
-// }
-
 void main()
 {
     FragColor = texture(texture1, TexCoord);
+    if (FragColor != vec4(0)) {
+        FragColor = mix(vec4(fogColor, 1.0), FragColor, Visibility);
+    }
+
+    // FragColor.rgb += vec3(rand(TexCoord - 0.5)) * 0.3;
+
+    // FragColor = vec4(getNearestPaletteColor(FragColor.rgb), FragColor.a);
+
+    // float scale = float(colorLevels - 1);
+    // // float scale = float(colorLevels);
+    // // vec3 noise = vec3(rand(TexCoord) - 0.5) * 0.3;
+    // // vec3 quantizedColor = floor((FragColor.rgb + noise) * scale + 0.5) / scale;
+    // vec3 quantizedColor = floor(FragColor.rgb * scale + 0.5) / scale;
+    // FragColor = vec4(quantizedColor, FragColor.a);
+
+    // FragColor = round(FragColor / colors_amount) * colors_amount;
 }
+
+// void main()
+// {
+//     FragColor = texture(texture1, TexCoord);
+// }

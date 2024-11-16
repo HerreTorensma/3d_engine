@@ -448,7 +448,7 @@ int main(int argc, char *argv[]) {
 		}
 
 		if (edit_mode) {
-			editor_update(&grid);
+			editor_update(&res_pack, &grid);
 		} else {
 			game_update(&ecs);
 		}

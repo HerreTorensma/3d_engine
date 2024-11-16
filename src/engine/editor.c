@@ -35,6 +35,13 @@ typedef enum {
 
 draw_mode_t draw_mode = DRAW_MODE_DRAG;
 
+const rect_t drawable_area = {
+	.x = 32,
+	.y = 32,
+	.w = 576,
+	.h = 296,
+};
+
 void editor_init(void) {
     {
 		vec3 camera_pos = {0.0f, 10.0f, 0.0f};  // Camera position (above looking down)
@@ -95,7 +102,7 @@ static void clamp_tile_coords(grid_t *grid, i32 *tile_x, i32 *tile_z) {
 	}
 }
 
-void editor_update(grid_t *grid) {
+void editor_update(res_pack_t *res_pack, grid_t *grid) {
     if (input_key_pressed(SDL_SCANCODE_1)) {
 		orientation = ORTHO_TOP;
     }
@@ -136,6 +143,14 @@ void editor_update(grid_t *grid) {
 		.mesh_index = selected_mesh_index,
 		.texture_index = selected_texture_index,
 	};
+
+	i32 mouse_x, mouse_y;
+	get_mouse_pos(&mouse_x, &mouse_y);
+	mouse_x /= (window_width / res_pack->render_width);
+    mouse_y /= (window_height / res_pack->render_height);
+	if (mouse_x < drawable_area.x || mouse_y < drawable_area.y || mouse_x > drawable_area.x + drawable_area.w || mouse_y > drawable_area.y + drawable_area.h) {
+		return;
+	}
 
 	if (draw_mode == DRAW_MODE_DRAG) {
 		i32 tile_x, tile_z;
@@ -286,7 +301,7 @@ void editor_render(res_pack_t *res_pack, grid_t *grid) {
 	}
 
 	char y_level_buffer[8];
-	sprintf(y_level_buffer, "Y: %d", selected_y_level);
+	sprintf(y_level_buffer, "Y: %d [-/+]", selected_y_level);
 	gui_print(res_pack, &res_pack->font, y_level_buffer, 32, 32, COLOR_WHITE);
 
 	if (show_stack) {

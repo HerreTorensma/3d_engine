@@ -11,7 +11,7 @@
 
 void editor_init(void);
 
-void editor_update(grid_t *level);
+void editor_update(res_pack_t *res_pack, grid_t *level);
 
 void editor_render(res_pack_t *res_pack, grid_t *level);
 
