@@ -21,7 +21,7 @@ static void clear(color_t color) {
 	glClearColor(gl_color[0], gl_color[1], gl_color[2], gl_color[3]);
 }
 
-inline static void render_mesh(res_pack_t *res_pack, mesh_t *mesh, size_t texture_index) {
+inline static void render_mesh(res_pack_t *res_pack, mesh_t *mesh, index_t texture_index) {
 	glActiveTexture(GL_TEXTURE0);
 	// glBindTexture(GL_TEXTURE_2D, res_pack->texture_ids[texture_index]);
 	
@@ -234,7 +234,7 @@ static void render_grid(res_pack_t *res_pack, grid_t *grid) {
 	}
 }
 
-void render_image(res_pack_t *res_pack, size_t texture_index, i32 x, i32 y, color_t color) {
+void render_image(res_pack_t *res_pack, index_t texture_index, i32 x, i32 y, color_t color) {
 	glDisable(GL_DEPTH_TEST);
 
 	glUseProgram(gui_shader);
@@ -266,7 +266,7 @@ void render_image(res_pack_t *res_pack, size_t texture_index, i32 x, i32 y, colo
 	render_mesh(res_pack, &res_pack->meshes[MESH_QUAD], texture_index);
 }
 
-void render_image_rect(res_pack_t *res_pack, size_t texture_index, rect_t src, rect_t dst, color_t color) {
+void render_image_rect(res_pack_t *res_pack, index_t texture_index, rect_t src, rect_t dst, color_t color) {
 	glDisable(GL_DEPTH_TEST);
 
 	glUseProgram(gui_shader);
@@ -308,7 +308,7 @@ void render_image_rect(res_pack_t *res_pack, size_t texture_index, rect_t src, r
 	render_mesh(res_pack, &res_pack->meshes[MESH_QUAD], texture_index);
 }
 
-void render_mesh_isometric(res_pack_t *res_pack, mesh_t mesh, size_t texture_index, i32 x, i32 y, float scale) {
+void render_mesh_isometric(res_pack_t *res_pack, mesh_t mesh, index_t texture_index, i32 x, i32 y, float scale) {
 	glEnable(GL_DEPTH_TEST);
 
 	glUseProgram(gui_shader);

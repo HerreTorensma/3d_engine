@@ -22,6 +22,10 @@ typedef struct {
 } rotating_c;
 
 enum {
+	ROTATING_C = 4,
+};
+
+enum {
 	MESH_CUBE = 2,
 	MESH_SLAB,
 	MESH_CORNER,
@@ -30,6 +34,9 @@ enum {
 	MESH_SLOPE,
 	MESH_MONKEY,
 	MESH_MUSHROOM,
+	MESH_WALL,
+	MESH_WALL_CORNER,
+	// MESH_EDITOR_STOP,
 };
 
 enum {
@@ -38,6 +45,8 @@ enum {
 	TEX_COBBLE,
 	TEX_GRASS,
 	TEX_IRON_BARS,
+	// TEX_EDITOR_STOP,
+
 	TEX_TREE,
 	TEX_BIRCH,
 	TEX_CROSSHAIR,
@@ -46,6 +55,7 @@ enum {
 	TEX_BUTTON,
 	TEX_BUTTON_PRESSED,
 	TEX_FRAME,
+	TEX_RED,
 };
 
 // enum {
@@ -106,8 +116,6 @@ void game_input(SDL_Event event) {
 	}
 }
 
-const int ROTATING_C = 3;
-
 static void rotating_system(ecs_world_t *ecs) {
 	ecs_query_t query = ecs_query(ecs, TRANSFORM_C, ROTATING_C, -1);
 	for (size_t i = 0; i < query.len; i++) {
@@ -120,7 +128,9 @@ static void rotating_system(ecs_world_t *ecs) {
 	}
 }
 
-void game_update(ecs_world_t *ecs) {
+bool colliding = false;
+
+void game_update(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs) {
 	float camera_speed = 0.05f;
 	// if (input_key_held(SDL_SCANCODE_W)) {
 	// 	vec3 temp;
@@ -173,11 +183,31 @@ void game_update(ecs_world_t *ecs) {
 	}
 
 	rotating_system(ecs);
+
+	// Temporary collision
+	i32 map_x = (i32)roundf(camera.position[0]);
+	i32 map_y = (i32)roundf(camera.position[1]);
+	i32 map_z = (i32)roundf(camera.position[2]);
+
+	tile_t current_tile = grid_get_cell(grid, map_x, map_y, map_z);
+
+	colliding = false;
+	
+	for (int i = 0; i < res_pack->meshes[current_tile.mesh_index].collision.boxes_len; i++) {
+		collision_box_t box = res_pack->meshes[current_tile.mesh_index].collision.boxes[i]; 
+		// debug_log("hello\n");
+		if (camera.position[0] > (float)map_x + box.min_x && camera.position[0] < (float)map_x + box.max_x &&
+			camera.position[1] > (float)map_y + box.min_y && camera.position[1] < (float)map_y + box.max_y &&
+			camera.position[2] > (float)map_z + box.min_z && camera.position[2] < (float)map_z + box.max_z) {
+			// debug_log("Collision!\n");
+			colliding = true;
+		}
+	}
 }
 
 #define FPS 120
 
-int main(int argc, char *argv[]) {
+SDL_Window *create_sdl2_window(i32 width, i32 height) {
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
@@ -185,36 +215,37 @@ int main(int argc, char *argv[]) {
 	// Initialize SDL2
 	if (SDL_Init(SDL_INIT_EVENTS) < 0) {
 		debug_log("Failed to initialize SDL2: %s\n", SDL_GetError());
-		return EXIT_FAILURE;
+		exit(EXIT_FAILURE);
 	}
-
-	window_width = 1280;
-	window_height = 720;
 
 	// Create the window
 	SDL_Window *window = SDL_CreateWindow(
 		"game",
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
-		window_width,
-		window_height,
+		width,
+		height,
 		SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE
 	);
 
 	if (!window) {
 		debug_log("Failed to create window: %s\n", SDL_GetError());
-		return EXIT_FAILURE;
+		exit(EXIT_FAILURE);
 	}
 
+	return window;
+}
+
+SDL_GLContext *create_sdl2_gl_context(SDL_Window *window, i32 width, i32 height) {
 	// Make an OpenGL context
 	SDL_GLContext context = SDL_GL_CreateContext(window);
     if (!context) {
 		debug_log("Failed to create OpenGL context: %s\n", SDL_GetError());
-		return EXIT_FAILURE;
+		exit(EXIT_FAILURE);
 	}
 	if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
 		debug_log("Failed to load OpenGL: %s\n", SDL_GetError());
-		return EXIT_FAILURE;
+		exit(EXIT_FAILURE);
 	}
 
 	debug_log("OpenGL loaded\n");
@@ -222,24 +253,29 @@ int main(int argc, char *argv[]) {
 	debug_log("Renderer: %s\n", glGetString(GL_RENDERER));
 	debug_log("Version: %s\n", glGetString(GL_VERSION));
 	
-	glViewport(0, 0, window_width, window_height);
+	glViewport(0, 0, width, height);
+
+	return context;
+}
+
+int main(int argc, char *argv[]) {
+	// init_sdl2();
+	window_width = 1280;
+	window_height = 720;
+
+	SDL_Window *window = create_sdl2_window(window_width, window_height);
+	SDL_GLContext *context = create_sdl2_gl_context(window, window_width, window_height);
 
 	res_pack_t res_pack = {0};
 	
 	res_pack.render_width = 640;
 	res_pack.render_height = 360;
 
-	// res_pack.render_width = 800;
-	// res_pack.render_height = 450;
-
-	// res_pack.render_height = 480;
 	res_pack.sky_color = (color_t){58, 49, 41, 255};
 	// res_pack.sky_color = (color_t){2, 9, 23, 255};
 	// res_pack.sky_color = (color_t){0, 0, 0, 255};
 	res_pack.fog_color = (color_t){58, 49, 41, 255};
 	res_pack.editor_color = (color_t){50, 50, 50, 255};
-
-	// render_init(&res_pack);
 
 	res_add_texture(&res_pack, TEX_BRICKS, load_tga("res/images/bricks.tga", true));
 	res_add_texture(&res_pack, TEX_DIRT, load_tga("res/images/dirt.tga", true));
@@ -259,61 +295,48 @@ int main(int argc, char *argv[]) {
 	res_pack.gui_tile_size = 8;
 
 	res_add_texture(&res_pack, TEX_FRAME, load_tga("res/images/frame_new.tga", false));
+	res_add_texture(&res_pack, TEX_RED, load_tga("res/images/red.tga", false));
+
+	collision_config_t cube_collision = {0};
+	cube_collision.boxes[0] = (collision_box_t){
+		.min_x = -0.5f,
+		.max_x = 0.5f,
+		.min_y = -0.5f,
+		.max_y = 0.5f,
+		.min_z = -0.5f,
+		.max_z = 0.5f,
+	};
+	cube_collision.boxes_len = 1;
+
+	collision_config_t wall_collision = {0};
+	wall_collision.boxes[0] = (collision_box_t){
+		.min_x = -0.5f,
+		.max_x = 0.5f,
+		.min_y = -0.5f,
+		.max_y = 0.5f,
+		.min_z = -0.1f,
+		.max_z = 0.1f,
+	};
+	wall_collision.boxes_len = 1;
 
 	res_add_mesh_raw(&res_pack, MESH_QUAD, quad_vertices, sizeof(quad_vertices) / sizeof(vertex_t), quad_indices, sizeof(quad_indices) / sizeof(u32));
-	res_add_mesh(&res_pack, MESH_CUBE, load_mesh("res/meshes/cube.mesh"));
-	res_add_mesh(&res_pack, MESH_FLOOR, load_mesh("res/meshes/floor.mesh"));
-	res_add_mesh(&res_pack, MESH_SLAB, load_mesh("res/meshes/slab.mesh"));
-	res_add_mesh(&res_pack, MESH_SLOPE, load_mesh("res/meshes/slope.mesh"));
-	res_add_mesh(&res_pack, MESH_PYRAMID, load_mesh("res/meshes/pyramid.mesh"));
-	res_add_mesh(&res_pack, MESH_CORNER, load_mesh("res/meshes/corner.mesh"));
-	res_add_mesh(&res_pack, MESH_MONKEY, load_mesh("res/meshes/monkey.mesh"));
-	res_add_mesh(&res_pack, MESH_MUSHROOM, load_mesh("res/meshes/mushroom.mesh"));
+	res_add_mesh(&res_pack, MESH_CUBE, load_mesh("res/meshes/cube.mesh"), cube_collision);
+	res_add_mesh(&res_pack, MESH_FLOOR, load_mesh("res/meshes/floor.mesh"), (collision_config_t){0});
+	res_add_mesh(&res_pack, MESH_SLAB, load_mesh("res/meshes/slab.mesh"), (collision_config_t){0});
+	res_add_mesh(&res_pack, MESH_SLOPE, load_mesh("res/meshes/slope.mesh"), (collision_config_t){0});
+	res_add_mesh(&res_pack, MESH_PYRAMID, load_mesh("res/meshes/pyramid.mesh"), (collision_config_t){0});
+	res_add_mesh(&res_pack, MESH_CORNER, load_mesh("res/meshes/corner.mesh"), (collision_config_t){0});
+	res_add_mesh(&res_pack, MESH_MONKEY, load_mesh("res/meshes/monkey.mesh"), (collision_config_t){0});
+	res_add_mesh(&res_pack, MESH_MUSHROOM, load_mesh("res/meshes/mushroom.mesh"), (collision_config_t){0});
+	res_add_mesh(&res_pack, MESH_WALL, load_mesh("res/meshes/wall.mesh"), wall_collision);
+	res_add_mesh(&res_pack, MESH_WALL_CORNER, load_mesh("res/meshes/wall_corner.mesh"), (collision_config_t){0});
 
-	// font_t font = {0};
 	font_init(&res_pack.font, &res_pack, TEX_FONT);
 	res_pack.font.y_center = -4;
-	// res_pack.font.color = COLOR_BLACK;
 
 	grid_t grid = {0};
 	// grid_init(&grid, 512, 16, 512);
 	grid_load(&grid, "test.grid");
-
-	// grid_init(&grid, 64, 64, 64);
-	// grid_init(&grid, 16, 16, 16);
-
-	// for (int z = 0; z < 16; z++) {
-	// 	for (int x = 0; x < 16; x++) {
-	// 		grid_set_cell(&grid, TILE_DIRT_FLOOR, x, 0, z);
-	// 	}
-	// }
-
-	// grid_set_cell(&grid, TILE_BRICK_CUBE, 0, 0, 0);
-	// grid_set_cell(&grid, TILE_BRICK_CUBE, 1, 0, 0);
-	// // grid_set_cell(&grid, TILE_BRICK_CUBE, 2, 0, 0);
-	// grid_set_cell(&grid, TILE_BRICK_CUBE, 3, 0, 0);
-	// grid_set_cell(&grid, TILE_BRICK_CUBE, 4, 0, 0);
-	// grid_set_cell(&grid, TILE_BRICK_CUBE, 5, 0, 0);
-	// grid_set_cell(&grid, TILE_BRICK_CUBE, 6, 0, 0);
-	// grid_set_cell(&grid, TILE_BRICK_CUBE, 7, 0, 0);
-	// grid_set_cell(&grid, TILE_BRICK_CUBE, 8, 0, 0);
-	// grid_set_cell(&grid, TILE_BRICK_CUBE, 9, 0, 0);
-
-	// grid_set_cell(&grid, TILE_BRICK_CUBE, 7, 1, 0);
-	// grid_set_cell(&grid, TILE_BRICK_CUBE, 8, 1, 0);
-	// grid_set_cell(&grid, TILE_BRICK_CUBE, 9, 1, 0);
-
-	// grid_set_cell(&grid, TILE_BRICK_CUBE, 9, 0, 1);
-	// grid_set_cell(&grid, TILE_BRICK_CUBE, 9, 0, 2);
-	// grid_set_cell(&grid, TILE_BRICK_CUBE, 9, 0, 3);
-	// grid_set_cell(&grid, TILE_BRICK_CUBE, 9, 0, 4);
-	
-	// grid_set_cell(&grid, TILE_BRICK_SLOPE, 10, 0, 4);
-	// grid_set_cell(&grid, TILE_BRICK_FLOOR, 11, 0, 4);
-	// grid_set_cell(&grid, TILE_BRICK_PYRAMID, 12, 0, 4);
-	// grid_set_cell(&grid, TILE_BRICK_SLAB, 13, 0, 4);
-	// grid_set_cell(&grid, TILE_BRICK_CORNER, 14, 0, 4);
-	// grid_set_cell(&grid, TILE_BRICK_MONKEY, 15, 0, 4);
 
 	camera = create_camera();
 
@@ -325,13 +348,13 @@ int main(int argc, char *argv[]) {
 	// Don't lock fps
 	// SDL_GL_SetSwapInterval(0);
 
-	// ecs_world_t ecs = ecs_create();
 	ecs_world_t ecs = {0};
 	ecs_init(&ecs);
 	ECS_REGISTER(&ecs, transform_c, TRANSFORM_C);
 	ECS_REGISTER(&ecs, sprite_c, SPRITE_C);
 	ECS_REGISTER(&ecs, mesh_c, MESH_C);
 	ECS_REGISTER(&ecs, rotating_c, ROTATING_C);
+	ECS_REGISTER(&ecs, collision_c, COLLISION_C);
 
 	for (int i = 0; i < 100; i++) {
 		entity_t tree_e = ecs_new(&ecs);
@@ -450,13 +473,14 @@ int main(int argc, char *argv[]) {
 		if (edit_mode) {
 			editor_update(&res_pack, &grid);
 		} else {
-			game_update(&ecs);
+			game_update(&res_pack, &grid, &ecs);
 		}
 
 		if (edit_mode) {
 			// render_start_frame_buffer(&res_pack);
 
-			editor_render(&res_pack, &grid);
+			// editor_render(&res_pack, &grid, MESH_EDITOR_STOP, TEX_EDITOR_STOP);
+			editor_render(&res_pack, &grid, 12, 6);
 
 			// render_end_frame_buffer(&res_pack);
 		} else {
@@ -479,8 +503,28 @@ int main(int argc, char *argv[]) {
 
 			// render_image_rect(&res_pack, TEX_COBBLE, (rect_t){0, 0, 16, 16}, (rect_t){16, 16, 128, 128}, COLOR_WHITE);
 
+			#ifdef DEBUG
 			gui_print(&res_pack, &res_pack.font, "DREAM SIMULATOR v0.1", 1, 0, COLOR_WHITE);
+			{
+				char buffer[64];
+				sprintf(buffer, "X: %f Y: %f Z: %f", camera.position[0], camera.position[1], camera.position[2]);
+				gui_print(&res_pack, &res_pack.font, buffer, 1, 8, COLOR_WHITE);
+			}
+			{
+				char buffer[64];
+				i32 map_x = (i32)roundf(camera.position[0]);
+				i32 map_y = (i32)roundf(camera.position[1]);
+				i32 map_z = (i32)roundf(camera.position[2]);
 
+				tile_t current_tile = grid_get_cell(&grid, map_x, map_y, map_z);
+				sprintf(buffer, "MESH: %d", current_tile.mesh_index);
+				gui_print(&res_pack, &res_pack.font, buffer, 1, 16, COLOR_WHITE);
+			}
+
+			if (colliding) {
+				gui_print(&res_pack, &res_pack.font, "COLLIDING", 1, 24, COLOR_WHITE);
+			}
+			#endif
 
 			render_end_frame_buffer(&res_pack);
 		}

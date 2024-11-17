@@ -1,6 +1,6 @@
 #include "res.h"
 
-void res_add_mesh(res_pack_t *res_pack, size_t index, mesh_t mesh) {
+void res_add_mesh(res_pack_t *res_pack, index_t index, mesh_t mesh, collision_config_t collision) {
 	// This line causes a segfault on MacOS because it has no OpenGL 3.3 support
     // Could be either because this is currently the first OpenGL call in the game,
     // or because MacOS supports up to OpenGL 2.1 which doesn't support vao's.
@@ -26,10 +26,12 @@ void res_add_mesh(res_pack_t *res_pack, size_t index, mesh_t mesh) {
 
 	glBindVertexArray(0);
 
+	mesh.collision = collision;
+
 	res_pack->meshes[index] = mesh;
 }
 
-void res_add_mesh_raw(res_pack_t *res_pack, size_t index, vertex_t *vertices, u32 vertex_count, u32 *indices, u32 index_count) {
+void res_add_mesh_raw(res_pack_t *res_pack, index_t index, vertex_t *vertices, u32 vertex_count, u32 *indices, u32 index_count) {
 	mesh_t mesh = {0};
 
 	mesh.vertex_count = vertex_count;
@@ -47,10 +49,10 @@ void res_add_mesh_raw(res_pack_t *res_pack, size_t index, vertex_t *vertices, u3
     }
 	memcpy(mesh.indices, indices, index_count * sizeof(u32));
 
-	res_add_mesh(res_pack, index, mesh);
+	res_add_mesh(res_pack, index, mesh, (collision_config_t){0});
 }
 
-void res_add_texture(res_pack_t *res_pack, size_t index, texture_t texture) {
+void res_add_texture(res_pack_t *res_pack, index_t index, texture_t texture) {
 	// Generate a new texture in OpenGL
 	glGenTextures(1, &texture.id);
 	glBindTexture(GL_TEXTURE_2D, texture.id);

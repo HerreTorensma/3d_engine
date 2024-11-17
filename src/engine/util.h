@@ -6,6 +6,8 @@ This header and source file contain utility helper functions.
 #include "global.h"
 #include "core.h"
 
+#define DEBUG
+
 extern i32 window_width;
 extern i32 window_height;
 

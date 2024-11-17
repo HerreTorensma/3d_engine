@@ -6,6 +6,22 @@ conveniently in one file to avoid cyclic imports.
 
 #include "global.h"
 
+typedef struct collision_box {
+    float min_x;
+    float max_x;
+    
+    float min_y;
+    float max_y;
+
+    float min_z;
+    float max_z;
+} collision_box_t;
+
+typedef struct collision_config {
+    collision_box_t boxes[4];
+    index_t boxes_len;
+} collision_config_t;
+
 // Structs
 typedef struct vertex {
     vec3 position;
@@ -22,6 +38,8 @@ typedef struct mesh {
     u32 vao;
     u32 vbo;
     u32 ebo;
+
+    collision_config_t collision;
 } mesh_t;
 
 typedef struct texture {
@@ -47,7 +65,7 @@ typedef struct color {
 } color_t;
 
 typedef struct font {
-    size_t texture_index;
+    index_t texture_index;
     rect_t rects[256];
     u32 horizontal_spacing;
     i32 y_center;
@@ -58,10 +76,10 @@ typedef struct theme {
 	
     font_t font;
 
-	size_t button_index;
-	size_t button_pressed_index;
+	index_t button_index;
+	index_t button_pressed_index;
 
-    size_t slider_index;
+    index_t slider_index;
 } theme_t;
 
 typedef struct tile {
@@ -99,8 +117,8 @@ typedef struct res_pack {
     mesh_t meshes[256];
 	texture_t textures[256];
 
-	size_t button_tex_index;
-	size_t button_pressed_tex_index;
+	index_t button_tex_index;
+	index_t button_pressed_tex_index;
 	u32 gui_tile_size;
 
 	font_t font;
@@ -114,6 +132,7 @@ typedef struct res_pack {
 #define COLOR_BLUE (color_t){0, 0, 0, 255}
 
 // Core enums
+// Continue own enum at 2
 enum {
     MESH_QUAD = 1,
 };
@@ -149,7 +168,7 @@ typedef struct transform {
 typedef transform_t transform_c;
 
 typedef struct {
-	size_t texture_index;
+	index_t texture_index;
 	bool billboard;
 
     float x_scale;
@@ -157,12 +176,16 @@ typedef struct {
 } sprite_c;
 
 typedef struct {
-    size_t mesh_index;
-    size_t texture_index;
+    index_t mesh_index;
+    index_t texture_index;
 } mesh_c;
 
+typedef collision_config_t collision_c;
+
+// Continue your own enum at 3
 enum {
     TRANSFORM_C = 0,
     SPRITE_C = 1,
     MESH_C = 2,
+    COLLISION_C = 3,
 };

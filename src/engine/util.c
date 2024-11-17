@@ -1,7 +1,5 @@
 #include "util.h"
 
-#define DEBUG
-
 i32 window_width = 0;
 i32 window_height = 0;
 

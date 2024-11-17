@@ -268,7 +268,7 @@ static bool texture_button(res_pack_t *res_pack, size_t texture_index, rect_t ti
 	return released;
 }
 
-void editor_render(res_pack_t *res_pack, grid_t *grid) {
+void editor_render(res_pack_t *res_pack, grid_t *grid, index_t mesh_amount, index_t tex_amount) {
 	// render_start_frame_buffer(res_pack);
 
 	if (show_stack) {
@@ -285,14 +285,14 @@ void editor_render(res_pack_t *res_pack, grid_t *grid) {
 	
 	// gui_text_edit(res_pack, idk_buffer, 32, (rect_t){4, 4, 4, 4});
 
-	for (i32 i = 2; i < 10; i++) {
+	for (index_t i = 2; i < mesh_amount; i++) {
 		if (mesh_button(res_pack, i, 1, (rect_t){0, -4 + i * 4, 4, 4})) {
 			selected_mesh_index = i;
 			debug_log("Selected mesh %d\n", i);
 		}
 	}
 
-	for (i32 i = 1; i < 13; i++) {
+	for (index_t i = 1; i < tex_amount; i++) {
 		// Right edge of the screen
 		if (texture_button(res_pack, i, (rect_t){76, i * 4, 4, 4})) {
 			selected_texture_index = i;

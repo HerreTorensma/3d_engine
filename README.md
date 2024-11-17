@@ -60,6 +60,7 @@
     - GUI
         - Text edit (for dialogue editor)
         - Slider with snap (for editing specific levels in the grid)
+        - Create debugging tool that prints values to the top right of the screen 'automatically' with formatted string support
 
 ## Dependencies
 - SDL2
