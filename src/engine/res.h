@@ -7,7 +7,7 @@ This header and source file contain functions related to the resource pack syste
 #include "core.h"
 #include "util.h"
 
-void res_add_mesh(res_pack_t *res_pack, index_t index, mesh_t mesh, collision_config_t collision);
+void res_add_mesh(res_pack_t *res_pack, index_t index, mesh_t mesh, collider_t collision);
 
 void res_add_mesh_raw(res_pack_t *res_pack, index_t index, vertex_t *vertices, u32 vertex_count, u32 *indices, u32 index_count);
 

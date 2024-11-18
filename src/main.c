@@ -89,8 +89,14 @@ static camera_t create_camera() {
 
 static camera_t camera = {0};
 
+static bool frozen = false;
+
 void game_input(SDL_Event event) {
 	if (event.type == SDL_MOUSEMOTION) {
+		if (frozen) {
+			return;
+		}
+
 		float x_offset = (float)(event.motion.xrel);
 		float y_offset = -(float)(event.motion.yrel);
 		
@@ -130,7 +136,18 @@ static void rotating_system(ecs_world_t *ecs) {
 
 bool colliding = false;
 
-void game_update(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs) {
+void game_update(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, SDL_Window *window) {
+	if (input_key_pressed(SDL_SCANCODE_F)) {
+		SDL_SetRelativeMouseMode(SDL_FALSE);
+		SDL_WarpMouseInWindow(window, window_width / 2, window_height / 2);
+		frozen = true;
+	}
+
+	if (input_key_released(SDL_SCANCODE_F)) {
+		SDL_SetRelativeMouseMode(SDL_TRUE);
+		frozen = false;
+	}
+
 	float camera_speed = 0.05f;
 	// if (input_key_held(SDL_SCANCODE_W)) {
 	// 	vec3 temp;
@@ -194,7 +211,7 @@ void game_update(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs) {
 	colliding = false;
 	
 	for (int i = 0; i < res_pack->meshes[current_tile.mesh_index].collision.boxes_len; i++) {
-		collision_box_t box = res_pack->meshes[current_tile.mesh_index].collision.boxes[i]; 
+		box_t box = res_pack->meshes[current_tile.mesh_index].collision.boxes[i]; 
 		// debug_log("hello\n");
 		if (camera.position[0] > (float)map_x + box.min_x && camera.position[0] < (float)map_x + box.max_x &&
 			camera.position[1] > (float)map_y + box.min_y && camera.position[1] < (float)map_y + box.max_y &&
@@ -297,8 +314,8 @@ int main(int argc, char *argv[]) {
 	res_add_texture(&res_pack, TEX_FRAME, load_tga("res/images/frame_new.tga", false));
 	res_add_texture(&res_pack, TEX_RED, load_tga("res/images/red.tga", false));
 
-	collision_config_t cube_collision = {0};
-	cube_collision.boxes[0] = (collision_box_t){
+	collider_t cube_collider = {0};
+	cube_collider.boxes[0] = (box_t){
 		.min_x = -0.5f,
 		.max_x = 0.5f,
 		.min_y = -0.5f,
@@ -306,10 +323,10 @@ int main(int argc, char *argv[]) {
 		.min_z = -0.5f,
 		.max_z = 0.5f,
 	};
-	cube_collision.boxes_len = 1;
+	cube_collider.boxes_len = 1;
 
-	collision_config_t wall_collision = {0};
-	wall_collision.boxes[0] = (collision_box_t){
+	collider_t wall_collider = {0};
+	wall_collider.boxes[0] = (box_t){
 		.min_x = -0.5f,
 		.max_x = 0.5f,
 		.min_y = -0.5f,
@@ -317,19 +334,38 @@ int main(int argc, char *argv[]) {
 		.min_z = -0.1f,
 		.max_z = 0.1f,
 	};
-	wall_collision.boxes_len = 1;
+	wall_collider.boxes_len = 1;
+
+	collider_t wall_corner_collider = {0};
+	wall_corner_collider.boxes[0] = (box_t){
+		.min_x = -0.5f,
+		.max_x = 0.1f,
+		.min_y = -0.5f,
+		.max_y = 0.5f,
+		.min_z = -0.1f,
+		.max_z = 0.1f,
+	};
+	wall_corner_collider.boxes[1] = (box_t){
+		.min_x = -0.1f,
+		.max_x = 0.1f,
+		.min_y = -0.5f,
+		.max_y = 0.5f,
+		.min_z = -0.5f,
+		.max_z = -0.1f,
+	};
+	wall_corner_collider.boxes_len = 2;
 
 	res_add_mesh_raw(&res_pack, MESH_QUAD, quad_vertices, sizeof(quad_vertices) / sizeof(vertex_t), quad_indices, sizeof(quad_indices) / sizeof(u32));
-	res_add_mesh(&res_pack, MESH_CUBE, load_mesh("res/meshes/cube.mesh"), cube_collision);
-	res_add_mesh(&res_pack, MESH_FLOOR, load_mesh("res/meshes/floor.mesh"), (collision_config_t){0});
-	res_add_mesh(&res_pack, MESH_SLAB, load_mesh("res/meshes/slab.mesh"), (collision_config_t){0});
-	res_add_mesh(&res_pack, MESH_SLOPE, load_mesh("res/meshes/slope.mesh"), (collision_config_t){0});
-	res_add_mesh(&res_pack, MESH_PYRAMID, load_mesh("res/meshes/pyramid.mesh"), (collision_config_t){0});
-	res_add_mesh(&res_pack, MESH_CORNER, load_mesh("res/meshes/corner.mesh"), (collision_config_t){0});
-	res_add_mesh(&res_pack, MESH_MONKEY, load_mesh("res/meshes/monkey.mesh"), (collision_config_t){0});
-	res_add_mesh(&res_pack, MESH_MUSHROOM, load_mesh("res/meshes/mushroom.mesh"), (collision_config_t){0});
-	res_add_mesh(&res_pack, MESH_WALL, load_mesh("res/meshes/wall.mesh"), wall_collision);
-	res_add_mesh(&res_pack, MESH_WALL_CORNER, load_mesh("res/meshes/wall_corner.mesh"), (collision_config_t){0});
+	res_add_mesh(&res_pack, MESH_CUBE, load_mesh("res/meshes/cube.mesh"), cube_collider);
+	res_add_mesh(&res_pack, MESH_FLOOR, load_mesh("res/meshes/floor.mesh"), (collider_t){0});
+	res_add_mesh(&res_pack, MESH_SLAB, load_mesh("res/meshes/slab.mesh"), (collider_t){0});
+	res_add_mesh(&res_pack, MESH_SLOPE, load_mesh("res/meshes/slope.mesh"), (collider_t){0});
+	res_add_mesh(&res_pack, MESH_PYRAMID, load_mesh("res/meshes/pyramid.mesh"), cube_collider);
+	res_add_mesh(&res_pack, MESH_CORNER, load_mesh("res/meshes/corner.mesh"), (collider_t){0});
+	res_add_mesh(&res_pack, MESH_MONKEY, load_mesh("res/meshes/monkey.mesh"), (collider_t){0});
+	res_add_mesh(&res_pack, MESH_MUSHROOM, load_mesh("res/meshes/mushroom.mesh"), (collider_t){0});
+	res_add_mesh(&res_pack, MESH_WALL, load_mesh("res/meshes/wall.mesh"), wall_collider);
+	res_add_mesh(&res_pack, MESH_WALL_CORNER, load_mesh("res/meshes/wall_corner.mesh"), wall_corner_collider);
 
 	font_init(&res_pack.font, &res_pack, TEX_FONT);
 	res_pack.font.y_center = -4;
@@ -473,7 +509,7 @@ int main(int argc, char *argv[]) {
 		if (edit_mode) {
 			editor_update(&res_pack, &grid);
 		} else {
-			game_update(&res_pack, &grid, &ecs);
+			game_update(&res_pack, &grid, &ecs, window);
 		}
 
 		if (edit_mode) {

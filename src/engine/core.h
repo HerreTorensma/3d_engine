@@ -6,7 +6,7 @@ conveniently in one file to avoid cyclic imports.
 
 #include "global.h"
 
-typedef struct collision_box {
+typedef struct box {
     float min_x;
     float max_x;
     
@@ -15,12 +15,12 @@ typedef struct collision_box {
 
     float min_z;
     float max_z;
-} collision_box_t;
+} box_t;
 
-typedef struct collision_config {
-    collision_box_t boxes[4];
+typedef struct collider {
+    box_t boxes[4];
     index_t boxes_len;
-} collision_config_t;
+} collider_t;
 
 // Structs
 typedef struct vertex {
@@ -39,7 +39,7 @@ typedef struct mesh {
     u32 vbo;
     u32 ebo;
 
-    collision_config_t collision;
+    collider_t collision;
 } mesh_t;
 
 typedef struct texture {
@@ -180,7 +180,7 @@ typedef struct {
     index_t texture_index;
 } mesh_c;
 
-typedef collision_config_t collision_c;
+typedef collider_t collision_c;
 
 // Continue your own enum at 3
 enum {

@@ -1,6 +1,6 @@
 #include "res.h"
 
-void res_add_mesh(res_pack_t *res_pack, index_t index, mesh_t mesh, collision_config_t collision) {
+void res_add_mesh(res_pack_t *res_pack, index_t index, mesh_t mesh, collider_t collision) {
 	// This line causes a segfault on MacOS because it has no OpenGL 3.3 support
     // Could be either because this is currently the first OpenGL call in the game,
     // or because MacOS supports up to OpenGL 2.1 which doesn't support vao's.
@@ -49,7 +49,7 @@ void res_add_mesh_raw(res_pack_t *res_pack, index_t index, vertex_t *vertices, u
     }
 	memcpy(mesh.indices, indices, index_count * sizeof(u32));
 
-	res_add_mesh(res_pack, index, mesh, (collision_config_t){0});
+	res_add_mesh(res_pack, index, mesh, (collider_t){0});
 }
 
 void res_add_texture(res_pack_t *res_pack, index_t index, texture_t texture) {
