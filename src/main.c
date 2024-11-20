@@ -88,6 +88,16 @@ static camera_t create_camera() {
 }
 
 static camera_t camera = {0};
+static box_t player_box = {
+	.min_x = -0.1f,
+	.max_x = 0.1f,
+	
+	.min_y = -0.5f,
+	.max_y = 0.0f,
+
+	.min_z = -0.1f,
+	.max_z = 0.1f,
+};
 
 static bool frozen = false;
 
@@ -134,7 +144,130 @@ static void rotating_system(ecs_world_t *ecs) {
 	}
 }
 
-bool colliding = false;
+bool global_colliding = false;
+
+static bool point_overlap_box(vec3 point, vec3 box_pos, box_t box) {
+	box.min_x += box_pos[0];
+	box.max_x += box_pos[0];
+	box.min_y += box_pos[1];
+	box.max_y += box_pos[1];
+	box.min_z += box_pos[2];
+	box.max_z += box_pos[2];
+
+	if (point[0] >= box.min_x &&
+		point[0] <= box.max_x &&
+		
+		point[1] >= box.min_y &&
+		point[1] <= box.max_y &&
+		
+		point[2] >= box.min_z &&
+		point[2] <= box.max_z
+	) {
+		return true;
+	}
+
+	return false;
+}
+
+static bool box_overlap_box(vec3 box1_pos, box_t box1, vec3 box2_pos, box_t box2) {
+	box1.min_x += box1_pos[0];
+	box1.max_x += box1_pos[0];
+	box1.min_y += box1_pos[1];
+	box1.max_y += box1_pos[1];
+	box1.min_z += box1_pos[2];
+	box1.max_z += box1_pos[2];
+
+	box2.min_x += box2_pos[0];
+	box2.max_x += box2_pos[0];
+	box2.min_y += box2_pos[1];
+	box2.max_y += box2_pos[1];
+	box2.min_z += box2_pos[2];
+	box2.max_z += box2_pos[2];
+
+	if (
+		box1.min_x <= box2.max_x &&
+		box1.max_x >= box2.min_x &&
+
+		box1.min_y <= box2.max_y &&
+		box1.max_y >= box2.min_y &&
+
+		box1.min_z <= box2.max_z &&
+		box1.max_z >= box2.min_z
+	) {
+		return true;
+	}
+
+	return false;
+}
+
+static bool check_player_collision(res_pack_t *res_pack, grid_t *grid) {
+	bool colliding = false;
+
+	// Get all 8 map positions surrounding the player, given the player is smaller than a map cell
+	vec3 map_positions[] = {
+		{
+			roundf(camera.position[0] + player_box.min_x),
+			roundf(camera.position[1] + player_box.min_y),
+			roundf(camera.position[2] + player_box.min_z),
+		},
+		{
+			roundf(camera.position[0] + player_box.max_x),
+			roundf(camera.position[1] + player_box.min_y),
+			roundf(camera.position[2] + player_box.min_z),
+		},
+		{
+			roundf(camera.position[0] + player_box.max_x),
+			roundf(camera.position[1] + player_box.max_y),
+			roundf(camera.position[2] + player_box.min_z),
+		},
+		{
+			roundf(camera.position[0] + player_box.max_x),
+			roundf(camera.position[1] + player_box.max_y),
+			roundf(camera.position[2] + player_box.max_z),
+		},
+		{
+			roundf(camera.position[0] + player_box.min_x),
+			roundf(camera.position[1] + player_box.max_y),
+			roundf(camera.position[2] + player_box.min_z),
+		},
+		{
+			roundf(camera.position[0] + player_box.max_x),
+			roundf(camera.position[1] + player_box.min_y),
+			roundf(camera.position[2] + player_box.max_z),
+		},
+		{
+			roundf(camera.position[0] + player_box.min_x),
+			roundf(camera.position[1] + player_box.max_y),
+			roundf(camera.position[2] + player_box.max_z),
+		},
+		{
+			roundf(camera.position[0] + player_box.min_x),
+			roundf(camera.position[1] + player_box.min_y),
+			roundf(camera.position[2] + player_box.max_z),
+		},
+	};
+
+	for (i32 i = 0; i < 8; i++) {
+		i32 map_x = (i32)(map_positions[i][0]);
+		i32 map_y = (i32)(map_positions[i][1]);
+		i32 map_z = (i32)(map_positions[i][2]);
+		if (map_x < 0 || map_y < 0 || map_z < 0) {
+			continue;
+		}
+
+		tile_t current_tile = grid_get_cell(grid, map_x, map_y, map_z);
+		
+		for (int j = 0; j < res_pack->meshes[current_tile.mesh_index].collision.boxes_len; j++) {
+			box_t box = res_pack->meshes[current_tile.mesh_index].collision.boxes[j];
+			
+			if (box_overlap_box(camera.position, player_box, map_positions[i], box)) {
+				colliding = true;
+			}
+		}
+	}
+
+	return colliding;
+}
 
 void game_update(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, SDL_Window *window) {
 	if (input_key_pressed(SDL_SCANCODE_F)) {
@@ -149,6 +282,11 @@ void game_update(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, SDL_Windo
 	}
 
 	float camera_speed = 0.05f;
+
+	if (input_key_held(SDL_SCANCODE_LSHIFT)) {
+		camera_speed = 0.005f;
+	}
+
 	// if (input_key_held(SDL_SCANCODE_W)) {
 	// 	vec3 temp;
 	// 	glm_vec3_scale(camera.front, camera_speed, temp);
@@ -160,66 +298,42 @@ void game_update(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, SDL_Windo
 	// 	glm_vec3_add(camera.position, temp, camera.position);
 	// }
 
+	vec2 input = {
+		input_key_held(SDL_SCANCODE_W) - input_key_held(SDL_SCANCODE_S),
+		input_key_held(SDL_SCANCODE_A) - input_key_held(SDL_SCANCODE_D)
+	};
+
+	// Normalize the input vector to handle diagonal movement properly
+	if (input[0] != 0.0f || input[1] != 0.0f) {
+		glm_vec2_normalize(input);
+	}
+
+	// Calculate forward and right vectors
 	vec3 right_vector;
 	glm_cross(camera.front, camera.up, right_vector);
 	glm_normalize(right_vector);
 
-	// Calculate the forward vector based on horizontal components
 	vec3 forward_vector = { camera.front[0], 0.0f, camera.front[2] }; // Zero out y-component
 	glm_normalize(forward_vector); // Normalize the forward vector for consistent speed
 
-	if (input_key_held(SDL_SCANCODE_W)) {
-		vec3 temp2;
-		glm_vec3_scale(forward_vector, camera_speed, temp2); // Move forward
-		glm_vec3_add(camera.position, temp2, camera.position); // Update position
-	}
+	// Calculate movement based on input vector
+	vec3 forward_movement, right_movement, total_movement = {0.0f, 0.0f, 0.0f};
 
-	if (input_key_held(SDL_SCANCODE_S)) {
-		vec3 temp2;
-		glm_vec3_scale(forward_vector, -camera_speed, temp2); // Move backward
-		glm_vec3_add(camera.position, temp2, camera.position); // Update position
-	}
+	// Scale forward movement by the input's vertical component (input[0])
+	glm_vec3_scale(forward_vector, input[0] * camera_speed, forward_movement);
+	glm_vec3_add(total_movement, forward_movement, total_movement);
 
-	if (input_key_held(SDL_SCANCODE_A)) {
-		vec3 temp;
-		glm_cross(camera.front, camera.up, temp);
-		glm_normalize(temp);
+	// Scale right movement by the input's horizontal component (input[1])
+	glm_vec3_scale(right_vector, -input[1] * camera_speed, right_movement); // Note the negative to align direction
+	glm_vec3_add(total_movement, right_movement, total_movement);
 
-		vec3 temp2;
-		glm_vec3_scale(temp, -camera_speed, temp2);
-		glm_vec3_add(camera.position, temp2, camera.position);
-	}
-	if (input_key_held(SDL_SCANCODE_D)) {
-		vec3 temp;
-		glm_cross(camera.front, camera.up, temp);
-		glm_normalize(temp);
+	// Update camera position
+	glm_vec3_add(camera.position, total_movement, camera.position);
 
-		vec3 temp2;
-		glm_vec3_scale(temp, camera_speed, temp2);
-		glm_vec3_add(camera.position, temp2, camera.position);
-	}
 
 	rotating_system(ecs);
 
-	// Temporary collision
-	i32 map_x = (i32)roundf(camera.position[0]);
-	i32 map_y = (i32)roundf(camera.position[1]);
-	i32 map_z = (i32)roundf(camera.position[2]);
-
-	tile_t current_tile = grid_get_cell(grid, map_x, map_y, map_z);
-
-	colliding = false;
-	
-	for (int i = 0; i < res_pack->meshes[current_tile.mesh_index].collision.boxes_len; i++) {
-		box_t box = res_pack->meshes[current_tile.mesh_index].collision.boxes[i]; 
-		// debug_log("hello\n");
-		if (camera.position[0] > (float)map_x + box.min_x && camera.position[0] < (float)map_x + box.max_x &&
-			camera.position[1] > (float)map_y + box.min_y && camera.position[1] < (float)map_y + box.max_y &&
-			camera.position[2] > (float)map_z + box.min_z && camera.position[2] < (float)map_z + box.max_z) {
-			// debug_log("Collision!\n");
-			colliding = true;
-		}
-	}
+	global_colliding = check_player_collision(res_pack, grid);
 }
 
 #define FPS 120
@@ -557,7 +671,7 @@ int main(int argc, char *argv[]) {
 				gui_print(&res_pack, &res_pack.font, buffer, 1, 16, COLOR_WHITE);
 			}
 
-			if (colliding) {
+			if (global_colliding) {
 				gui_print(&res_pack, &res_pack.font, "COLLIDING", 1, 24, COLOR_WHITE);
 			}
 			#endif
