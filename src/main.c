@@ -75,7 +75,7 @@ enum {
 static camera_t create_camera() {
 	camera_t camera = {0};
 
-	glm_vec3_copy((vec3){0.0f, 0.0f, 3.0f}, camera.position);
+	glm_vec3_copy((vec3){3.0f, 0.5f, 3.0f}, camera.position);
 	// glm_vec3_copy((vec3){0.0f, 0.3f, 3.0f}, camera.position);
 	// glm_vec3_copy((vec3){0.0f, 1.0f, 3.0f}, camera.position);
 	glm_vec3_copy((vec3){0.0f, 0.0f, -1.0f}, camera.front);
@@ -200,9 +200,12 @@ static bool box_overlap_box(vec3 box1_pos, box_t box1, vec3 box2_pos, box_t box2
 	return false;
 }
 
-static bool check_player_collision(res_pack_t *res_pack, grid_t *grid) {
-	bool colliding = false;
+typedef struct collision {
+	bool hit;
+	box_t global_box;
+} collision_t;
 
+static collision_t check_player_collision(res_pack_t *res_pack, grid_t *grid) {
 	// Get all 8 map positions surrounding the player, given the player is smaller than a map cell
 	vec3 map_positions[] = {
 		{
@@ -251,6 +254,7 @@ static bool check_player_collision(res_pack_t *res_pack, grid_t *grid) {
 		i32 map_x = (i32)(map_positions[i][0]);
 		i32 map_y = (i32)(map_positions[i][1]);
 		i32 map_z = (i32)(map_positions[i][2]);
+
 		if (map_x < 0 || map_y < 0 || map_z < 0) {
 			continue;
 		}
@@ -261,13 +265,33 @@ static bool check_player_collision(res_pack_t *res_pack, grid_t *grid) {
 			box_t box = res_pack->meshes[current_tile.mesh_index].collision.boxes[j];
 			
 			if (box_overlap_box(camera.position, player_box, map_positions[i], box)) {
-				colliding = true;
+				// colliding = true;
+				// return &res_pack->meshes[current_tile.mesh_index].collision.boxes[j];
+				box_t collision_box = box;
+
+				collision_box.min_x += map_positions[i][0];
+				collision_box.max_x += map_positions[i][0];
+				collision_box.min_y += map_positions[i][1];
+				collision_box.max_y += map_positions[i][1];
+				collision_box.min_z += map_positions[i][2];
+				collision_box.max_z += map_positions[i][2];
+
+				collision_t collision = {
+					.hit = true,
+					.global_box = collision_box,
+				};
+
+				return collision;
 			}
 		}
 	}
 
-	return colliding;
+	return (collision_t){0};
 }
+
+static bool player_grounded = false;
+// static vec3 player_velocity = {0};
+static vec3 velocity = {0};
 
 void game_update(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, SDL_Window *window) {
 	if (input_key_pressed(SDL_SCANCODE_F)) {
@@ -297,6 +321,7 @@ void game_update(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, SDL_Windo
 	// 	glm_vec3_scale(camera.front, -camera_speed, temp);
 	// 	glm_vec3_add(camera.position, temp, camera.position);
 	// }
+	rotating_system(ecs);
 
 	vec2 input = {
 		input_key_held(SDL_SCANCODE_W) - input_key_held(SDL_SCANCODE_S),
@@ -313,27 +338,70 @@ void game_update(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, SDL_Windo
 	glm_cross(camera.front, camera.up, right_vector);
 	glm_normalize(right_vector);
 
-	vec3 forward_vector = { camera.front[0], 0.0f, camera.front[2] }; // Zero out y-component
+	vec3 forward_vector = {camera.front[0], 0.0f, camera.front[2]}; // Zero out y-component
 	glm_normalize(forward_vector); // Normalize the forward vector for consistent speed
 
 	// Calculate movement based on input vector
-	vec3 forward_movement, right_movement, total_movement = {0.0f, 0.0f, 0.0f};
+	vec3 forward_movement = {0.0f, 0.0f, 0.0f};
+	vec3 right_movement = {0.0f, 0.0f, 0.0f};
+
+	velocity[0] = 0.0f;
+	velocity[2] = 0.0f;
+	// vec3 velocity = {0.0f, 0.0f, 0.0f};
 
 	// Scale forward movement by the input's vertical component (input[0])
 	glm_vec3_scale(forward_vector, input[0] * camera_speed, forward_movement);
-	glm_vec3_add(total_movement, forward_movement, total_movement);
+	glm_vec3_add(velocity, forward_movement, velocity);
 
 	// Scale right movement by the input's horizontal component (input[1])
 	glm_vec3_scale(right_vector, -input[1] * camera_speed, right_movement); // Note the negative to align direction
-	glm_vec3_add(total_movement, right_movement, total_movement);
+	glm_vec3_add(velocity, right_movement, velocity);
 
 	// Update camera position
-	glm_vec3_add(camera.position, total_movement, camera.position);
+	// glm_vec3_add(camera.position, total_movement, camera.position);
 
+	if (input_key_pressed(SDL_SCANCODE_SPACE) && player_grounded) {
+		velocity[1] = 0.12f;
+	}
+	velocity[1] -= 0.005f;
 
-	rotating_system(ecs);
+	camera.position[0] += velocity[0];
+	collision_t collision = check_player_collision(res_pack, grid);
+	if (collision.hit) {
+		if (velocity[0] > 0) {
+			camera.position[0] = collision.global_box.min_x - player_box.max_x - 0.001f;
+		}
+		if (velocity[0] < 0) {
+			camera.position[0] = collision.global_box.max_x - player_box.min_x + 0.001f;
+		}
+	}
 
-	global_colliding = check_player_collision(res_pack, grid);
+	player_grounded = false;
+	camera.position[1] += velocity[1];
+	collision = check_player_collision(res_pack, grid);
+	if (collision.hit) {
+		if (velocity[1] > 0) {
+			camera.position[1] = collision.global_box.min_y - player_box.max_y - 0.001f;
+			player_grounded = true;
+			velocity[1] = 0.0f;
+		}
+		if (velocity[1] < 0) {
+			camera.position[1] = collision.global_box.max_y - player_box.min_y + 0.001f;
+			player_grounded = true;
+			velocity[1] = 0.0f;
+		}
+	}
+
+	camera.position[2] += velocity[2];
+	collision = check_player_collision(res_pack, grid);
+	if (collision.hit) {
+		if (velocity[2] > 0) {
+			camera.position[2] = collision.global_box.min_z - player_box.max_z - 0.001f;
+		}
+		if (velocity[2] < 0) {
+			camera.position[2] = collision.global_box.max_z - player_box.min_z + 0.001f;
+		}
+	}
 }
 
 #define FPS 120
@@ -439,6 +507,17 @@ int main(int argc, char *argv[]) {
 	};
 	cube_collider.boxes_len = 1;
 
+	collider_t floor_collider = {0};
+	floor_collider.boxes[0] = (box_t){
+		.min_x = -0.5f,
+		.max_x = 0.5f,
+		.min_y = -0.5f,
+		.max_y = -0.5f,
+		.min_z = -0.5f,
+		.max_z = 0.5f,
+	};
+	floor_collider.boxes_len = 1;
+
 	collider_t wall_collider = {0};
 	wall_collider.boxes[0] = (box_t){
 		.min_x = -0.5f,
@@ -448,7 +527,8 @@ int main(int argc, char *argv[]) {
 		.min_z = -0.1f,
 		.max_z = 0.1f,
 	};
-	wall_collider.boxes_len = 1;
+	wall_collider.boxes[1] = floor_collider.boxes[0];
+	wall_collider.boxes_len = 2;
 
 	collider_t wall_corner_collider = {0};
 	wall_corner_collider.boxes[0] = (box_t){
@@ -467,12 +547,24 @@ int main(int argc, char *argv[]) {
 		.min_z = -0.5f,
 		.max_z = -0.1f,
 	};
-	wall_corner_collider.boxes_len = 2;
+	wall_corner_collider.boxes[2] = floor_collider.boxes[0];
+	wall_corner_collider.boxes_len = 3;
+
+	collider_t slab_collider = {0};
+	slab_collider.boxes[0] = (box_t){
+		.min_x = -0.5f,
+		.max_x = 0.5f,
+		.min_y = -0.5f,
+		.max_y = 0.0f,
+		.min_z = -0.5f,
+		.max_z = 0.5f,
+	};
+	slab_collider.boxes_len = 1;
 
 	res_add_mesh_raw(&res_pack, MESH_QUAD, quad_vertices, sizeof(quad_vertices) / sizeof(vertex_t), quad_indices, sizeof(quad_indices) / sizeof(u32));
 	res_add_mesh(&res_pack, MESH_CUBE, load_mesh("res/meshes/cube.mesh"), cube_collider);
-	res_add_mesh(&res_pack, MESH_FLOOR, load_mesh("res/meshes/floor.mesh"), (collider_t){0});
-	res_add_mesh(&res_pack, MESH_SLAB, load_mesh("res/meshes/slab.mesh"), (collider_t){0});
+	res_add_mesh(&res_pack, MESH_FLOOR, load_mesh("res/meshes/floor.mesh"), floor_collider);
+	res_add_mesh(&res_pack, MESH_SLAB, load_mesh("res/meshes/slab.mesh"), slab_collider);
 	res_add_mesh(&res_pack, MESH_SLOPE, load_mesh("res/meshes/slope.mesh"), (collider_t){0});
 	res_add_mesh(&res_pack, MESH_PYRAMID, load_mesh("res/meshes/pyramid.mesh"), cube_collider);
 	res_add_mesh(&res_pack, MESH_CORNER, load_mesh("res/meshes/corner.mesh"), (collider_t){0});

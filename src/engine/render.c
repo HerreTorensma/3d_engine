@@ -405,7 +405,8 @@ void render_game(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, camera_t 
 	// Projection matrix
 	mat4 projection = {0};
 	// glm_perspective(glm_rad(45.0f), (float)window_width / (float)window_height, 0.1f, 100.0f, projection);
-	glm_perspective(glm_rad(60.0f), (float)window_width / (float)window_height, 0.1f, 100.0f, projection);
+	// glm_perspective(glm_rad(60.0f), (float)window_width / (float)window_height, 0.1f, 100.0f, projection);
+	glm_perspective(glm_rad(60.0f), (float)window_width / (float)window_height, 0.001f, 100.0f, projection);
 	
 	shader_set_mat4(game_shader, "projection", &projection);
 
