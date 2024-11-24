@@ -5,6 +5,7 @@
 #include "engine/ecs.h"
 #include "engine/gui.h"
 #include "engine/grid.h"
+#include "engine/audio.h"
 
 static vertex_t quad_vertices[] = {
     {{1.0f,  1.0f, 0.0f}, {1.0f, 1.0f}},  // top right
@@ -56,6 +57,10 @@ enum {
 	TEX_BUTTON_PRESSED,
 	TEX_FRAME,
 	TEX_RED,
+};
+
+enum {
+	SOUND_JUMP = 1,
 };
 
 // enum {
@@ -362,6 +367,7 @@ void game_update(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, SDL_Windo
 
 	if (input_key_pressed(SDL_SCANCODE_SPACE) && player_grounded) {
 		velocity[1] = 0.12f;
+		audio_play_sound(res_pack, SOUND_JUMP);
 	}
 	velocity[1] -= 0.005f;
 
@@ -464,6 +470,11 @@ int main(int argc, char *argv[]) {
 
 	SDL_Window *window = create_sdl2_window(window_width, window_height);
 	SDL_GLContext *context = create_sdl2_gl_context(window, window_width, window_height);
+
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+		printf("Failed to open audio\n");
+		return EXIT_FAILURE;
+	}
 
 	res_pack_t res_pack = {0};
 	
@@ -572,6 +583,8 @@ int main(int argc, char *argv[]) {
 	res_add_mesh(&res_pack, MESH_MUSHROOM, load_mesh("res/meshes/mushroom.mesh"), (collider_t){0});
 	res_add_mesh(&res_pack, MESH_WALL, load_mesh("res/meshes/wall.mesh"), wall_collider);
 	res_add_mesh(&res_pack, MESH_WALL_CORNER, load_mesh("res/meshes/wall_corner.mesh"), wall_corner_collider);
+
+	res_add_sound(&res_pack, SOUND_JUMP, (sound_t){Mix_LoadWAV("res/sounds/jump.wav")});
 
 	font_init(&res_pack.font, &res_pack, TEX_FONT);
 	res_pack.font.y_center = -4;

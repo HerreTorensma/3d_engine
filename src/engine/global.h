@@ -14,7 +14,7 @@ Should be included everywhere
 
 // Vendor libraries
 #include <SDL2/SDL.h>
-// #include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_mixer.h>
 #include <glad/glad.h>
 #include <cglm/cglm.h>
 

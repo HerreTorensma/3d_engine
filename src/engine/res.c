@@ -70,3 +70,7 @@ void res_add_texture(res_pack_t *res_pack, index_t index, texture_t texture) {
 
 	res_pack->textures[index] = texture;
 }
+
+void res_add_sound(res_pack_t *res_pack, index_t index, sound_t sound) {
+	res_pack->sounds[index] = sound;
+}

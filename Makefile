@@ -18,7 +18,7 @@ else
 	endif
 endif
 
-SRC = src/main.c src/engine/render.c src/engine/util.c src/engine/shader.c src/engine/input.c src/engine/res.c src/engine/editor.c src/engine/ecs.c src/engine/gui.c src/engine/grid.c src/engine/arena.c
+SRC = src/main.c src/engine/render.c src/engine/util.c src/engine/shader.c src/engine/input.c src/engine/res.c src/engine/editor.c src/engine/ecs.c src/engine/gui.c src/engine/grid.c src/engine/arena.c src/engine/audio.c
 OBJ = $(SRC:.c=.o)
 
 all: libs game

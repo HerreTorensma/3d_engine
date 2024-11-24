@@ -21,3 +21,5 @@ inline rect_t tex_get_default_src(res_pack_t *res_pack, index_t texture_index) {
 		.h = res_pack->textures[texture_index].height,
 	};
 }
+
+void res_add_sound(res_pack_t *res_pack, index_t index, sound_t sound);

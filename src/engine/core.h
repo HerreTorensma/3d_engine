@@ -106,6 +106,10 @@ inline void grid_set_cell(grid_t *grid, tile_t tile, u32 x, u32 y, u32 z) {
 	grid->map[z * grid->width * grid->height + y * grid->width + x] = tile;
 }
 
+typedef struct sound {
+    Mix_Chunk *chunk;
+} sound_t;
+
 typedef struct res_pack {
 	color_t fog_color;
 	color_t sky_color;
@@ -116,6 +120,8 @@ typedef struct res_pack {
 
     mesh_t meshes[256];
 	texture_t textures[256];
+
+    sound_t sounds[256];
 
 	index_t button_tex_index;
 	index_t button_pressed_tex_index;
