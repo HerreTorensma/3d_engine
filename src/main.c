@@ -316,6 +316,10 @@ void game_update(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, SDL_Windo
 		camera_speed = 0.005f;
 	}
 
+	if (input_key_pressed(SDL_SCANCODE_T)) {
+		audio_play_sound_3d(res_pack, SOUND_JUMP, camera.position, camera.front, (vec3){10.0f, 1.0f, 10.0f});
+	}
+
 	// if (input_key_held(SDL_SCANCODE_W)) {
 	// 	vec3 temp;
 	// 	glm_vec3_scale(camera.front, camera_speed, temp);
@@ -667,9 +671,9 @@ int main(int argc, char *argv[]) {
 		// rotating->speed[1] = 1.0f;
 		// rotating->speed[2] = 1.0f;
 
-		transform->position[0] = 1.0f;
+		transform->position[0] = 10.0f;
 		transform->position[1] = 1.0f;
-		transform->position[2] = 1.0f;
+		transform->position[2] = 10.0f;
 
 		transform->rotation[1] = 45.0f;
 
@@ -774,6 +778,12 @@ int main(int argc, char *argv[]) {
 				tile_t current_tile = grid_get_cell(&grid, map_x, map_y, map_z);
 				sprintf(buffer, "MESH: %d", current_tile.mesh_index);
 				gui_print(&res_pack, &res_pack.font, buffer, 1, 16, COLOR_WHITE);
+			}
+
+			{
+				char buffer[64];
+				sprintf(buffer, "X: %f Y: %f Z: %f", camera.front[0], camera.front[1], camera.front[2]);
+				gui_print(&res_pack, &res_pack.font, buffer, 1, 32, COLOR_WHITE);
 			}
 
 			if (global_colliding) {
