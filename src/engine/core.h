@@ -26,6 +26,7 @@ typedef struct collider {
 typedef struct vertex {
     vec3 position;
     vec2 tex_coord;
+    vec3 normal;
 } vertex_t;
 
 typedef struct mesh {

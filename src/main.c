@@ -578,6 +578,14 @@ int main(int argc, char *argv[]) {
 
 	res_add_mesh_raw(&res_pack, MESH_QUAD, quad_vertices, sizeof(quad_vertices) / sizeof(vertex_t), quad_indices, sizeof(quad_indices) / sizeof(u32));
 	res_add_mesh(&res_pack, MESH_CUBE, load_mesh("res/meshes/cube.mesh"), cube_collider);
+
+	for (i32 i = 0; i < res_pack.meshes[MESH_CUBE].vertex_count; i++) {
+		vertex_t vertex = res_pack.meshes[MESH_CUBE].vertices[i];
+		printf("position: %f %f %f\n", vertex.position[0], vertex.position[1], vertex.position[2]);
+		printf("uv: %f %f\n", vertex.tex_coord[0], vertex.tex_coord[1]);
+		printf("normal: %f %f %f\n", vertex.normal[0], vertex.normal[1], vertex.normal[2]);
+	}
+
 	res_add_mesh(&res_pack, MESH_FLOOR, load_mesh("res/meshes/floor.mesh"), floor_collider);
 	res_add_mesh(&res_pack, MESH_SLAB, load_mesh("res/meshes/slab.mesh"), slab_collider);
 	res_add_mesh(&res_pack, MESH_SLOPE, load_mesh("res/meshes/slope.mesh"), (collider_t){0});
@@ -761,6 +769,12 @@ int main(int argc, char *argv[]) {
 			// render_mesh_isometric(&res_pack, res_pack.meshes[MESH_SLAB], 2, 200, 100, 32.0f);
 
 			// render_image_rect(&res_pack, TEX_COBBLE, (rect_t){0, 0, 16, 16}, (rect_t){16, 16, 128, 128}, COLOR_WHITE);
+
+			gui_button(&res_pack, "", (rect_t){40, 1, 2, 2});
+			gui_button(&res_pack, "", (rect_t){43, 1, 2, 2});
+			gui_button(&res_pack, "", (rect_t){46, 1, 2, 2});
+			gui_button(&res_pack, "", (rect_t){49, 1, 2, 2});
+			gui_button(&res_pack, "", (rect_t){52, 1, 2, 2});
 
 			#ifdef DEBUG
 			gui_print(&res_pack, &res_pack.font, "DREAM SIMULATOR v0.1", 1, 0, COLOR_WHITE);

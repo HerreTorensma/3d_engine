@@ -50,6 +50,11 @@
 
         - Do the rotation of the billboard sprites on the GPU via a shader
 
+        - Throw away the ECS in favor of just an entity struct that contains all components??? way simpler
+
+        - For the GUI generate ids to know whats focused
+
+
     - Add sound with SDL2_Mixer
     - Add collision
     - Make dialogue system
@@ -61,6 +66,18 @@
         - Text edit (for dialogue editor)
         - Slider with snap (for editing specific levels in the grid)
         - Create debugging tool that prints values to the top right of the screen 'automatically' with formatted string support
+
+    - Temp allocators for strings n stuff
+
+    - Multiple meshes per tile
+        - Auto generate bounding box (easy af)
+        - Save tile and texture inside grid
+
+    - Global state struct accesible from everywhere
+
+    - Add redo / undo to the editor
+        - Keep stack of actions
+        - Every undoable action is an action object
 
 ## Dependencies
 - SDL2

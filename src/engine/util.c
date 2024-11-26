@@ -115,6 +115,10 @@ mesh_t load_mesh(const char path[]) {
 
 		fread(&mesh.vertices[i].tex_coord[0], sizeof(f32), 1, file);
 		fread(&mesh.vertices[i].tex_coord[1], sizeof(f32), 1, file);
+
+		fread(&mesh.vertices[i].normal[0], sizeof(f32), 1, file);
+		fread(&mesh.vertices[i].normal[1], sizeof(f32), 1, file);
+		fread(&mesh.vertices[i].normal[2], sizeof(f32), 1, file);
 	}
 
 	// Triangle count and indices
