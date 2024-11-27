@@ -7,7 +7,6 @@
 #include "engine/grid.h"
 #include "engine/audio.h"
 #include "engine/arena.h"
-#include "engine/string.h"
 #include "engine/collision.h"
 
 typedef struct {
@@ -250,6 +249,12 @@ SDL_Window *create_sdl2_window(i32 width, i32 height) {
 		exit(EXIT_FAILURE);
 	}
 
+	// Initialize audio
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+		printf("Failed to open audio\n");
+		return EXIT_FAILURE;
+	}
+
 	// Create the window
 	SDL_Window *window = SDL_CreateWindow(
 		"game",
@@ -295,16 +300,8 @@ int main(int argc, char *argv[]) {
 	window_width = 1280;
 	window_height = 720;
 
-	string_t test_string = STR("test");
-	printf("%d, %s\n", test_string.len, test_string.data);
-
 	SDL_Window *window = create_sdl2_window(window_width, window_height);
 	SDL_GLContext *context = create_sdl2_gl_context(window, window_width, window_height);
-
-	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
-		printf("Failed to open audio\n");
-		return EXIT_FAILURE;
-	}
 
 	res_pack_t res_pack = {0};
 

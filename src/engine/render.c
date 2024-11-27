@@ -118,6 +118,7 @@ void render_init(res_pack_t *res_pack) {
 	
 	init_frame_buffer(res_pack);
 
+	// Load the quad
 	quad_mesh = load_mesh_raw(quad_vertices, sizeof(quad_vertices) / sizeof(vertex_t), quad_indices, sizeof(quad_indices) / sizeof(u32));
 	send_mesh_to_gpu(&quad_mesh);
 }

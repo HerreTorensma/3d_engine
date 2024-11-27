@@ -29,6 +29,7 @@ enum {
 	TEX_BUTTON_PRESSED,
 	TEX_FRAME,
 	TEX_RED,
+    TEX_BUTTON_SELECTED_INDICATOR,
 };
 
 enum {
@@ -64,6 +65,8 @@ void load_res(res_pack_t *res_pack) {
 
 	res_add_texture(res_pack, TEX_FRAME, load_tga("res/images/frame_new.tga", false));
 	res_add_texture(res_pack, TEX_RED, load_tga("res/images/red.tga", false));
+	res_add_texture(res_pack, TEX_BUTTON_SELECTED_INDICATOR, load_tga("res/images/button_selected_indicator.tga", false));
+    res_pack->button_pressed_indicator_tex_index = TEX_BUTTON_SELECTED_INDICATOR;
 
 	collider_t cube_collider = {0};
 	cube_collider.boxes[0] = (box_t){

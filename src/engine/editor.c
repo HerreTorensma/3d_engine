@@ -245,6 +245,10 @@ static bool mesh_button(res_pack_t *res_pack, size_t mesh_index, size_t texture_
 
 	render_mesh_isometric(res_pack, res_pack->meshes[mesh_index], texture_index, rect.x * res_pack->gui_tile_size + (rect.w / 2) * res_pack->gui_tile_size, rect.y * res_pack->gui_tile_size + (rect.h / 2) * res_pack->gui_tile_size, 8.0f);
 
+	if (mesh_index == selected_mesh_index) {
+		render_image(res_pack, res_pack->button_pressed_indicator_tex_index, rect.x * res_pack->gui_tile_size + rect.w * res_pack->gui_tile_size, rect.y * res_pack->gui_tile_size + 12, COLOR_WHITE);
+	}
+
 	return released;
 }
 
@@ -264,6 +268,10 @@ static bool texture_button(res_pack_t *res_pack, size_t texture_index, rect_t ti
 	};
 
 	render_image_rect(res_pack, texture_index, tex_get_default_src(res_pack, texture_index), dst, COLOR_WHITE);
+
+	if (texture_index == selected_texture_index) {
+		render_image(res_pack, res_pack->button_pressed_indicator_tex_index, tile_rect.x * res_pack->gui_tile_size - 8, tile_rect.y * res_pack->gui_tile_size + 12, COLOR_WHITE);
+	}
 
 	return released;
 }

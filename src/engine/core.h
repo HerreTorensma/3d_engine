@@ -140,6 +140,7 @@ typedef struct res_pack {
 
 	index_t button_tex_index;
 	index_t button_pressed_tex_index;
+    index_t button_pressed_indicator_tex_index;
 	u32 gui_tile_size;
 
 	font_t font;
