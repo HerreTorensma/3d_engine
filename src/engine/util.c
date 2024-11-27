@@ -93,6 +93,29 @@ void color_to_gl_color(color_t color, vec4 gl_color) {
 	gl_color[3] = (float)color.a / 255.0f;
 }
 
+mesh_t load_mesh_raw(vertex_t *vertices, u32 vertex_count, u32 *indices, u32 index_count) {
+	mesh_t mesh = {0};
+
+	mesh.vertex_count = vertex_count;
+	mesh.index_count = index_count;
+
+	mesh.vertices = malloc(vertex_count * sizeof(vertex_t));
+    if (mesh.vertices == NULL) {
+        printf("Failed to allocate memory for vertices\n");
+    }
+	memcpy(mesh.vertices, vertices, vertex_count * sizeof(vertex_t));
+
+	mesh.indices = malloc(index_count * sizeof(u32));
+    if (mesh.indices == NULL) {
+        printf("Failed to allocate memory for indices\n");
+    }
+	memcpy(mesh.indices, indices, index_count * sizeof(u32));
+
+	send_mesh_to_gpu(&mesh);
+
+	return mesh;
+}
+
 mesh_t load_mesh(const char path[]) {
 	debug_log("Loading model %s...\n", path);
 

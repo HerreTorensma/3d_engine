@@ -10,15 +10,6 @@ This header and source file contain the rendering code.
 #include "res.h"
 #include "ecs.h"
 
-typedef struct camera {
-    vec3 position;
-    vec3 front;
-    vec3 up;
-
-    f32 pitch;
-    f32 yaw;
-} camera_t;
-
 typedef struct renderer {
     camera_t *camera;
     ecs_world_t *ecs;

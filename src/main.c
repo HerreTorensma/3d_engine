@@ -8,76 +8,38 @@
 #include "engine/audio.h"
 #include "engine/arena.h"
 #include "engine/string.h"
-
-static vertex_t quad_vertices[] = {
-    {{1.0f,  1.0f, 0.0f}, {1.0f, 1.0f}},  // top right
-    {{1.0f, -1.0f, 0.0f}, {1.0f, 0.0f}},  // bottom right
-    {{-1.0f, -1.0f, 0.0f}, {0.0f, 0.0f}},  // bottom left
-    {{-1.0f,  1.0f, 0.0f}, {0.0f, 1.0f}}   // top left 
-};
-static u32 quad_indices[] = {  // note that we start from 0!
-    0, 1, 3,   // first triangle
-    1, 2, 3    // second triangle
-};
+#include "engine/collision.h"
 
 typedef struct {
     vec3 speed;
 } rotating_c;
 
+// Generic flags
+typedef enum entity_flag {
+	IS_PLAYER,
+	IS_SPRITE,
+	IS_BILLBOARD_SPRITE,
+	IS_MESH,
+} entity_flag_t;
+
+// Specific types
+// typedef enum entity_type {
+
+// } entity_type_t;
+
+typedef struct entity {
+	transform_t transform;
+
+	camera_t camera;
+
+	index_t texture_index;
+
+	index_t mesh_index;
+} entity;
+
 enum {
 	ROTATING_C = 4,
 };
-
-enum {
-	MESH_CUBE = 2,
-	MESH_SLAB,
-	MESH_CORNER,
-	MESH_FLOOR,
-	MESH_PYRAMID,
-	MESH_SLOPE,
-	MESH_MONKEY,
-	MESH_MUSHROOM,
-	MESH_WALL,
-	MESH_WALL_CORNER,
-	// MESH_EDITOR_STOP,
-};
-
-enum {
-	TEX_BRICKS = 1,
-	TEX_DIRT,
-	TEX_COBBLE,
-	TEX_GRASS,
-	TEX_IRON_BARS,
-	// TEX_EDITOR_STOP,
-
-	TEX_TREE,
-	TEX_BIRCH,
-	TEX_CROSSHAIR,
-	TEX_WORMFISH,
-	TEX_FONT,
-	TEX_BUTTON,
-	TEX_BUTTON_PRESSED,
-	TEX_FRAME,
-	TEX_RED,
-};
-
-enum {
-	SOUND_JUMP = 1,
-};
-
-// enum {
-// 	TEX_BRICKS = 1,
-// 	TEX_IRON_BARS,
-// 	TEX_DIRT,
-// 	TEX_COBBLE,
-// 	TEX_TREE,
-// 	TEX_BIRCH,
-// 	TEX_CROSSHAIR,
-// 	TEX_WORMFISH,
-// 	TEX_FONT,
-// 	TEX_BUTTON,
-// 	TEX_BUTTON_PRESSED
-// };
 
 static camera_t create_camera() {
 	camera_t camera = {0};
@@ -153,152 +115,11 @@ static void rotating_system(ecs_world_t *ecs) {
 
 bool global_colliding = false;
 
-static bool point_overlap_box(vec3 point, vec3 box_pos, box_t box) {
-	box.min_x += box_pos[0];
-	box.max_x += box_pos[0];
-	box.min_y += box_pos[1];
-	box.max_y += box_pos[1];
-	box.min_z += box_pos[2];
-	box.max_z += box_pos[2];
-
-	if (point[0] >= box.min_x &&
-		point[0] <= box.max_x &&
-		
-		point[1] >= box.min_y &&
-		point[1] <= box.max_y &&
-		
-		point[2] >= box.min_z &&
-		point[2] <= box.max_z
-	) {
-		return true;
-	}
-
-	return false;
-}
-
-static bool box_overlap_box(vec3 box1_pos, box_t box1, vec3 box2_pos, box_t box2) {
-	box1.min_x += box1_pos[0];
-	box1.max_x += box1_pos[0];
-	box1.min_y += box1_pos[1];
-	box1.max_y += box1_pos[1];
-	box1.min_z += box1_pos[2];
-	box1.max_z += box1_pos[2];
-
-	box2.min_x += box2_pos[0];
-	box2.max_x += box2_pos[0];
-	box2.min_y += box2_pos[1];
-	box2.max_y += box2_pos[1];
-	box2.min_z += box2_pos[2];
-	box2.max_z += box2_pos[2];
-
-	if (
-		box1.min_x <= box2.max_x &&
-		box1.max_x >= box2.min_x &&
-
-		box1.min_y <= box2.max_y &&
-		box1.max_y >= box2.min_y &&
-
-		box1.min_z <= box2.max_z &&
-		box1.max_z >= box2.min_z
-	) {
-		return true;
-	}
-
-	return false;
-}
-
-typedef struct collision {
-	bool hit;
-	box_t global_box;
-} collision_t;
-
-static collision_t check_player_collision(res_pack_t *res_pack, grid_t *grid) {
-	// Get all 8 map positions surrounding the player, given the player is smaller than a map cell
-	vec3 map_positions[] = {
-		{
-			roundf(camera.position[0] + player_box.min_x),
-			roundf(camera.position[1] + player_box.min_y),
-			roundf(camera.position[2] + player_box.min_z),
-		},
-		{
-			roundf(camera.position[0] + player_box.max_x),
-			roundf(camera.position[1] + player_box.min_y),
-			roundf(camera.position[2] + player_box.min_z),
-		},
-		{
-			roundf(camera.position[0] + player_box.max_x),
-			roundf(camera.position[1] + player_box.max_y),
-			roundf(camera.position[2] + player_box.min_z),
-		},
-		{
-			roundf(camera.position[0] + player_box.max_x),
-			roundf(camera.position[1] + player_box.max_y),
-			roundf(camera.position[2] + player_box.max_z),
-		},
-		{
-			roundf(camera.position[0] + player_box.min_x),
-			roundf(camera.position[1] + player_box.max_y),
-			roundf(camera.position[2] + player_box.min_z),
-		},
-		{
-			roundf(camera.position[0] + player_box.max_x),
-			roundf(camera.position[1] + player_box.min_y),
-			roundf(camera.position[2] + player_box.max_z),
-		},
-		{
-			roundf(camera.position[0] + player_box.min_x),
-			roundf(camera.position[1] + player_box.max_y),
-			roundf(camera.position[2] + player_box.max_z),
-		},
-		{
-			roundf(camera.position[0] + player_box.min_x),
-			roundf(camera.position[1] + player_box.min_y),
-			roundf(camera.position[2] + player_box.max_z),
-		},
-	};
-
-	for (i32 i = 0; i < 8; i++) {
-		i32 map_x = (i32)(map_positions[i][0]);
-		i32 map_y = (i32)(map_positions[i][1]);
-		i32 map_z = (i32)(map_positions[i][2]);
-
-		if (map_x < 0 || map_y < 0 || map_z < 0) {
-			continue;
-		}
-
-		tile_t current_tile = grid_get_cell(grid, map_x, map_y, map_z);
-		
-		for (int j = 0; j < res_pack->meshes[current_tile.mesh_index].collision.boxes_len; j++) {
-			box_t box = res_pack->meshes[current_tile.mesh_index].collision.boxes[j];
-			
-			if (box_overlap_box(camera.position, player_box, map_positions[i], box)) {
-				// colliding = true;
-				// return &res_pack->meshes[current_tile.mesh_index].collision.boxes[j];
-				box_t collision_box = box;
-
-				collision_box.min_x += map_positions[i][0];
-				collision_box.max_x += map_positions[i][0];
-				collision_box.min_y += map_positions[i][1];
-				collision_box.max_y += map_positions[i][1];
-				collision_box.min_z += map_positions[i][2];
-				collision_box.max_z += map_positions[i][2];
-
-				collision_t collision = {
-					.hit = true,
-					.global_box = collision_box,
-				};
-
-				return collision;
-			}
-		}
-	}
-
-	return (collision_t){0};
-}
-
 static bool player_grounded = false;
 // static vec3 player_velocity = {0};
 static vec3 velocity = {0};
+
+#include "res_loading.c"
 
 void game_update(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, SDL_Window *window) {
 	if (input_key_pressed(SDL_SCANCODE_F)) {
@@ -378,7 +199,7 @@ void game_update(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, SDL_Windo
 	velocity[1] -= 0.005f;
 
 	camera.position[0] += velocity[0];
-	collision_t collision = check_player_collision(res_pack, grid);
+	collision_t collision = check_player_collision(res_pack, grid, &camera, &player_box);
 	if (collision.hit) {
 		if (velocity[0] > 0) {
 			camera.position[0] = collision.global_box.min_x - player_box.max_x - 0.001f;
@@ -390,7 +211,7 @@ void game_update(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, SDL_Windo
 
 	player_grounded = false;
 	camera.position[1] += velocity[1];
-	collision = check_player_collision(res_pack, grid);
+	collision = check_player_collision(res_pack, grid, &camera, &player_box);
 	if (collision.hit) {
 		if (velocity[1] > 0) {
 			camera.position[1] = collision.global_box.min_y - player_box.max_y - 0.001f;
@@ -405,7 +226,7 @@ void game_update(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, SDL_Windo
 	}
 
 	camera.position[2] += velocity[2];
-	collision = check_player_collision(res_pack, grid);
+	collision = check_player_collision(res_pack, grid, &camera, &player_box);
 	if (collision.hit) {
 		if (velocity[2] > 0) {
 			camera.position[2] = collision.global_box.min_z - player_box.max_z - 0.001f;
@@ -486,122 +307,8 @@ int main(int argc, char *argv[]) {
 	}
 
 	res_pack_t res_pack = {0};
-	
-	res_pack.render_width = 640;
-	res_pack.render_height = 360;
 
-	res_pack.sky_color = (color_t){58, 49, 41, 255};
-	// res_pack.sky_color = (color_t){2, 9, 23, 255};
-	// res_pack.sky_color = (color_t){0, 0, 0, 255};
-	res_pack.fog_color = (color_t){58, 49, 41, 255};
-	res_pack.editor_color = (color_t){50, 50, 50, 255};
-
-	res_add_texture(&res_pack, TEX_BRICKS, load_tga("res/images/bricks.tga", true));
-	res_add_texture(&res_pack, TEX_DIRT, load_tga("res/images/dirt.tga", true));
-	res_add_texture(&res_pack, TEX_COBBLE, load_tga("res/images/cobble.tga", false));
-	res_add_texture(&res_pack, TEX_GRASS, load_tga("res/images/grass.tga", false));
-	res_add_texture(&res_pack, TEX_IRON_BARS, load_tga("res/images/iron_bars.tga", true));
-	res_add_texture(&res_pack, TEX_TREE, load_tga("res/images/tree.tga", true));
-	res_add_texture(&res_pack, TEX_BIRCH, load_tga("res/images/birch.tga", true));
-	res_add_texture(&res_pack, TEX_CROSSHAIR, load_tga("res/images/crosshair.tga", true));
-	res_add_texture(&res_pack, TEX_WORMFISH, load_tga("res/images/wormfish.tga", true));
-	res_add_texture(&res_pack, TEX_FONT, load_tga("res/images/font.tga", false));
-
-	res_add_texture(&res_pack, TEX_BUTTON, load_tga("res/images/button_sheet.tga", false));
-	res_add_texture(&res_pack, TEX_BUTTON_PRESSED, load_tga("res/images/button_pressed_sheet.tga", false));
-	res_pack.button_tex_index = TEX_BUTTON;
-	res_pack.button_pressed_tex_index = TEX_BUTTON_PRESSED;
-	res_pack.gui_tile_size = 8;
-
-	res_add_texture(&res_pack, TEX_FRAME, load_tga("res/images/frame_new.tga", false));
-	res_add_texture(&res_pack, TEX_RED, load_tga("res/images/red.tga", false));
-
-	collider_t cube_collider = {0};
-	cube_collider.boxes[0] = (box_t){
-		.min_x = -0.5f,
-		.max_x = 0.5f,
-		.min_y = -0.5f,
-		.max_y = 0.5f,
-		.min_z = -0.5f,
-		.max_z = 0.5f,
-	};
-	cube_collider.boxes_len = 1;
-
-	collider_t floor_collider = {0};
-	floor_collider.boxes[0] = (box_t){
-		.min_x = -0.5f,
-		.max_x = 0.5f,
-		.min_y = -0.5f,
-		.max_y = -0.5f,
-		.min_z = -0.5f,
-		.max_z = 0.5f,
-	};
-	floor_collider.boxes_len = 1;
-
-	collider_t wall_collider = {0};
-	wall_collider.boxes[0] = (box_t){
-		.min_x = -0.5f,
-		.max_x = 0.5f,
-		.min_y = -0.5f,
-		.max_y = 0.5f,
-		.min_z = -0.1f,
-		.max_z = 0.1f,
-	};
-	wall_collider.boxes[1] = floor_collider.boxes[0];
-	wall_collider.boxes_len = 2;
-
-	collider_t wall_corner_collider = {0};
-	wall_corner_collider.boxes[0] = (box_t){
-		.min_x = -0.5f,
-		.max_x = 0.1f,
-		.min_y = -0.5f,
-		.max_y = 0.5f,
-		.min_z = -0.1f,
-		.max_z = 0.1f,
-	};
-	wall_corner_collider.boxes[1] = (box_t){
-		.min_x = -0.1f,
-		.max_x = 0.1f,
-		.min_y = -0.5f,
-		.max_y = 0.5f,
-		.min_z = -0.5f,
-		.max_z = -0.1f,
-	};
-	wall_corner_collider.boxes[2] = floor_collider.boxes[0];
-	wall_corner_collider.boxes_len = 3;
-
-	collider_t slab_collider = {0};
-	slab_collider.boxes[0] = (box_t){
-		.min_x = -0.5f,
-		.max_x = 0.5f,
-		.min_y = -0.5f,
-		.max_y = 0.0f,
-		.min_z = -0.5f,
-		.max_z = 0.5f,
-	};
-	slab_collider.boxes_len = 1;
-
-	res_add_mesh_raw(&res_pack, MESH_QUAD, quad_vertices, sizeof(quad_vertices) / sizeof(vertex_t), quad_indices, sizeof(quad_indices) / sizeof(u32));
-	res_add_mesh(&res_pack, MESH_CUBE, load_mesh("res/meshes/cube.mesh"), cube_collider);
-
-	for (i32 i = 0; i < res_pack.meshes[MESH_CUBE].vertex_count; i++) {
-		vertex_t vertex = res_pack.meshes[MESH_CUBE].vertices[i];
-		printf("position: %f %f %f\n", vertex.position[0], vertex.position[1], vertex.position[2]);
-		printf("uv: %f %f\n", vertex.tex_coord[0], vertex.tex_coord[1]);
-		printf("normal: %f %f %f\n", vertex.normal[0], vertex.normal[1], vertex.normal[2]);
-	}
-
-	res_add_mesh(&res_pack, MESH_FLOOR, load_mesh("res/meshes/floor.mesh"), floor_collider);
-	res_add_mesh(&res_pack, MESH_SLAB, load_mesh("res/meshes/slab.mesh"), slab_collider);
-	res_add_mesh(&res_pack, MESH_SLOPE, load_mesh("res/meshes/slope.mesh"), (collider_t){0});
-	res_add_mesh(&res_pack, MESH_PYRAMID, load_mesh("res/meshes/pyramid.mesh"), cube_collider);
-	res_add_mesh(&res_pack, MESH_CORNER, load_mesh("res/meshes/corner.mesh"), (collider_t){0});
-	res_add_mesh(&res_pack, MESH_MONKEY, load_mesh("res/meshes/monkey.mesh"), (collider_t){0});
-	res_add_mesh(&res_pack, MESH_MUSHROOM, load_mesh("res/meshes/mushroom.mesh"), (collider_t){0});
-	res_add_mesh(&res_pack, MESH_WALL, load_mesh("res/meshes/wall.mesh"), wall_collider);
-	res_add_mesh(&res_pack, MESH_WALL_CORNER, load_mesh("res/meshes/wall_corner.mesh"), wall_corner_collider);
-
-	res_add_sound(&res_pack, SOUND_JUMP, (sound_t){Mix_LoadWAV("res/sounds/jump.wav")});
+	load_res(&res_pack);
 
 	font_init(&res_pack.font, &res_pack, TEX_FONT);
 	res_pack.font.y_center = -4;

@@ -6,6 +6,13 @@ conveniently in one file to avoid cyclic imports.
 
 #include "global.h"
 
+// Structs
+typedef struct vertex {
+    vec3 position;
+    vec2 tex_coord;
+    vec3 normal;
+} vertex_t;
+
 typedef struct box {
     float min_x;
     float max_x;
@@ -21,13 +28,6 @@ typedef struct collider {
     box_t boxes[4];
     index_t boxes_len;
 } collider_t;
-
-// Structs
-typedef struct vertex {
-    vec3 position;
-    vec2 tex_coord;
-    vec3 normal;
-} vertex_t;
 
 typedef struct mesh {
 	vertex_t *vertices;
@@ -64,6 +64,20 @@ typedef struct color {
 	u8 b;
 	u8 a;
 } color_t;
+
+typedef struct collision {
+	bool hit;
+	box_t global_box;
+} collision_t;
+
+typedef struct camera {
+    vec3 position;
+    vec3 front;
+    vec3 up;
+
+    f32 pitch;
+    f32 yaw;
+} camera_t;
 
 typedef struct font {
     index_t texture_index;
@@ -139,11 +153,6 @@ typedef struct res_pack {
 #define COLOR_BLUE (color_t){0, 0, 0, 255}
 
 // Core enums
-// Continue own enum at 2
-enum {
-    MESH_QUAD = 1,
-};
-
 enum screen_anchor {
     ANCHOR_CENTER,
     ANCHOR_TOP,

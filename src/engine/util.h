@@ -15,6 +15,8 @@ char *load_file_to_string(const char path[]);
 
 texture_t load_tga(const char path[], bool flip);
 
+mesh_t load_mesh_raw(vertex_t *vertices, u32 vertex_count, u32 *indices, u32 index_count);
+
 mesh_t load_mesh(const char path[]);
 
 void color_to_gl_color(color_t color, vec4 gl_color);

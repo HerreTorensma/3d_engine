@@ -15,6 +15,19 @@ static mat4 isometric_view = {0};
 static camera_t *global_camera = NULL;
 static ecs_world_t *global_ecs = NULL;
 
+static vertex_t quad_vertices[] = {
+    {{1.0f,  1.0f, 0.0f}, {1.0f, 1.0f}},
+    {{1.0f, -1.0f, 0.0f}, {1.0f, 0.0f}},
+    {{-1.0f, -1.0f, 0.0f}, {0.0f, 0.0f}},
+    {{-1.0f,  1.0f, 0.0f}, {0.0f, 1.0f}}
+};
+static u32 quad_indices[] = {
+    0, 1, 3,
+    1, 2, 3
+};
+
+mesh_t quad_mesh = {0};
+
 static void clear(color_t color) {
 	vec4 gl_color = {0};
 	color_to_gl_color(color, gl_color);
@@ -104,6 +117,9 @@ void render_init(res_pack_t *res_pack) {
     gui_shader = create_shader_program("res/shaders/gui/vert.glsl", "res/shaders/gui/frag.glsl");
 	
 	init_frame_buffer(res_pack);
+
+	quad_mesh = load_mesh_raw(quad_vertices, sizeof(quad_vertices) / sizeof(vertex_t), quad_indices, sizeof(quad_indices) / sizeof(u32));
+	send_mesh_to_gpu(&quad_mesh);
 }
 
 void render_start_frame_buffer(res_pack_t *res_pack) {
@@ -122,7 +138,7 @@ void render_end_frame_buffer(res_pack_t *res_pack) {
 
 	glUseProgram(basic_shader);
 
-	render_mesh(res_pack, &(res_pack->meshes[MESH_QUAD]), fbo_tex);
+	render_mesh(res_pack, &quad_mesh, fbo_tex);
 	
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
@@ -178,7 +194,7 @@ static void render_sprite_components(res_pack_t *res_pack, ecs_world_t *ecs, cam
 		sprite_c *sprite = ecs_get(ecs, query.entities[i], SPRITE_C);
 		transform_c *transform = ecs_get(ecs, query.entities[i], TRANSFORM_C);
 
-		mesh_t mesh = res_pack->meshes[MESH_QUAD];
+		mesh_t mesh = quad_mesh;
 
 		mat4 model;
 		glm_mat4_identity(model);
@@ -264,7 +280,7 @@ void render_image(res_pack_t *res_pack, index_t texture_index, i32 x, i32 y, col
 	color_to_gl_color(color, gl_color);
 	shader_set_vec4(gui_shader, "color1", &gl_color);
 
-	render_mesh(res_pack, &res_pack->meshes[MESH_QUAD], texture_index);
+	render_mesh(res_pack, &quad_mesh, texture_index);
 }
 
 void render_image_rect(res_pack_t *res_pack, index_t texture_index, rect_t src, rect_t dst, color_t color) {
@@ -306,7 +322,7 @@ void render_image_rect(res_pack_t *res_pack, index_t texture_index, rect_t src, 
 	color_to_gl_color(color, gl_color);
 	shader_set_vec4(gui_shader, "color1", &gl_color);
 
-	render_mesh(res_pack, &res_pack->meshes[MESH_QUAD], texture_index);
+	render_mesh(res_pack, &quad_mesh, texture_index);
 }
 
 void render_mesh_isometric(res_pack_t *res_pack, mesh_t mesh, index_t texture_index, i32 x, i32 y, float scale) {
