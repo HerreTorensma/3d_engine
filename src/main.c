@@ -6,6 +6,8 @@
 #include "engine/gui.h"
 #include "engine/grid.h"
 #include "engine/audio.h"
+#include "engine/arena.h"
+#include "engine/string.h"
 
 static vertex_t quad_vertices[] = {
     {{1.0f,  1.0f, 0.0f}, {1.0f, 1.0f}},  // top right
@@ -472,6 +474,9 @@ int main(int argc, char *argv[]) {
 	window_width = 1280;
 	window_height = 720;
 
+	string_t test_string = STR("test");
+	printf("%d, %s\n", test_string.len, test_string.data);
+
 	SDL_Window *window = create_sdl2_window(window_width, window_height);
 	SDL_GLContext *context = create_sdl2_gl_context(window, window_width, window_height);
 
@@ -692,6 +697,10 @@ int main(int argc, char *argv[]) {
 	render_init(&res_pack);
 	editor_init();
 
+	arena_t temp_arena = {0};
+	// 1 MB
+	arena_init(&temp_arena, 1024*1024);
+
 	// Window loop
 	bool running = true;
 	SDL_Event event;
@@ -716,6 +725,8 @@ int main(int argc, char *argv[]) {
 				game_input(event);
 			}
 		}
+
+		arena_clear(&temp_arena);
 
 		input_update();
 
@@ -779,12 +790,14 @@ int main(int argc, char *argv[]) {
 			#ifdef DEBUG
 			gui_print(&res_pack, &res_pack.font, "DREAM SIMULATOR v0.1", 1, 0, COLOR_WHITE);
 			{
-				char buffer[64];
+				// char buffer[64];
+				char *buffer = arena_alloc(&temp_arena, 64);
 				sprintf(buffer, "X: %f Y: %f Z: %f", camera.position[0], camera.position[1], camera.position[2]);
 				gui_print(&res_pack, &res_pack.font, buffer, 1, 8, COLOR_WHITE);
 			}
 			{
-				char buffer[64];
+				// char buffer[64];
+				char *buffer = arena_alloc(&temp_arena, 64);
 				i32 map_x = (i32)roundf(camera.position[0]);
 				i32 map_y = (i32)roundf(camera.position[1]);
 				i32 map_z = (i32)roundf(camera.position[2]);
@@ -794,11 +807,12 @@ int main(int argc, char *argv[]) {
 				gui_print(&res_pack, &res_pack.font, buffer, 1, 16, COLOR_WHITE);
 			}
 
-			{
-				char buffer[64];
-				sprintf(buffer, "X: %f Y: %f Z: %f", camera.front[0], camera.front[1], camera.front[2]);
-				gui_print(&res_pack, &res_pack.font, buffer, 1, 32, COLOR_WHITE);
-			}
+			// {
+			// 	// char buffer[64];
+			// 	char *buffer = arena_alloc(&temp_arena, 64);
+			// 	sprintf(buffer, "X: %f Y: %f Z: %f", camera.front[0], camera.front[1], camera.front[2]);
+			// 	gui_print(&res_pack, &res_pack.font, buffer, 1, 24, COLOR_WHITE);
+			// }
 
 			if (global_colliding) {
 				gui_print(&res_pack, &res_pack.font, "COLLIDING", 1, 24, COLOR_WHITE);
