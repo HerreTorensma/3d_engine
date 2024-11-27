@@ -94,14 +94,14 @@ static camera_t create_camera() {
 
 static camera_t camera = {0};
 static box_t player_box = {
-	.min_x = -0.1f,
-	.max_x = 0.1f,
+	.min_x = -0.15f,
+	.max_x = 0.15f,
 	
 	.min_y = -0.5f,
 	.max_y = 0.0f,
 
-	.min_z = -0.1f,
-	.max_z = 0.1f,
+	.min_z = -0.15f,
+	.max_z = 0.15f,
 };
 
 static bool frozen = false;

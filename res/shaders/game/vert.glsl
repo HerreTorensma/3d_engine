@@ -1,8 +1,11 @@
 #version 330 core
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec2 aTexCoord;
+layout (location = 2) in vec3 aNormal;
 
 out vec2 TexCoord;
+
+flat out vec3 FaceNormal;
 
 out float Visibility;
 
@@ -29,4 +32,7 @@ void main()
     Visibility = exp(-pow((distance * fogDensity), fogGradient));
     Visibility = clamp(Visibility, 0.0, 1.0);
     // Visibility = clamp(Visibility, 0.05, 1.0);
+
+    // FragNormal = mat3(transpose(inverse(model)));
+    FaceNormal = mat3(transpose(inverse(model))) * aNormal;
 }

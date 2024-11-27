@@ -24,6 +24,9 @@ void res_add_mesh(res_pack_t *res_pack, index_t index, mesh_t mesh, collider_t c
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (void*)offsetof(vertex_t, tex_coord));
 
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (void*)offsetof(vertex_t, normal));
+
 	glBindVertexArray(0);
 
 	mesh.collision = collision;

@@ -43,6 +43,7 @@ static void init_frame_buffer(res_pack_t *res_pack) {
 	glGenRenderbuffers(1, &rbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, res_pack->render_width, res_pack->render_height);
+	// glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH32F_STENCIL8, res_pack->render_width, res_pack->render_height);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
 	glGenTextures(1, &fbo_tex);
@@ -406,7 +407,7 @@ void render_game(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, camera_t 
 	mat4 projection = {0};
 	// glm_perspective(glm_rad(45.0f), (float)window_width / (float)window_height, 0.1f, 100.0f, projection);
 	// glm_perspective(glm_rad(60.0f), (float)window_width / (float)window_height, 0.1f, 100.0f, projection);
-	glm_perspective(glm_rad(60.0f), (float)window_width / (float)window_height, 0.001f, 100.0f, projection);
+	glm_perspective(glm_rad(60.0f), (float)window_width / (float)window_height, 0.1f, 100.0f, projection);
 	
 	shader_set_mat4(game_shader, "projection", &projection);
 

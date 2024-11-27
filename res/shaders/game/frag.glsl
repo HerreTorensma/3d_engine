@@ -2,6 +2,7 @@
 out vec4 FragColor;
 
 in vec2 TexCoord;
+flat in vec3 FaceNormal;
 
 in float Visibility;
 
@@ -45,9 +46,36 @@ vec3 getNearestPaletteColor(vec3 color) {
 void main()
 {
     FragColor = texture(texture1, TexCoord);
+    // if (FragColor != vec4(0)) {
+    //     FragColor = mix(vec4(fogColor, 1.0), FragColor, Visibility);
+    // }
+
+    // Normalize the face normal
+    vec3 normal = normalize(FaceNormal);
+
+    // Use the absolute value of the normal's components
+    vec3 absNormal = abs(normal);
+
+    // Find the dominant axis and assign a unique shade
+    float shade;
+    if (absNormal.x > absNormal.y && absNormal.x > absNormal.z) {
+        // Dominant axis is X
+        shade = 0.6;
+    } else if (absNormal.y > absNormal.x && absNormal.y > absNormal.z) {
+        // Dominant axis is Y
+        shade = 0.8;
+    } else {
+        // Dominant axis is Z
+        shade = 1.0;
+    }
+
+    // Output the shade as grayscale
+    FragColor *= vec4(vec3(shade), 1.0);
+
     if (FragColor != vec4(0)) {
         FragColor = mix(vec4(fogColor, 1.0), FragColor, Visibility);
     }
+
 
     // FragColor.rgb += vec3(rand(TexCoord - 0.5)) * 0.3;
 
