@@ -43,7 +43,9 @@ enum {
 static camera_t create_camera() {
 	camera_t camera = {0};
 
-	glm_vec3_copy((vec3){3.0f, 0.5f, 3.0f}, camera.position);
+	// glm_vec3_copy((vec3){3.0f, 0.5f, 3.0f}, camera.position);
+	glm_vec3_copy((vec3){3.0f, 1.5f, 3.0f}, camera.position);
+
 	// glm_vec3_copy((vec3){0.0f, 0.3f, 3.0f}, camera.position);
 	// glm_vec3_copy((vec3){0.0f, 1.0f, 3.0f}, camera.position);
 	glm_vec3_copy((vec3){0.0f, 0.0f, -1.0f}, camera.front);
@@ -312,7 +314,8 @@ int main(int argc, char *argv[]) {
 
 	grid_t grid = {0};
 	// grid_init(&grid, 512, 16, 512);
-	grid_load(&grid, "test.grid");
+	// grid_load(&grid, "test.grid");
+	grid_load(&grid, "test2.grid");
 
 	camera = create_camera();
 
@@ -336,7 +339,7 @@ int main(int argc, char *argv[]) {
 		entity_t tree_e = ecs_new(&ecs);
 		transform_c *transform = ecs_set(&ecs, tree_e, TRANSFORM_C);
 		transform->position[0] = 10.0f;
-		transform->position[1] = 0.0f;
+		transform->position[1] = 1.0f;
 		transform->position[2] = 5.0f + (float)i;
 
 		// ECS_SET(&ecs, tree, sprite_c, {TEX_BIRCH, true, 1.0f, 2.0f});
@@ -351,7 +354,7 @@ int main(int argc, char *argv[]) {
 		entity_t worm_e = ecs_new(&ecs);
 		transform_c *transform = ecs_set(&ecs, worm_e, TRANSFORM_C);
 		transform->position[0] = 5.0f;
-		transform->position[1] = 0.0f;
+		transform->position[1] = 1.0f;
 		transform->position[2] = 5.0f;
 
 		// ECS_SET(&ecs, worm_e, sprite_c, {TEX_WORMFISH, true, 2.0f, 1.0f});
@@ -367,7 +370,7 @@ int main(int argc, char *argv[]) {
 		entity_t bars = ecs_new(&ecs);
 		transform_c *transform = ecs_set(&ecs, bars, TRANSFORM_C);
 		transform->position[0] = 2.0f;
-		transform->position[1] = 0.0f;
+		transform->position[1] = 1.0f;
 		transform->position[2] = 0.0f;
 
 		sprite_c *sprite = ecs_set(&ecs, bars, SPRITE_C);
@@ -375,7 +378,6 @@ int main(int argc, char *argv[]) {
 		sprite->billboard = false;
 		sprite->x_scale = 1.0f;
 		sprite->y_scale = 1.0f;
-
 	}
 
 	{
@@ -389,7 +391,7 @@ int main(int argc, char *argv[]) {
 		// rotating->speed[2] = 1.0f;
 
 		transform->position[0] = 10.0f;
-		transform->position[1] = 1.0f;
+		transform->position[1] = 2.0f;
 		transform->position[2] = 10.0f;
 
 		transform->rotation[1] = 45.0f;

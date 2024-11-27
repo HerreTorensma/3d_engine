@@ -287,7 +287,7 @@ void editor_render(res_pack_t *res_pack, grid_t *grid, index_t mesh_amount, inde
 	}
 
 	if (gui_button(res_pack, "SAVE", (rect_t){0, 0, 4, 2})) {
-		grid_save(grid, "test.grid");
+		grid_save(grid, "test2.grid");
 		debug_log("Saved grid test.grid\n");
 	}
 	
