@@ -52,7 +52,7 @@ void load_res(res_pack_t *res_pack) {
 	res_add_texture(res_pack, TEX_GRASS, load_tga("res/images/grass.tga", false));
 	res_add_texture(res_pack, TEX_IRON_BARS, load_tga("res/images/iron_bars.tga", true));
 	res_add_texture(res_pack, TEX_TREE, load_tga("res/images/tree.tga", true));
-	res_add_texture(res_pack, TEX_BIRCH, load_tga("res/images/birch.tga", true));
+	res_add_texture(res_pack, TEX_BIRCH, load_tga("res/images/bush.tga", true));
 	res_add_texture(res_pack, TEX_CROSSHAIR, load_tga("res/images/crosshair.tga", true));
 	res_add_texture(res_pack, TEX_WORMFISH, load_tga("res/images/wormfish.tga", true));
 	res_add_texture(res_pack, TEX_FONT, load_tga("res/images/font.tga", false));

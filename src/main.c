@@ -347,7 +347,7 @@ int main(int argc, char *argv[]) {
 		sprite->texture_index = TEX_BIRCH;
 		sprite->billboard = true;
 		sprite->x_scale = 1.0f;
-		sprite->y_scale = 2.0f;
+		sprite->y_scale = 1.0f;
 	}
 
 	{
@@ -468,7 +468,7 @@ int main(int argc, char *argv[]) {
 
 			// render_end_frame_buffer(&res_pack);
 		} else {
-			render_start_frame_buffer(&res_pack);
+			// render_start_frame_buffer(&res_pack);
 
 			render_game(&res_pack, &grid, &ecs, &camera);
 
@@ -525,7 +525,7 @@ int main(int argc, char *argv[]) {
 			}
 			#endif
 
-			render_end_frame_buffer(&res_pack);
+			// render_end_frame_buffer(&res_pack);
 		}
 
 		SDL_GL_SwapWindow(window);
