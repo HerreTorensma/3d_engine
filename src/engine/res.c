@@ -44,14 +44,20 @@ void send_mesh_to_gpu(mesh_t *mesh) {
 	glBindVertexArray(0);
 }
 
-void res_add_mesh(res_pack_t *res_pack, index_t index, mesh_t mesh, collider_t collision) {
+void res_add_mesh(res_pack_t *res_pack, index_t index, mesh_t mesh, collider_t *collider) {
 	if (!index_valid(index)) {
 		return;
 	}
 
 	send_mesh_to_gpu(&mesh);
 
-	mesh.collision = collision;
+	// mesh.collider = collider;
+	if (collider != NULL) {
+		memcpy(&mesh.collider, collider, sizeof(collider_t));
+	} else {
+		mesh.collider.boxes[0] = compute_bounding_box(&mesh);
+		mesh.collider.boxes_len = 1;
+	}
 
 	res_pack->meshes[index] = mesh;
 }

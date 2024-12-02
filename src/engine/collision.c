@@ -110,8 +110,8 @@ collision_t check_player_collision(res_pack_t *res_pack, grid_t *grid, camera_t 
 
 		tile_t current_tile = grid_get_cell(grid, map_x, map_y, map_z);
 		
-		for (int j = 0; j < res_pack->meshes[current_tile.mesh_index].collision.boxes_len; j++) {
-			box_t box = res_pack->meshes[current_tile.mesh_index].collision.boxes[j];
+		for (int j = 0; j < res_pack->meshes[current_tile.mesh_index].collider.boxes_len; j++) {
+			box_t box = res_pack->meshes[current_tile.mesh_index].collider.boxes[j];
 			
 			if (box_overlap_box(camera->position, *player_box, map_positions[i], box)) {
 				// colliding = true;

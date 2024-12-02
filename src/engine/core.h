@@ -40,7 +40,7 @@ typedef struct mesh {
     u32 vbo;
     u32 ebo;
 
-    collider_t collision;
+    collider_t collider;
 } mesh_t;
 
 typedef struct texture {
@@ -197,12 +197,12 @@ typedef struct {
     index_t texture_index;
 } mesh_c;
 
-typedef collider_t collision_c;
+typedef collider_t collider_c;
 
 // Continue your own enum at 3
 enum {
     TRANSFORM_C = 0,
     SPRITE_C = 1,
     MESH_C = 2,
-    COLLISION_C = 3,
+    COLLIDER_C = 3,
 };

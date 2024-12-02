@@ -333,7 +333,7 @@ int main(int argc, char *argv[]) {
 	ECS_REGISTER(&ecs, sprite_c, SPRITE_C);
 	ECS_REGISTER(&ecs, mesh_c, MESH_C);
 	ECS_REGISTER(&ecs, rotating_c, ROTATING_C);
-	ECS_REGISTER(&ecs, collision_c, COLLISION_C);
+	ECS_REGISTER(&ecs, collider_c, COLLIDER_C);
 
 	for (int i = 0; i < 100; i++) {
 		entity_t tree_e = ecs_new(&ecs);

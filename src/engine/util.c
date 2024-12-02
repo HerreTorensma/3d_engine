@@ -183,3 +183,41 @@ void debug_log(const char *format, ...) {
 		va_end(args);
 	#endif
 }
+
+box_t compute_bounding_box(mesh_t *mesh) {
+	box_t box = {0};
+	
+	for (u32 i = 0; i < mesh->vertex_count; i++) {
+		if (mesh->vertices[i].position[0] < box.min_x) {
+			box.min_x = mesh->vertices[i].position[0];
+		}
+		if (mesh->vertices[i].position[0] > box.max_x) {
+			box.max_x = mesh->vertices[i].position[0];
+		}
+
+		if (mesh->vertices[i].position[1] < box.min_y) {
+			box.min_y = mesh->vertices[i].position[1];
+		}
+		if (mesh->vertices[i].position[1] > box.max_y) {
+			box.max_y = mesh->vertices[i].position[1];
+		}
+
+		if (mesh->vertices[i].position[2] < box.min_z) {
+			box.min_z = mesh->vertices[i].position[2];
+		}
+		if (mesh->vertices[i].position[2] > box.max_z) {
+			box.max_z = mesh->vertices[i].position[2];
+		}
+	}
+
+	box.min_x *= 0.5;
+	box.max_x *= 0.5;
+
+	box.min_y *= 0.5;
+	box.max_y *= 0.5;
+
+	box.min_z *= 0.5;
+	box.max_z *= 0.5;
+
+	return box;
+}

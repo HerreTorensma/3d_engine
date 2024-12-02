@@ -68,40 +68,6 @@ void load_res(res_pack_t *res_pack) {
 	res_add_texture(res_pack, TEX_BUTTON_SELECTED_INDICATOR, load_tga("res/images/button_selected_indicator.tga", false));
     res_pack->button_pressed_indicator_tex_index = TEX_BUTTON_SELECTED_INDICATOR;
 
-	collider_t cube_collider = {0};
-	cube_collider.boxes[0] = (box_t){
-		.min_x = -0.5f,
-		.max_x = 0.5f,
-		.min_y = -0.5f,
-		.max_y = 0.5f,
-		.min_z = -0.5f,
-		.max_z = 0.5f,
-	};
-	cube_collider.boxes_len = 1;
-
-	collider_t floor_collider = {0};
-	floor_collider.boxes[0] = (box_t){
-		.min_x = -0.5f,
-		.max_x = 0.5f,
-		.min_y = -0.5f,
-		.max_y = -0.5f,
-		.min_z = -0.5f,
-		.max_z = 0.5f,
-	};
-	floor_collider.boxes_len = 1;
-
-	collider_t wall_collider = {0};
-	wall_collider.boxes[0] = (box_t){
-		.min_x = -0.5f,
-		.max_x = 0.5f,
-		.min_y = -0.5f,
-		.max_y = 0.5f,
-		.min_z = -0.1f,
-		.max_z = 0.1f,
-	};
-	wall_collider.boxes[1] = floor_collider.boxes[0];
-	wall_collider.boxes_len = 2;
-
 	collider_t wall_corner_collider = {0};
 	wall_corner_collider.boxes[0] = (box_t){
 		.min_x = -0.5f,
@@ -119,39 +85,18 @@ void load_res(res_pack_t *res_pack) {
 		.min_z = -0.5f,
 		.max_z = -0.1f,
 	};
-	wall_corner_collider.boxes[2] = floor_collider.boxes[0];
-	wall_corner_collider.boxes_len = 3;
+	wall_corner_collider.boxes_len = 2;
 
-	collider_t slab_collider = {0};
-	slab_collider.boxes[0] = (box_t){
-		.min_x = -0.5f,
-		.max_x = 0.5f,
-		.min_y = -0.5f,
-		.max_y = 0.0f,
-		.min_z = -0.5f,
-		.max_z = 0.5f,
-	};
-	slab_collider.boxes_len = 1;
-
-	// res_add_mesh_raw(res_pack, MESH_QUAD, quad_vertices, sizeof(quad_vertices) / sizeof(vertex_t), quad_indices, sizeof(quad_indices) / sizeof(u32));
-	res_add_mesh(res_pack, MESH_CUBE, load_mesh("res/meshes/cube.mesh"), cube_collider);
-
-	// for (i32 i = 0; i < res_pack.meshes[MESH_CUBE].vertex_count; i++) {
-	// 	vertex_t vertex = res_pack.meshes[MESH_CUBE].vertices[i];
-	// 	printf("position: %f %f %f\n", vertex.position[0], vertex.position[1], vertex.position[2]);
-	// 	printf("uv: %f %f\n", vertex.tex_coord[0], vertex.tex_coord[1]);
-	// 	printf("normal: %f %f %f\n", vertex.normal[0], vertex.normal[1], vertex.normal[2]);
-	// }
-
-	res_add_mesh(res_pack, MESH_FLOOR, load_mesh("res/meshes/floor.mesh"), floor_collider);
-	res_add_mesh(res_pack, MESH_SLAB, load_mesh("res/meshes/slab.mesh"), slab_collider);
-	res_add_mesh(res_pack, MESH_SLOPE, load_mesh("res/meshes/slope.mesh"), (collider_t){0});
-	res_add_mesh(res_pack, MESH_PYRAMID, load_mesh("res/meshes/pyramid.mesh"), cube_collider);
-	res_add_mesh(res_pack, MESH_CORNER, load_mesh("res/meshes/corner.mesh"), (collider_t){0});
-	res_add_mesh(res_pack, MESH_MONKEY, load_mesh("res/meshes/monkey.mesh"), (collider_t){0});
-	res_add_mesh(res_pack, MESH_MUSHROOM, load_mesh("res/meshes/mushroom.mesh"), (collider_t){0});
-	res_add_mesh(res_pack, MESH_WALL, load_mesh("res/meshes/wall.mesh"), wall_collider);
-	res_add_mesh(res_pack, MESH_WALL_CORNER, load_mesh("res/meshes/wall_corner.mesh"), wall_corner_collider);
+	res_add_mesh(res_pack, MESH_CUBE, load_mesh("res/meshes/cube.mesh"), NULL);
+	res_add_mesh(res_pack, MESH_FLOOR, load_mesh("res/meshes/floor.mesh"), NULL);
+	res_add_mesh(res_pack, MESH_SLAB, load_mesh("res/meshes/slab.mesh"), NULL);
+	res_add_mesh(res_pack, MESH_SLOPE, load_mesh("res/meshes/slope.mesh"), NULL);
+	res_add_mesh(res_pack, MESH_PYRAMID, load_mesh("res/meshes/pyramid.mesh"), NULL);
+	res_add_mesh(res_pack, MESH_CORNER, load_mesh("res/meshes/corner.mesh"), NULL);
+	res_add_mesh(res_pack, MESH_MONKEY, load_mesh("res/meshes/monkey.mesh"), NULL);
+	res_add_mesh(res_pack, MESH_MUSHROOM, load_mesh("res/meshes/mushroom.mesh"), NULL);
+	res_add_mesh(res_pack, MESH_WALL, load_mesh("res/meshes/wall.mesh"), NULL);
+	res_add_mesh(res_pack, MESH_WALL_CORNER, load_mesh("res/meshes/wall_corner.mesh"), &wall_corner_collider);
 
 	res_add_sound(res_pack, SOUND_JUMP, (sound_t){Mix_LoadWAV("res/sounds/jump.wav")});
 }
