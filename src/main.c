@@ -71,6 +71,9 @@ static box_t player_box = {
 
 static bool frozen = false;
 
+arena_t temp_arena = {0};
+
+
 void game_input(SDL_Event event) {
 	if (event.type == SDL_MOUSEMOTION) {
 		if (frozen) {
@@ -194,46 +197,75 @@ void game_update(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, SDL_Windo
 	// glm_vec3_add(camera.position, total_movement, camera.position);
 
 	if (input_key_pressed(SDL_SCANCODE_SPACE) && player_grounded) {
-		velocity[1] = 0.12f;
-		audio_play_sound(res_pack, SOUND_JUMP);
+		velocity[1] = 0.08f;
+		player_grounded = false;
+		// audio_play_sound(res_pack, SOUND_JUMP);
 	}
+	
 	velocity[1] -= 0.005f;
 
-	camera.position[0] += velocity[0];
-	collision_t collision = check_player_collision(res_pack, grid, &camera, &player_box);
-	if (collision.hit) {
-		if (velocity[0] > 0) {
-			camera.position[0] = collision.global_box.min_x - player_box.max_x - 0.001f;
-		}
-		if (velocity[0] < 0) {
-			camera.position[0] = collision.global_box.max_x - player_box.min_x + 0.001f;
+	vec3 coming_position = {0};
+	coming_position[0] = camera.position[0] + velocity[0];
+	coming_position[1] = camera.position[1];
+	coming_position[2] = camera.position[2] + velocity[2];
+
+	collision_t *collisions = arena_calloc(&temp_arena, 8 * sizeof(collision_t));
+	i32 count = get_player_collisions(res_pack, grid, coming_position, &player_box, collisions);
+	collision_t best_collision = collisions[0];
+
+	if (count > 0) {
+		float max_y_difference = collisions[0].global_box.max_y - (coming_position[1] + player_box.min_y);
+		for (i32 i = 1; i < count; i++) {
+			float y_difference = collisions[i].global_box.max_y - (coming_position[1] + player_box.min_y);
+			if (y_difference > max_y_difference) {
+				max_y_difference = y_difference;
+				best_collision = collisions[i];
+			}
 		}
 	}
 
-	player_grounded = false;
-	camera.position[1] += velocity[1];
-	collision = check_player_collision(res_pack, grid, &camera, &player_box);
+	if (best_collision.hit) {
+		float y_difference = best_collision.global_box.max_y - (coming_position[1] + player_box.min_y);
+		if (player_grounded && y_difference > 0.0f && y_difference < 0.2f) {
+			camera.position[1] = best_collision.global_box.max_y - player_box.min_y + 0.001f;
+		}
+	}
+	
+	camera.position[0] += velocity[0];
+	collision_t collision = get_first_player_collision(res_pack, grid, camera.position, &player_box);
 	if (collision.hit) {
-		if (velocity[1] > 0) {
+		if (velocity[0] < 0.0f) {
+			camera.position[0] = collision.global_box.max_x - player_box.min_x + 0.001f;
+		}
+		if (velocity[0] > 0.0f) {
+			camera.position[0] = collision.global_box.min_x - player_box.max_x - 0.001f;
+		}
+	}
+	
+	
+	camera.position[2] += velocity[2];
+	collision = get_first_player_collision(res_pack, grid, camera.position, &player_box);
+	if (collision.hit) {
+		if (velocity[2] < 0.0f) {
+			camera.position[2] = collision.global_box.max_z - player_box.min_z + 0.001f;
+		}
+		if (velocity[2] > 0.0f) {
+			camera.position[2] = collision.global_box.min_z - player_box.max_z - 0.001f;
+		}
+	}
+
+	camera.position[1] += velocity[1];
+	collision = get_first_player_collision(res_pack, grid, camera.position, &player_box);
+	if (collision.hit) {
+		if (velocity[1] > 0.0f) {
 			camera.position[1] = collision.global_box.min_y - player_box.max_y - 0.001f;
 			player_grounded = true;
 			velocity[1] = 0.0f;
 		}
-		if (velocity[1] < 0) {
+		if (velocity[1] < 0.0f) {
 			camera.position[1] = collision.global_box.max_y - player_box.min_y + 0.001f;
 			player_grounded = true;
 			velocity[1] = 0.0f;
-		}
-	}
-
-	camera.position[2] += velocity[2];
-	collision = check_player_collision(res_pack, grid, &camera, &player_box);
-	if (collision.hit) {
-		if (velocity[2] > 0) {
-			camera.position[2] = collision.global_box.min_z - player_box.max_z - 0.001f;
-		}
-		if (velocity[2] < 0) {
-			camera.position[2] = collision.global_box.max_z - player_box.min_z + 0.001f;
 		}
 	}
 }
@@ -403,7 +435,6 @@ int main(int argc, char *argv[]) {
 	render_init(&res_pack);
 	editor_init();
 
-	arena_t temp_arena = {0};
 	// 1 MB
 	arena_init(&temp_arena, 1024*1024);
 
@@ -464,7 +495,7 @@ int main(int argc, char *argv[]) {
 			// render_start_frame_buffer(&res_pack);
 
 			// editor_render(&res_pack, &grid, MESH_EDITOR_STOP, TEX_EDITOR_STOP);
-			editor_render(&res_pack, &grid, 12, 6);
+			editor_render(&res_pack, &grid, 13, 13);
 
 			// render_end_frame_buffer(&res_pack);
 		} else {
@@ -487,11 +518,29 @@ int main(int argc, char *argv[]) {
 
 			// render_image_rect(&res_pack, TEX_COBBLE, (rect_t){0, 0, 16, 16}, (rect_t){16, 16, 128, 128}, COLOR_WHITE);
 
-			gui_button(&res_pack, "", (rect_t){40, 1, 2, 2});
-			gui_button(&res_pack, "", (rect_t){43, 1, 2, 2});
-			gui_button(&res_pack, "", (rect_t){46, 1, 2, 2});
-			gui_button(&res_pack, "", (rect_t){49, 1, 2, 2});
-			gui_button(&res_pack, "", (rect_t){52, 1, 2, 2});
+			// gui_button(&res_pack, "", (rect_t){40, 1, 2, 2});
+			// gui_button(&res_pack, "", (rect_t){43, 1, 2, 2});
+			// gui_button(&res_pack, "", (rect_t){46, 1, 2, 2});
+			// gui_button(&res_pack, "", (rect_t){49, 1, 2, 2});
+			// gui_button(&res_pack, "", (rect_t){52, 1, 2, 2});
+
+			// gui_button(&res_pack, "", (rect_t){40, 1, 2, 2});
+			// gui_button(&res_pack, "", (rect_t){42, 1, 2, 2});
+			// gui_button(&res_pack, "", (rect_t){44, 1, 2, 2});
+			// gui_button(&res_pack, "", (rect_t){46, 1, 2, 2});
+			// gui_button(&res_pack, "", (rect_t){48, 1, 2, 2});
+
+			gui_button(&res_pack, "1", (rect_t){65, 39, 3, 3});
+			gui_button(&res_pack, "2", (rect_t){68, 39, 3, 3});
+			gui_button(&res_pack, "3", (rect_t){71, 39, 3, 3});
+			gui_button(&res_pack, "4", (rect_t){74, 39, 3, 3});
+			gui_button(&res_pack, "5", (rect_t){77, 39, 3, 3});
+
+			gui_button(&res_pack, "6", (rect_t){65, 42, 3, 3});
+			gui_button(&res_pack, "7", (rect_t){68, 42, 3, 3});
+			gui_button(&res_pack, "8", (rect_t){71, 42, 3, 3});
+			gui_button(&res_pack, "9", (rect_t){74, 42, 3, 3});
+			gui_button(&res_pack, "10", (rect_t){77, 42, 3, 3});
 
 			#ifdef DEBUG
 			gui_print(&res_pack, &res_pack.font, "DREAM SIMULATOR v0.1", 1, 0, COLOR_WHITE);

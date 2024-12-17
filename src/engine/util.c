@@ -186,6 +186,15 @@ void debug_log(const char *format, ...) {
 
 box_t compute_bounding_box(mesh_t *mesh) {
 	box_t box = {0};
+
+	box.min_x = mesh->vertices[0].position[0];
+	box.max_x = mesh->vertices[0].position[0];
+
+	box.min_y = mesh->vertices[1].position[1];
+	box.max_y = mesh->vertices[1].position[1];
+	
+	box.min_z = mesh->vertices[2].position[2];
+	box.max_z = mesh->vertices[2].position[2];
 	
 	for (u32 i = 0; i < mesh->vertex_count; i++) {
 		if (mesh->vertices[i].position[0] < box.min_x) {
@@ -220,4 +229,28 @@ box_t compute_bounding_box(mesh_t *mesh) {
 	box.max_z *= 0.5;
 
 	return box;
+}
+
+void print_box(box_t *box) {
+	printf("min_x: %f\n", box->min_x);
+	printf("max_x: %f\n", box->max_x);
+	printf("\n");
+
+	printf("min_y: %f\n", box->min_y);
+	printf("max_y: %f\n", box->max_y);
+	printf("\n");
+
+	printf("min_z: %f\n", box->min_z);
+	printf("max_z: %f\n", box->max_z);
+	printf("\n");
+}
+
+void print_mesh(res_pack_t *res_pack, index_t mesh_index) {
+	for (i32 i = 0; i < res_pack->meshes[mesh_index].vertex_count; i++) {
+		vertex_t vertex = res_pack->meshes[mesh_index].vertices[i];
+		printf("position: %f %f %f\n", vertex.position[0], vertex.position[1], vertex.position[2]);
+		printf("uv: %f %f\n", vertex.tex_coord[0], vertex.tex_coord[1]);
+		printf("normal: %f %f %f\n", vertex.normal[0], vertex.normal[1], vertex.normal[2]);
+		printf("\n");
+	}
 }

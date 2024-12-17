@@ -54,48 +54,48 @@ bool box_overlap_box(vec3 box1_pos, box_t box1, vec3 box2_pos, box_t box2) {
 	return false;
 }
 
-collision_t check_player_collision(res_pack_t *res_pack, grid_t *grid, camera_t *camera, box_t *player_box) {
+collision_t get_first_player_collision(res_pack_t *res_pack, grid_t *grid, vec3 position, box_t *player_box) {
 	// Get all 8 map positions surrounding the player, given the player is smaller than a map cell
 	vec3 map_positions[] = {
 		{
-			roundf(camera->position[0] + player_box->min_x),
-			roundf(camera->position[1] + player_box->min_y),
-			roundf(camera->position[2] + player_box->min_z),
+			roundf(position[0] + player_box->min_x),
+			roundf(position[1] + player_box->min_y),
+			roundf(position[2] + player_box->min_z),
 		},
 		{
-			roundf(camera->position[0] + player_box->max_x),
-			roundf(camera->position[1] + player_box->min_y),
-			roundf(camera->position[2] + player_box->min_z),
+			roundf(position[0] + player_box->max_x),
+			roundf(position[1] + player_box->min_y),
+			roundf(position[2] + player_box->min_z),
 		},
 		{
-			roundf(camera->position[0] + player_box->max_x),
-			roundf(camera->position[1] + player_box->max_y),
-			roundf(camera->position[2] + player_box->min_z),
+			roundf(position[0] + player_box->max_x),
+			roundf(position[1] + player_box->max_y),
+			roundf(position[2] + player_box->min_z),
 		},
 		{
-			roundf(camera->position[0] + player_box->max_x),
-			roundf(camera->position[1] + player_box->max_y),
-			roundf(camera->position[2] + player_box->max_z),
+			roundf(position[0] + player_box->max_x),
+			roundf(position[1] + player_box->max_y),
+			roundf(position[2] + player_box->max_z),
 		},
 		{
-			roundf(camera->position[0] + player_box->min_x),
-			roundf(camera->position[1] + player_box->max_y),
-			roundf(camera->position[2] + player_box->min_z),
+			roundf(position[0] + player_box->min_x),
+			roundf(position[1] + player_box->max_y),
+			roundf(position[2] + player_box->min_z),
 		},
 		{
-			roundf(camera->position[0] + player_box->max_x),
-			roundf(camera->position[1] + player_box->min_y),
-			roundf(camera->position[2] + player_box->max_z),
+			roundf(position[0] + player_box->max_x),
+			roundf(position[1] + player_box->min_y),
+			roundf(position[2] + player_box->max_z),
 		},
 		{
-			roundf(camera->position[0] + player_box->min_x),
-			roundf(camera->position[1] + player_box->max_y),
-			roundf(camera->position[2] + player_box->max_z),
+			roundf(position[0] + player_box->min_x),
+			roundf(position[1] + player_box->max_y),
+			roundf(position[2] + player_box->max_z),
 		},
 		{
-			roundf(camera->position[0] + player_box->min_x),
-			roundf(camera->position[1] + player_box->min_y),
-			roundf(camera->position[2] + player_box->max_z),
+			roundf(position[0] + player_box->min_x),
+			roundf(position[1] + player_box->min_y),
+			roundf(position[2] + player_box->max_z),
 		},
 	};
 
@@ -113,7 +113,7 @@ collision_t check_player_collision(res_pack_t *res_pack, grid_t *grid, camera_t 
 		for (int j = 0; j < res_pack->meshes[current_tile.mesh_index].collider.boxes_len; j++) {
 			box_t box = res_pack->meshes[current_tile.mesh_index].collider.boxes[j];
 			
-			if (box_overlap_box(camera->position, *player_box, map_positions[i], box)) {
+			if (box_overlap_box(position, *player_box, map_positions[i], box)) {
 				// colliding = true;
 				// return &res_pack->meshes[current_tile.mesh_index].collision.boxes[j];
 				box_t collision_box = box;
@@ -136,4 +136,92 @@ collision_t check_player_collision(res_pack_t *res_pack, grid_t *grid, camera_t 
 	}
 
 	return (collision_t){0};
+}
+
+// Returns amount of collisions
+i32 get_player_collisions(res_pack_t *res_pack, grid_t *grid, vec3 position, box_t *player_box, collision_t collisions[]) {
+	// Get all 8 map positions surrounding the player, given the player is smaller than a map cell
+	vec3 map_positions[] = {
+		{
+			roundf(position[0] + player_box->min_x),
+			roundf(position[1] + player_box->min_y),
+			roundf(position[2] + player_box->min_z),
+		},
+		{
+			roundf(position[0] + player_box->max_x),
+			roundf(position[1] + player_box->min_y),
+			roundf(position[2] + player_box->min_z),
+		},
+		{
+			roundf(position[0] + player_box->max_x),
+			roundf(position[1] + player_box->max_y),
+			roundf(position[2] + player_box->min_z),
+		},
+		{
+			roundf(position[0] + player_box->max_x),
+			roundf(position[1] + player_box->max_y),
+			roundf(position[2] + player_box->max_z),
+		},
+		{
+			roundf(position[0] + player_box->min_x),
+			roundf(position[1] + player_box->max_y),
+			roundf(position[2] + player_box->min_z),
+		},
+		{
+			roundf(position[0] + player_box->max_x),
+			roundf(position[1] + player_box->min_y),
+			roundf(position[2] + player_box->max_z),
+		},
+		{
+			roundf(position[0] + player_box->min_x),
+			roundf(position[1] + player_box->max_y),
+			roundf(position[2] + player_box->max_z),
+		},
+		{
+			roundf(position[0] + player_box->min_x),
+			roundf(position[1] + player_box->min_y),
+			roundf(position[2] + player_box->max_z),
+		},
+	};
+
+	i32 collisions_count = 0;
+
+	for (i32 i = 0; i < 8; i++) {
+		i32 map_x = (i32)(map_positions[i][0]);
+		i32 map_y = (i32)(map_positions[i][1]);
+		i32 map_z = (i32)(map_positions[i][2]);
+
+		if (map_x < 0 || map_y < 0 || map_z < 0) {
+			continue;
+		}
+
+		tile_t current_tile = grid_get_cell(grid, map_x, map_y, map_z);
+		
+		for (int j = 0; j < res_pack->meshes[current_tile.mesh_index].collider.boxes_len; j++) {
+			box_t box = res_pack->meshes[current_tile.mesh_index].collider.boxes[j];
+			
+			if (box_overlap_box(position, *player_box, map_positions[i], box)) {
+				// colliding = true;
+				// return &res_pack->meshes[current_tile.mesh_index].collision.boxes[j];
+				box_t collision_box = box;
+
+				collision_box.min_x += map_positions[i][0];
+				collision_box.max_x += map_positions[i][0];
+				collision_box.min_y += map_positions[i][1];
+				collision_box.max_y += map_positions[i][1];
+				collision_box.min_z += map_positions[i][2];
+				collision_box.max_z += map_positions[i][2];
+
+				collision_t collision = {
+					.hit = true,
+					.global_box = collision_box,
+				};
+
+				collisions[collisions_count] = collision;
+				collisions_count++;
+			}
+		}
+	}
+
+	return collisions_count;
 }

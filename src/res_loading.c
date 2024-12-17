@@ -11,6 +11,7 @@ enum {
 	MESH_MUSHROOM,
 	MESH_WALL,
 	MESH_WALL_CORNER,
+	MESH_LOWER_SLAB,
 };
 
 enum {
@@ -19,6 +20,7 @@ enum {
 	TEX_COBBLE,
 	TEX_GRASS,
 	TEX_IRON_BARS,
+    TEX_PLANKS,
 
 	TEX_TREE,
 	TEX_BIRCH,
@@ -40,10 +42,14 @@ void load_res(res_pack_t *res_pack) {
     res_pack->render_width = 640;
 	res_pack->render_height = 360;
 
-	res_pack->sky_color = (color_t){58, 49, 41, 255};
-	// res_pack.sky_color = (color_t){2, 9, 23, 255};
-	// res_pack.sky_color = (color_t){0, 0, 0, 255};
-	res_pack->fog_color = (color_t){58, 49, 41, 255};
+	// res_pack->sky_color = (color_t){58, 49, 41, 255};
+	// // res_pack.sky_color = (color_t){2, 9, 23, 255};
+	// // res_pack.sky_color = (color_t){0, 0, 0, 255};
+	// res_pack->fog_color = (color_t){58, 49, 41, 255};
+
+	res_pack->sky_color = COLOR_BLACK;
+	res_pack->fog_color = COLOR_BLACK;
+
 	res_pack->editor_color = (color_t){50, 50, 50, 255};
 
 	res_add_texture(res_pack, TEX_BRICKS, load_tga("res/images/bricks.tga", true));
@@ -51,6 +57,8 @@ void load_res(res_pack_t *res_pack) {
 	res_add_texture(res_pack, TEX_COBBLE, load_tga("res/images/cobble.tga", false));
 	res_add_texture(res_pack, TEX_GRASS, load_tga("res/images/grass.tga", false));
 	res_add_texture(res_pack, TEX_IRON_BARS, load_tga("res/images/iron_bars.tga", true));
+	res_add_texture(res_pack, TEX_PLANKS, load_tga("res/images/planks.tga", false));
+	
 	res_add_texture(res_pack, TEX_TREE, load_tga("res/images/tree.tga", true));
 	res_add_texture(res_pack, TEX_BIRCH, load_tga("res/images/bush.tga", true));
 	res_add_texture(res_pack, TEX_CROSSHAIR, load_tga("res/images/crosshair.tga", true));
@@ -97,6 +105,9 @@ void load_res(res_pack_t *res_pack) {
 	res_add_mesh(res_pack, MESH_MUSHROOM, load_mesh("res/meshes/mushroom.mesh"), NULL);
 	res_add_mesh(res_pack, MESH_WALL, load_mesh("res/meshes/wall.mesh"), NULL);
 	res_add_mesh(res_pack, MESH_WALL_CORNER, load_mesh("res/meshes/wall_corner.mesh"), &wall_corner_collider);
+	res_add_mesh(res_pack, MESH_LOWER_SLAB, load_mesh("res/meshes/lower_slab.mesh"), NULL);
+
+	// print_box(&res_pack->meshes[MESH_LOWER_SLAB].collider.boxes[0]);
 
 	res_add_sound(res_pack, SOUND_JUMP, (sound_t){Mix_LoadWAV("res/sounds/jump.wav")});
 }

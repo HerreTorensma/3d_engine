@@ -16,7 +16,7 @@ uniform mat4 model;
 uniform bool billboard;
 
 // const float fogDensity = 0.2;
-const float fogDensity = 0.3;
+const float fogDensity = 0.1;
 // const float fogGradient = 3.0;
 const float fogGradient = 1.0;
 

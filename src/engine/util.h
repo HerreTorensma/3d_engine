@@ -28,3 +28,7 @@ void get_normalized_mouse_pos(float *x, float *y);
 void debug_log(const char *format, ...);
 
 box_t compute_bounding_box(mesh_t *mesh);
+
+void print_box(box_t *box);
+
+void print_mesh(res_pack_t *res_pack, index_t mesh_index);

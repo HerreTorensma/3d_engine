@@ -241,8 +241,12 @@ static void render_grid(res_pack_t *res_pack, grid_t *grid) {
 				// vec3 fog_color = {1.0f, 0.0f, 0.0f};
 				// vec3 fog_color = {0.231f, 0.2f, 0.149f};
 				// vec3 fog_color = {0.8f, 0.8f, 0.8f};
-				vec3 fog_color = {0.227f, 0.192f, 0.161f};
 				// vec3 fog_color = {0.0f, 0.0f, 0.0f};
+
+				// vec3 fog_color = {0.227f, 0.192f, 0.161f};
+
+				vec4 fog_color = {0};
+				color_to_gl_color(res_pack->fog_color, fog_color);
 				
 				shader_set_vec3(game_shader, "fogColor", &fog_color);
 
