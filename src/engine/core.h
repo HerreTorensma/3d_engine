@@ -91,10 +91,9 @@ typedef struct theme {
 	
     font_t font;
 
-	index_t button_index;
-	index_t button_pressed_index;
-
-    index_t slider_index;
+	index_t button_tex_index;
+	index_t button_pressed_tex_index;
+    index_t button_pressed_indicator_tex_index;
 } theme_t;
 
 typedef struct tile {
@@ -145,6 +144,17 @@ typedef struct res_pack {
 
 	font_t font;
 } res_pack_t;
+
+typedef struct response {
+    char text[512];
+    i32 next_dialogue;
+} response_t;
+
+typedef struct dialogue {
+    char text[512];
+    response_t responses[8];
+    i32 response_count;
+} dialogue_t;
 
 // Core definitions
 #define COLOR_WHITE (color_t){255, 255, 255, 255}

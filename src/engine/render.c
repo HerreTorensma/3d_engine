@@ -187,6 +187,8 @@ static void render_mesh_components(res_pack_t *res_pack, ecs_world_t *ecs) {
 	}
 }
 
+// static void render_3d_sprite(res_pack_t *res_pack, camera_t *camera)
+
 static void render_sprite_components(res_pack_t *res_pack, ecs_world_t *ecs, camera_t *camera) {
 	// Transparent stuff
 	ecs_query_t query = ecs_query(ecs, TRANSFORM_C, SPRITE_C, -1);

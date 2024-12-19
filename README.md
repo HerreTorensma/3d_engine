@@ -79,6 +79,8 @@
         - Keep stack of actions
         - Every undoable action is an action object
 
+    - Don't pass res_pack everywhere, just make it a static global variable inside res.c and use helper functions
+
 ## Dependencies
 - SDL2
 - SDL_mixer

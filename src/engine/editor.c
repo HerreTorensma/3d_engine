@@ -294,7 +294,7 @@ void editor_render(res_pack_t *res_pack, grid_t *grid, index_t mesh_amount, inde
 	// gui_text_edit(res_pack, idk_buffer, 32, (rect_t){4, 4, 4, 4});
 
 	for (index_t i = 2; i < mesh_amount; i++) {
-		if (mesh_button(res_pack, i, 1, (rect_t){0, -4 + i * 4, 4, 4})) {
+		if (mesh_button(res_pack, i, selected_texture_index, (rect_t){0, -4 + i * 4, 4, 4})) {
 			selected_mesh_index = i;
 			debug_log("Selected mesh %d\n", i);
 		}

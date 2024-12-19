@@ -24,8 +24,10 @@ enum {
 
 	TEX_TREE,
 	TEX_BIRCH,
-	TEX_CROSSHAIR,
 	TEX_WORMFISH,
+	TEX_PINE,
+
+	TEX_CROSSHAIR,
 	TEX_FONT,
 	TEX_BUTTON,
 	TEX_BUTTON_PRESSED,
@@ -42,13 +44,13 @@ void load_res(res_pack_t *res_pack) {
     res_pack->render_width = 640;
 	res_pack->render_height = 360;
 
-	// res_pack->sky_color = (color_t){58, 49, 41, 255};
+	res_pack->sky_color = (color_t){58, 49, 41, 255};
 	// // res_pack.sky_color = (color_t){2, 9, 23, 255};
 	// // res_pack.sky_color = (color_t){0, 0, 0, 255};
-	// res_pack->fog_color = (color_t){58, 49, 41, 255};
+	res_pack->fog_color = (color_t){58, 49, 41, 255};
 
-	res_pack->sky_color = COLOR_BLACK;
-	res_pack->fog_color = COLOR_BLACK;
+	// res_pack->sky_color = COLOR_BLACK;
+	// res_pack->fog_color = COLOR_BLACK;
 
 	res_pack->editor_color = (color_t){50, 50, 50, 255};
 
@@ -61,10 +63,11 @@ void load_res(res_pack_t *res_pack) {
 	
 	res_add_texture(res_pack, TEX_TREE, load_tga("res/images/tree.tga", true));
 	res_add_texture(res_pack, TEX_BIRCH, load_tga("res/images/bush.tga", true));
-	res_add_texture(res_pack, TEX_CROSSHAIR, load_tga("res/images/crosshair.tga", true));
 	res_add_texture(res_pack, TEX_WORMFISH, load_tga("res/images/wormfish.tga", true));
-	res_add_texture(res_pack, TEX_FONT, load_tga("res/images/font.tga", false));
+	res_add_texture(res_pack, TEX_PINE, load_tga("res/images/pine.tga", true));
 
+	res_add_texture(res_pack, TEX_CROSSHAIR, load_tga("res/images/crosshair.tga", true));
+	res_add_texture(res_pack, TEX_FONT, load_tga("res/images/font.tga", false));
 	res_add_texture(res_pack, TEX_BUTTON, load_tga("res/images/button_sheet.tga", false));
 	res_add_texture(res_pack, TEX_BUTTON_PRESSED, load_tga("res/images/button_pressed_sheet.tga", false));
 	res_pack->button_tex_index = TEX_BUTTON;

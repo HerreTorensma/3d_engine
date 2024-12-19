@@ -242,7 +242,6 @@ void game_update(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, SDL_Windo
 		}
 	}
 	
-	
 	camera.position[2] += velocity[2];
 	collision = get_first_player_collision(res_pack, grid, camera.position, &player_box);
 	if (collision.hit) {
@@ -376,10 +375,25 @@ int main(int argc, char *argv[]) {
 
 		// ECS_SET(&ecs, tree, sprite_c, {TEX_BIRCH, true, 1.0f, 2.0f});
 		sprite_c *sprite = ecs_set(&ecs, tree_e, SPRITE_C);
-		sprite->texture_index = TEX_BIRCH;
+		sprite->texture_index = TEX_PINE;
 		sprite->billboard = true;
 		sprite->x_scale = 1.0f;
-		sprite->y_scale = 1.0f;
+		sprite->y_scale = 2.0f;
+
+		collider_c *collider = ecs_set(&ecs, tree_e, COLLIDER_C);
+		collider->boxes_len = 1;
+
+		box_t tree_box = {0};
+		tree_box.min_x = -0.1f;
+		tree_box.max_x = 0.1f;
+
+		tree_box.min_y = -0.5f;
+		tree_box.max_y = 1.5f;
+
+		tree_box.min_z = -0.1f;
+		tree_box.max_z = 0.1f;
+
+		collider->boxes[0] = tree_box;
 	}
 
 	{
@@ -410,6 +424,21 @@ int main(int argc, char *argv[]) {
 		sprite->billboard = false;
 		sprite->x_scale = 1.0f;
 		sprite->y_scale = 1.0f;
+
+		collider_c *collider = ecs_set(&ecs, bars, COLLIDER_C);
+		collider->boxes_len = 1;
+
+		box_t quad_bounding_box = {0};
+		quad_bounding_box.min_x = -0.5f;
+		quad_bounding_box.max_x = 0.5f;
+
+		quad_bounding_box.min_y = -0.5f;
+		quad_bounding_box.max_y = 0.5f;
+
+		quad_bounding_box.min_z = -0.5f;
+		quad_bounding_box.max_z = 0.5f;
+
+		collider->boxes[0] = quad_bounding_box;
 	}
 
 	{

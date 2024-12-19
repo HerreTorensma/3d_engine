@@ -1,5 +1,7 @@
 #include "res.h"
 
+res_pack_t _res_pack = {0};
+
 static bool index_valid(index_t index) {
 	if (index == 0) {
 		debug_log("Index 0 is reserved empty space. Please start from index 1.\n");
@@ -93,4 +95,20 @@ void res_add_texture(res_pack_t *res_pack, index_t index, texture_t texture) {
 
 void res_add_sound(res_pack_t *res_pack, index_t index, sound_t sound) {
 	res_pack->sounds[index] = sound;
+}
+
+texture_t *tex_get(index_t index) {
+	if (!index_valid(index)) {
+		return NULL;
+	}
+
+	return &_res_pack.textures[index];
+}
+
+mesh_t *mesh_get(index_t index) {
+	if (!index_valid(index)) {
+		return NULL;
+	}
+
+	return &_res_pack.meshes[index];
 }
