@@ -375,10 +375,10 @@ int main(int argc, char *argv[]) {
 
 		// ECS_SET(&ecs, tree, sprite_c, {TEX_BIRCH, true, 1.0f, 2.0f});
 		sprite_c *sprite = ecs_set(&ecs, tree_e, SPRITE_C);
-		sprite->texture_index = TEX_PINE;
+		sprite->texture_index = TEX_TREE;
 		sprite->billboard = true;
 		sprite->x_scale = 1.0f;
-		sprite->y_scale = 2.0f;
+		sprite->y_scale = 1.0f;
 
 		collider_c *collider = ecs_set(&ecs, tree_e, COLLIDER_C);
 		collider->boxes_len = 1;
@@ -405,9 +405,9 @@ int main(int argc, char *argv[]) {
 
 		// ECS_SET(&ecs, worm_e, sprite_c, {TEX_WORMFISH, true, 2.0f, 1.0f});
 		sprite_c *sprite = ecs_set(&ecs, worm_e, SPRITE_C);
-		sprite->texture_index = TEX_WORMFISH;
+		sprite->texture_index = TEX_BARREL;
 		sprite->billboard = true;
-		sprite->x_scale = 2.0f;
+		sprite->x_scale = 1.0f;
 		sprite->y_scale = 1.0f;
 	}
 

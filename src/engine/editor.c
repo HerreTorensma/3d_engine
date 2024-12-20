@@ -16,7 +16,7 @@ mat4 projection = {0};
 // vec3 pos = {2.0f, 0.0f, 0.0f};
 vec2 pos = {2.0f, 0.0f};
 
-static size_t selected_mesh_index = 2;
+static size_t selected_mesh_index = 1;
 static size_t selected_texture_index = 1;
 
 static char idk_buffer[32] = "test";
@@ -293,8 +293,8 @@ void editor_render(res_pack_t *res_pack, grid_t *grid, index_t mesh_amount, inde
 	
 	// gui_text_edit(res_pack, idk_buffer, 32, (rect_t){4, 4, 4, 4});
 
-	for (index_t i = 2; i < mesh_amount; i++) {
-		if (mesh_button(res_pack, i, selected_texture_index, (rect_t){0, -4 + i * 4, 4, 4})) {
+	for (index_t i = 1; i < mesh_amount; i++) {
+		if (mesh_button(res_pack, i, selected_texture_index, (rect_t){0, i * 4, 4, 4})) {
 			selected_mesh_index = i;
 			debug_log("Selected mesh %d\n", i);
 		}

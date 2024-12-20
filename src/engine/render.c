@@ -210,9 +210,19 @@ static void render_sprite_components(res_pack_t *res_pack, ecs_world_t *ecs, cam
 		glm_rotate(model, glm_rad(transform->rotation[2]), (vec3){0.0f, 0.0f, 1.0f});
 
 		if (sprite->billboard) {
-			vec3 direction = {camera->position[0] - transform->position[0], 0.0f, camera->position[2] - transform->position[2]};
-			glm_normalize(direction);
-			float angle = atan2(direction[0], direction[2]);
+			// vec3 direction = {camera->position[0] - transform->position[0], 0.0f, camera->position[2] - transform->position[2]};
+			// glm_normalize(direction);
+			// float angle = atan2(direction[0], direction[2]);
+			// glm_rotate(model, angle, (vec3){0.0f, 1.0f, 0.0f});
+
+			    // Get the forward direction of the camera projected onto the XZ plane
+			vec3 camera_forward = {camera->front[0], 0.0f, camera->front[2]};
+			glm_normalize(camera_forward);
+
+			// Calculate the angle between the camera's forward direction and the world forward (Z-axis)
+			float angle = atan2(camera_forward[0], camera_forward[2]);
+
+			// Rotate the sprite to align with the camera's forward direction
 			glm_rotate(model, angle, (vec3){0.0f, 1.0f, 0.0f});
 		}
 

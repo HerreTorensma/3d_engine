@@ -72,9 +72,13 @@ void main()
     // Output the shade as grayscale
     FragColor *= vec4(vec3(shade), 1.0);
 
-    if (FragColor != vec4(0)) {
-        FragColor = mix(vec4(fogColor, 1.0), FragColor, Visibility);
-    }
+    // Fog
+    // if (FragColor != vec4(0)) {
+    //     FragColor = mix(vec4(fogColor, 1.0), FragColor, Visibility);
+    // }
+
+
+
 
 
     // FragColor.rgb += vec3(rand(TexCoord - 0.5)) * 0.3;
