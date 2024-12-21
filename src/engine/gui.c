@@ -82,10 +82,7 @@ bool gui_button(res_pack_t *res_pack, const char text[], rect_t tile_rect) {
     size_t tex_index = res_pack->button_tex_index;
 
     i32 mouse_x, mouse_y;
-    SDL_GetMouseState(&mouse_x, &mouse_y);
-
-    mouse_x /= (window_width / res_pack->render_width);
-    mouse_y /= (window_height / res_pack->render_height);
+    get_mouse_pos(&mouse_x, &mouse_y);
 
     rect_t global_rect = tile_to_global(res_pack, tile_rect);
 

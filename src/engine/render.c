@@ -29,9 +29,13 @@ static u32 quad_indices[] = {
 mesh_t quad_mesh = {0};
 
 static void clear(color_t color) {
+	glViewport(0, 0, window_width, window_height);
+
 	vec4 gl_color = {0};
 	color_to_gl_color(color, gl_color);
 	glClearColor(gl_color[0], gl_color[1], gl_color[2], gl_color[3]);
+
+	glViewport(x_offset, y_offset, viewport_width, viewport_height);
 }
 
 inline static void render_mesh(res_pack_t *res_pack, mesh_t *mesh, index_t texture_index) {
@@ -274,17 +278,20 @@ void render_image(res_pack_t *res_pack, index_t texture_index, i32 x, i32 y, col
 	glUseProgram(gui_shader);
 
 	mat4 projection = {0};
-	glm_ortho(0.0f, window_width, window_height, 0.0f, -1.0f, 1.0f, projection);
+	// glm_ortho(0.0f, window_width, window_height, 0.0f, -1.0f, 1.0f, projection);
+	glm_ortho(0.0f, res_pack->render_width, res_pack->render_height, 0.0f, -1.0f, 1.0f, projection);
 
 	texture_t texture = res_pack->textures[texture_index];
 
 	mat4 model = {0};
 	glm_mat4_identity(model);
 
-	glm_translate(model, (vec3){(float)(x * screen_scale), (float)(y * screen_scale), 0.0f});
+	// glm_translate(model, (vec3){x_offset, y_offset, 0.0f});
+	// glm_translate(model, (vec3){(float)(x * screen_scale), (float)(y * screen_scale), 0.0f});
+	glm_translate(model, (vec3){(float)x, (float)y, 0.0f});
 	
 	glm_scale(model, (vec3){(float)texture.width / 2.0f, (float)texture.height / 2.0f, 0.0f});
-	glm_scale(model, (vec3){(float)screen_scale, (float)screen_scale, 0.0f});
+	// glm_scale(model, (vec3){(float)screen_scale, (float)screen_scale, 0.0f});
 
 	glm_translate(model, (vec3){1.0f, 1.0f, 0.0f});
 
@@ -307,18 +314,21 @@ void render_image_rect(res_pack_t *res_pack, index_t texture_index, rect_t src, 
 	glUseProgram(gui_shader);
 
 	mat4 projection = {0};
-	glm_ortho(0.0f, window_width, window_height, 0.0f, -1.0f, 1.0f, projection);
+	// glm_ortho(0.0f, window_width, window_height, 0.0f, -1.0f, 1.0f, projection);
+	glm_ortho(0.0f, res_pack->render_width, res_pack->render_height, 0.0f, -1.0f, 1.0f, projection);
 
 	texture_t texture = res_pack->textures[texture_index];
 
 	mat4 model = {0};
 	glm_mat4_identity(model);
 
-	glm_translate(model, (vec3){(float)dst.x * screen_scale, (float)dst.y * screen_scale, 0.0f});
+	// glm_translate(model, (vec3){x_offset, y_offset, 0.0f});
+	// glm_translate(model, (vec3){(float)dst.x * screen_scale, (float)dst.y * screen_scale, 0.0f});
+	glm_translate(model, (vec3){(float)dst.x, (float)dst.y, 0.0f});
 	
 	// Scale according to the dst rect
 	glm_scale(model, (vec3){(float)dst.w / 2.0f, (float)dst.h / 2.0f, 0.0f});
-	glm_scale(model, (vec3){(float)screen_scale, (float)screen_scale, 0.0f});
+	// glm_scale(model, (vec3){(float)screen_scale, (float)screen_scale, 0.0f});
 
 	// Draw from top left instead of center
 	glm_translate(model, (vec3){1.0f, 1.0f, 0.0f});
@@ -351,21 +361,29 @@ void render_mesh_isometric(res_pack_t *res_pack, mesh_t mesh, index_t texture_in
 
     mat4 projection = {0};
 
-    glm_ortho(
-        0.0f, (float)(window_width / screen_scale),
-        0.0f, (float)(window_height / screen_scale),
-        0.1f, 1024.0f,
-        projection
-    );
+    // glm_ortho(
+    //     0.0f, (float)(window_width / screen_scale),
+    //     0.0f, (float)(window_height / screen_scale),
+    //     0.1f, 1024.0f,
+    //     projection
+    // );
+	glm_ortho(0.0f, res_pack->render_width, 0.0f, res_pack->render_height, 0.1f, 1024.0f, projection);
 
     mat4 model = {0};
     glm_mat4_identity(model);
 
-    glm_translate(model, (vec3){
-        (float)x,
-        (float)((window_height / screen_scale) - y),
-        -16.0f,
-    });
+	glm_translate(model, (vec3){x, res_pack->render_height - y, -16.0f});
+	// glm_translate(model, (vec3){x_offset / screen_scale, y_offset / screen_scale, 0.0f});
+    // glm_translate(model, (vec3){
+    //     (float)x,
+    //     (float)((window_height / screen_scale) - y),
+    //     -16.0f,
+    // });
+	// glm_translate(model, (vec3){
+    //     (float)(x + x_offset / screen_scale),
+    //     (float)((window_height / screen_scale) - (y + y_offset / screen_scale)),
+    //     -16.0f,
+    // });
 
 	glm_scale(model, (vec3){scale, scale, scale});
 
@@ -379,9 +397,7 @@ void render_mesh_isometric(res_pack_t *res_pack, mesh_t mesh, index_t texture_in
 }
 
 void render_grid_ortho(res_pack_t *res_pack, grid_t *grid, enum ortho_view orientation, float zoom, mat4 *projection, i32 min_y, i32 max_y, bool enable_transparency) {
-	// glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	clear(res_pack->editor_color);
-	// glClearColor(res_pack->editor_color.gl_color[0], res_pack->editor_color.gl_color[1], res_pack->editor_color.gl_color[2], res_pack->editor_color.gl_color[3]);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
@@ -444,9 +460,7 @@ void render_game(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, camera_t 
 
 	// Projection matrix
 	mat4 projection = {0};
-	// glm_perspective(glm_rad(45.0f), (float)window_width / (float)window_height, 0.1f, 100.0f, projection);
-	// glm_perspective(glm_rad(60.0f), (float)window_width / (float)window_height, 0.1f, 100.0f, projection);
-	glm_perspective(glm_rad(60.0f), (float)window_width / (float)window_height, 0.1f, 100.0f, projection);
+	glm_perspective(glm_rad(60.0f), (float)(viewport_width) / (float)(viewport_height), 0.1f, 100.0f, projection);
 	
 	shader_set_mat4(game_shader, "projection", &projection);
 

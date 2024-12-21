@@ -3,6 +3,10 @@
 i32 window_width = 0;
 i32 window_height = 0;
 i32 screen_scale = 0;
+i32 x_offset = 0;
+i32 y_offset = 0;
+i32 viewport_width = 0;
+i32 viewport_height = 0;
 
 // Loads a text file to a char array
 // The char array is dynamically allocated so the user is responsible for freeing it
@@ -164,16 +168,24 @@ mesh_t load_mesh(const char path[]) {
 // Wrapper so I can change SDL2 dependency
 void get_mouse_pos(i32 *x, i32 *y) {
 	SDL_GetMouseState(x, y);
+
+	*x -= x_offset;
+	*y -= y_offset;
+
+	*x /= screen_scale;
+	*y /= screen_scale;
 }
 
 // Returns the mouse position normalized to -1.0 to 1.0
 void get_normalized_mouse_pos(float *x, float *y) {
 	i32 window_x, window_y;
-	// SDL_GetMouseState(&window_x, &window_y);
-	get_mouse_pos(&window_x, &window_y);
+	SDL_GetMouseState(&window_x, &window_y);
 
-	*x = (2.0f * window_x) / window_width - 1.0f;
-	*y = 1.0f - (2.0f * window_y) / window_height;
+	window_x -= x_offset;
+	window_y -= y_offset;
+
+	*x = (2.0f * window_x) / viewport_width - 1.0f;
+	*y = 1.0f - (2.0f * window_y) / viewport_height;
 }
 
 void debug_log(const char *format, ...) {
@@ -254,4 +266,18 @@ void print_mesh(res_pack_t *res_pack, index_t mesh_index) {
 		printf("normal: %f %f %f\n", vertex.normal[0], vertex.normal[1], vertex.normal[2]);
 		printf("\n");
 	}
+}
+
+void resize_window(res_pack_t *res_pack, SDL_Window *window) {
+	i32 w, h;
+	SDL_GetWindowSize(window, &w, &h);
+	glViewport(0, 0, w, h);
+	window_width = w;
+	window_height = h;
+	screen_scale = min_i32(window_width / res_pack->render_width, window_height / res_pack->render_height);
+	x_offset = (window_width / 2) - ((res_pack->render_width * screen_scale) / 2);
+	y_offset = (window_height / 2) - ((res_pack->render_height * screen_scale) / 2);
+	
+	viewport_width = res_pack->render_width * screen_scale;
+	viewport_height = res_pack->render_height * screen_scale;
 }

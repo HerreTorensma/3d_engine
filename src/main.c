@@ -329,10 +329,8 @@ SDL_GLContext *create_sdl2_gl_context(SDL_Window *window, i32 width, i32 height)
 }
 
 int main(int argc, char *argv[]) {
-	// init_sdl2();
 	window_width = 1280;
 	window_height = 720;
-	screen_scale = 2;
 
 	SDL_Window *window = create_sdl2_window(window_width, window_height);
 	SDL_GLContext *context = create_sdl2_gl_context(window, window_width, window_height);
@@ -340,6 +338,8 @@ int main(int argc, char *argv[]) {
 	res_pack_t res_pack = {0};
 
 	load_res(&res_pack);
+
+	resize_window(&res_pack, window);
 
 	font_init(&res_pack.font, &res_pack, TEX_FONT);
 	res_pack.font.y_center = -4;
@@ -494,12 +494,19 @@ int main(int argc, char *argv[]) {
 			}
 
 			if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED) {
-				i32 w, h;
-				SDL_GetWindowSize(window, &w, &h);
-				glViewport(0, 0, w, h);
-				window_width = w;
-				window_height = h;
-				screen_scale = min_i32(window_width / res_pack.render_width, window_height / res_pack.render_height);
+				resize_window(&res_pack, window);
+				
+				// i32 w, h;
+				// SDL_GetWindowSize(window, &w, &h);
+				// glViewport(0, 0, w, h);
+				// window_width = w;
+				// window_height = h;
+				// screen_scale = min_i32(window_width / res_pack.render_width, window_height / res_pack.render_height);
+				// x_offset = (window_width / 2) - ((res_pack.render_width * screen_scale) / 2);
+				// y_offset = (window_height / 2) - ((res_pack.render_height * screen_scale) / 2);
+				
+				// viewport_width = res_pack.render_width * screen_scale;
+				// viewport_height = res_pack.render_height * screen_scale;
 			}
 
 			if (edit_mode) {
@@ -553,12 +560,12 @@ int main(int argc, char *argv[]) {
 			render_image(&res_pack, TEX_CROSSHAIR, res_pack.render_width / 2 - 4, res_pack.render_height / 2 - 4, COLOR_WHITE);
 
 			// render_image(res_pack, PIVOT_TOP_LEFT, 6, 1, 1);
-			render_image(&res_pack, TEX_TREE, 0, 0, COLOR_WHITE);
+			// render_image(&res_pack, TEX_TREE, 0, 0, COLOR_WHITE);
 			// render_image(&res_pack, TEX_BIRCH, 0, -4, COLOR_WHITE);
-			render_image(&res_pack, TEX_TREE, 640-64, 0, COLOR_WHITE);
+			// render_image(&res_pack, TEX_TREE, 640-64, 0, COLOR_WHITE);
 			// render_image(&res_pack, TEX_BIRCH, 640-64, -4, COLOR_WHITE);
 
-			render_image(&res_pack, TEX_FRAME, 0, 0, COLOR_WHITE);
+			// render_image(&res_pack, TEX_FRAME, 0, 0, COLOR_WHITE);
 			// render_mesh_isometric(&res_pack, res_pack.meshes[MESH_CUBE], 1, 100, 100, 32.0f);
 			// render_mesh_isometric(&res_pack, res_pack.meshes[MESH_SLAB], 2, 200, 100, 32.0f);
 
@@ -589,7 +596,8 @@ int main(int argc, char *argv[]) {
 			// gui_button(&res_pack, "10", (rect_t){77, 42, 3, 3});
 
 			for (i32 i = 0; i < 20; i++) {
-				gui_button(&res_pack, "", (rect_t){10 + i * 3, 42, 3, 3});
+				// gui_button(&res_pack, "", (rect_t){10 + i * 3, 42, 3, 3});
+				gui_button(&res_pack, "", (rect_t){i * 2, 43, 2, 2});
 			}
 
 			#ifdef DEBUG

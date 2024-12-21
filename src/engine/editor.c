@@ -53,7 +53,8 @@ void editor_init(void) {
 
 static void compute_projection(void) {
 	// Projection matrix
-	float aspect = (float)window_width / (float)window_height;
+	// float aspect = (float)window_width / (float)window_height;
+	float aspect = (float)(viewport_width) / (float)(viewport_height);
 
 	float left = -zoom + pos[0];
 	float right = zoom + pos[0];
@@ -146,8 +147,7 @@ void editor_update(res_pack_t *res_pack, grid_t *grid) {
 
 	i32 mouse_x, mouse_y;
 	get_mouse_pos(&mouse_x, &mouse_y);
-	mouse_x /= (window_width / res_pack->render_width);
-    mouse_y /= (window_height / res_pack->render_height);
+	
 	if (mouse_x < drawable_area.x || mouse_y < drawable_area.y || mouse_x > drawable_area.x + drawable_area.w || mouse_y > drawable_area.y + drawable_area.h) {
 		return;
 	}

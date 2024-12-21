@@ -164,7 +164,7 @@ typedef struct dialogue {
 #define COLOR_BLUE (color_t){0, 0, 0, 255}
 
 // Core enums
-enum screen_anchor {
+typedef enum screen_anchor {
     ANCHOR_CENTER,
     ANCHOR_TOP,
     ANCHOR_BOTTOM,
@@ -174,16 +174,16 @@ enum screen_anchor {
     ANCHOR_TOPRIGHT,
     ANCHOR_BOTTOMLEFT,
     ANCHOR_BOTTOMRIGHT,
-};
+} screen_anchor_t;
 
-enum ortho_view {
+typedef enum ortho_view {
     ORTHO_TOP,
     ORTHO_BOTTOM,
     ORTHO_FRONT,
     ORTHO_BACK,
     ORTHO_LEFT,
     ORTHO_RIGHT,
-};
+} ortho_view_t;
 
 // Core components required by the engine itself
 typedef struct transform {
