@@ -25,6 +25,7 @@ enum {
 
 	TEX_TREE,
 	TEX_BARREL,
+	TEX_CHARACTER,
 
 	TEX_FONT,
 	TEX_CROSSHAIR,
@@ -44,7 +45,8 @@ void load_res(res_pack_t *res_pack) {
 
 	// res_pack->sky_color = (color_t){58, 49, 41, 255};
 	// res_pack->sky_color = (color_t){0, 20, 150, 255};
-	res_pack->sky_color = (color_t){149, 177, 225, 255};
+	// res_pack->sky_color = (color_t){149, 177, 225, 255};
+	res_pack->sky_color = (color_t){0, 0, 0, 255};
 
 	// // res_pack.sky_color = (color_t){2, 9, 23, 255};
 	// // res_pack.sky_color = (color_t){0, 0, 0, 255};
@@ -66,6 +68,7 @@ void load_res(res_pack_t *res_pack) {
 	
 	res_add_texture(res_pack, TEX_TREE, load_tga("res/images/tree.tga", true));
 	res_add_texture(res_pack, TEX_BARREL, load_tga("res/images/barrel.tga", true));
+	res_add_texture(res_pack, TEX_CHARACTER, load_tga("res/images/character.tga", true));
 
 	res_add_texture(res_pack, TEX_FONT, load_tga("res/images/font.tga", false));
 	res_add_texture(res_pack, TEX_CROSSHAIR, load_tga("res/images/crosshair.tga", true));

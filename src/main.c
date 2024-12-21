@@ -332,6 +332,7 @@ int main(int argc, char *argv[]) {
 	// init_sdl2();
 	window_width = 1280;
 	window_height = 720;
+	screen_scale = 2;
 
 	SDL_Window *window = create_sdl2_window(window_width, window_height);
 	SDL_GLContext *context = create_sdl2_gl_context(window, window_width, window_height);
@@ -397,15 +398,30 @@ int main(int argc, char *argv[]) {
 	}
 
 	{
-		entity_t worm_e = ecs_new(&ecs);
-		transform_c *transform = ecs_set(&ecs, worm_e, TRANSFORM_C);
+		entity_t barrel_e = ecs_new(&ecs);
+		transform_c *transform = ecs_set(&ecs, barrel_e, TRANSFORM_C);
 		transform->position[0] = 5.0f;
 		transform->position[1] = 1.0f;
 		transform->position[2] = 5.0f;
 
-		// ECS_SET(&ecs, worm_e, sprite_c, {TEX_WORMFISH, true, 2.0f, 1.0f});
-		sprite_c *sprite = ecs_set(&ecs, worm_e, SPRITE_C);
+		// ECS_SET(&ecs, barrel_e, sprite_c, {TEX_WORMFISH, true, 2.0f, 1.0f});
+		sprite_c *sprite = ecs_set(&ecs, barrel_e, SPRITE_C);
 		sprite->texture_index = TEX_BARREL;
+		sprite->billboard = true;
+		sprite->x_scale = 1.0f;
+		sprite->y_scale = 1.0f;
+	}
+
+	{
+		entity_t barrel_e = ecs_new(&ecs);
+		transform_c *transform = ecs_set(&ecs, barrel_e, TRANSFORM_C);
+		transform->position[0] = 5.0f;
+		transform->position[1] = 1.0f;
+		transform->position[2] = 7.0f;
+
+		// ECS_SET(&ecs, barrel_e, sprite_c, {TEX_WORMFISH, true, 2.0f, 1.0f});
+		sprite_c *sprite = ecs_set(&ecs, barrel_e, SPRITE_C);
+		sprite->texture_index = TEX_CHARACTER;
 		sprite->billboard = true;
 		sprite->x_scale = 1.0f;
 		sprite->y_scale = 1.0f;
@@ -483,6 +499,7 @@ int main(int argc, char *argv[]) {
 				glViewport(0, 0, w, h);
 				window_width = w;
 				window_height = h;
+				screen_scale = min_i32(window_width / res_pack.render_width, window_height / res_pack.render_height);
 			}
 
 			if (edit_mode) {
@@ -559,17 +576,21 @@ int main(int argc, char *argv[]) {
 			// gui_button(&res_pack, "", (rect_t){46, 1, 2, 2});
 			// gui_button(&res_pack, "", (rect_t){48, 1, 2, 2});
 
-			gui_button(&res_pack, "1", (rect_t){65, 39, 3, 3});
-			gui_button(&res_pack, "2", (rect_t){68, 39, 3, 3});
-			gui_button(&res_pack, "3", (rect_t){71, 39, 3, 3});
-			gui_button(&res_pack, "4", (rect_t){74, 39, 3, 3});
-			gui_button(&res_pack, "5", (rect_t){77, 39, 3, 3});
+			// gui_button(&res_pack, "1", (rect_t){65, 39, 3, 3});
+			// gui_button(&res_pack, "2", (rect_t){68, 39, 3, 3});
+			// gui_button(&res_pack, "3", (rect_t){71, 39, 3, 3});
+			// gui_button(&res_pack, "4", (rect_t){74, 39, 3, 3});
+			// gui_button(&res_pack, "5", (rect_t){77, 39, 3, 3});
 
-			gui_button(&res_pack, "6", (rect_t){65, 42, 3, 3});
-			gui_button(&res_pack, "7", (rect_t){68, 42, 3, 3});
-			gui_button(&res_pack, "8", (rect_t){71, 42, 3, 3});
-			gui_button(&res_pack, "9", (rect_t){74, 42, 3, 3});
-			gui_button(&res_pack, "10", (rect_t){77, 42, 3, 3});
+			// gui_button(&res_pack, "6", (rect_t){65, 42, 3, 3});
+			// gui_button(&res_pack, "7", (rect_t){68, 42, 3, 3});
+			// gui_button(&res_pack, "8", (rect_t){71, 42, 3, 3});
+			// gui_button(&res_pack, "9", (rect_t){74, 42, 3, 3});
+			// gui_button(&res_pack, "10", (rect_t){77, 42, 3, 3});
+
+			for (i32 i = 0; i < 20; i++) {
+				gui_button(&res_pack, "", (rect_t){10 + i * 3, 42, 3, 3});
+			}
 
 			#ifdef DEBUG
 			gui_print(&res_pack, &res_pack.font, "DREAM SIMULATOR v0.1", 1, 0, COLOR_WHITE);

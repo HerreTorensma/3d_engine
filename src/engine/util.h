@@ -10,6 +10,7 @@ This header and source file contain utility helper functions.
 
 extern i32 window_width;
 extern i32 window_height;
+extern i32 screen_scale;
 
 char *load_file_to_string(const char path[]);
 
@@ -32,3 +33,10 @@ box_t compute_bounding_box(mesh_t *mesh);
 void print_box(box_t *box);
 
 void print_mesh(res_pack_t *res_pack, index_t mesh_index);
+
+inline i32 min_i32(i32 a, i32 b) {
+	if (a < b) {
+		return a;
+	}
+	return b;
+}
