@@ -9,7 +9,7 @@ This header and source file contain functions related to the resource pack syste
 
 void send_mesh_to_gpu(mesh_t *mesh);
 
-void res_add_mesh(res_pack_t *res_pack, index_t index, mesh_t mesh, collider_t *collider);
+void res_add_mesh(res_pack_t *res_pack, index_t index, mesh_t mesh, multi_box_collider_t *collider);
 
 void send_texture_to_gpu(texture_t *texture);
 

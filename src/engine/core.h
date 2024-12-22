@@ -24,10 +24,10 @@ typedef struct box {
     float max_z;
 } box_t;
 
-typedef struct collider {
-    box_t boxes[4];
+typedef struct multi_box_collider {
+    box_t boxes[8];
     index_t boxes_len;
-} collider_t;
+} multi_box_collider_t;
 
 typedef struct mesh {
 	vertex_t *vertices;
@@ -40,7 +40,7 @@ typedef struct mesh {
     u32 vbo;
     u32 ebo;
 
-    collider_t collider;
+    multi_box_collider_t collider;
 } mesh_t;
 
 typedef struct texture {
@@ -71,7 +71,7 @@ typedef struct collision {
 } collision_t;
 
 typedef struct camera {
-    vec3 position;
+    // vec3 position;
     vec3 front;
     vec3 up;
 
@@ -207,7 +207,21 @@ typedef struct {
     index_t texture_index;
 } mesh_c;
 
-typedef collider_t collider_c;
+typedef multi_box_collider_t collider_c;
+
+typedef camera_t camera_c;
+
+typedef struct {
+    float walk_speed;
+    float crouch_speed;
+    float jump_height;
+} player_controller_c;
+
+typedef struct {
+    box_t box;
+    // For collision with cylinder colliders
+    float radius;
+} player_collider_c;
 
 // Continue your own enum at 3
 enum {
@@ -215,4 +229,7 @@ enum {
     SPRITE_C = 1,
     MESH_C = 2,
     COLLIDER_C = 3,
+    CAMERA_C = 4,
+    PLAYER_CONTROLLER_C = 5,
+    PLAYER_COLLIDER_C = 6,
 };

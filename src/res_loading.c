@@ -83,7 +83,7 @@ void load_res(res_pack_t *res_pack) {
 	res_add_texture(res_pack, TEX_BUTTON_SELECTED_INDICATOR, load_tga("res/images/button_selected_indicator.tga", false));
     res_pack->button_pressed_indicator_tex_index = TEX_BUTTON_SELECTED_INDICATOR;
 
-	collider_t wall_corner_collider = {0};
+	multi_box_collider_t wall_corner_collider = {0};
 	wall_corner_collider.boxes[0] = (box_t){
 		.min_x = -0.5f,
 		.max_x = 0.1f,

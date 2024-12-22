@@ -12,7 +12,7 @@ static mat4 ortho_views[6] = {0};
 
 static mat4 isometric_view = {0};
 
-static camera_t *global_camera = NULL;
+static vec3 *global_position = NULL;
 static ecs_world_t *global_ecs = NULL;
 
 static vertex_t quad_vertices[] = {
@@ -156,8 +156,8 @@ static i32 compare_by_distance(const void *a, const void *b) {
 	transform_c *transform1 = ecs_get(global_ecs, entity1, TRANSFORM_C);
 	transform_c *transform2 = ecs_get(global_ecs, entity2, TRANSFORM_C);
 
-	float distance1 = ((global_camera->position[0] - transform1->position[0]) * (global_camera->position[0] - transform1->position[0])) + ((global_camera->position[1] - transform1->position[1]) * (global_camera->position[1] - transform1->position[1])) + ((global_camera->position[2] - transform1->position[2]) * (global_camera->position[2] - transform1->position[2]));
-	float distance2 = ((global_camera->position[0] - transform2->position[0]) * (global_camera->position[0] - transform2->position[0])) + ((global_camera->position[1] - transform2->position[1]) * (global_camera->position[1] - transform2->position[1])) + ((global_camera->position[2] - transform2->position[2]) * (global_camera->position[2] - transform2->position[2]));
+	float distance1 = ((*global_position[0] - transform1->position[0]) * (*global_position[0] - transform1->position[0])) + ((*global_position[1] - transform1->position[1]) * (*global_position[1] - transform1->position[1])) + ((*global_position[2] - transform1->position[2]) * (*global_position[2] - transform1->position[2]));
+	float distance2 = ((*global_position[0] - transform2->position[0]) * (*global_position[0] - transform2->position[0])) + ((*global_position[1] - transform2->position[1]) * (*global_position[1] - transform2->position[1])) + ((*global_position[2] - transform2->position[2]) * (*global_position[2] - transform2->position[2]));
 
 	if (distance1 > distance2) {
 		return -1;
@@ -166,6 +166,23 @@ static i32 compare_by_distance(const void *a, const void *b) {
 	} else {
 		return 0;
 	}
+}
+
+static void render_mesh_transform(res_pack_t *res_pack, transform_t *transform, index_t mesh_index, index_t tex_index) {
+	mesh_t *mesh = &res_pack->meshes[mesh_index];
+
+	mat4 model;
+	glm_mat4_identity(model);
+	glm_translate(model, transform->position);
+	glm_scale(model, (vec3){0.5f, 0.5f, 0.5f});
+
+	glm_rotate(model, glm_rad(transform->rotation[0]), (vec3){1.0f, 0.0f, 0.0f});
+	glm_rotate(model, glm_rad(transform->rotation[1]), (vec3){0.0f, 1.0f, 0.0f});
+	glm_rotate(model, glm_rad(transform->rotation[2]), (vec3){0.0f, 0.0f, 1.0f});
+
+	shader_set_mat4(game_shader, "model", &model);
+
+	render_mesh(res_pack, mesh, tex_index);
 }
 
 static void render_mesh_components(res_pack_t *res_pack, ecs_world_t *ecs) {
@@ -191,7 +208,29 @@ static void render_mesh_components(res_pack_t *res_pack, ecs_world_t *ecs) {
 	}
 }
 
-// static void render_3d_sprite(res_pack_t *res_pack, camera_t *camera)
+static void render_sprite_transform(res_pack_t *res_pack, transform_t *transform, camera_t *camera, sprite_c *sprite) {
+	mat4 model;
+	glm_mat4_identity(model);
+	glm_translate(model, (vec3){transform->position[0], transform->position[1] + ((sprite->y_scale - 1) / 2), transform->position[2]});
+	glm_scale(model, (vec3){0.5f * sprite->x_scale, 0.5f * sprite->y_scale, 0.5f * sprite->x_scale});
+
+	glm_rotate(model, glm_rad(transform->rotation[0]), (vec3){1.0f, 0.0f, 0.0f});
+	glm_rotate(model, glm_rad(transform->rotation[1]), (vec3){0.0f, 1.0f, 0.0f});
+	glm_rotate(model, glm_rad(transform->rotation[2]), (vec3){0.0f, 0.0f, 1.0f});
+
+	if (sprite->billboard) {
+		vec3 camera_forward = {camera->front[0], 0.0f, camera->front[2]};
+		glm_normalize(camera_forward);
+
+		float angle = atan2(camera_forward[0], camera_forward[2]);
+
+		glm_rotate(model, angle, (vec3){0.0f, 1.0f, 0.0f});
+	}
+
+	shader_set_mat4(game_shader, "model", &model);
+
+	render_mesh(res_pack, &quad_mesh, sprite->texture_index);
+}
 
 static void render_sprite_components(res_pack_t *res_pack, ecs_world_t *ecs, camera_t *camera) {
 	// Transparent stuff
@@ -438,8 +477,8 @@ void render_grid_ortho(res_pack_t *res_pack, grid_t *grid, enum ortho_view orien
 	}
 }
 
-void render_game(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, camera_t *camera) {
-	global_camera = camera;
+void render_game(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, vec3 position, camera_t *camera) {
+	global_position = &position;
 	global_ecs = ecs;
 
 	clear(res_pack->sky_color);
@@ -454,8 +493,8 @@ void render_game(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, camera_t 
 	// View matrix
 	mat4 view = {0};
 	vec3 temp = {0};
-	glm_vec3_add(camera->position, camera->front, temp);
-	glm_lookat(camera->position, temp, camera->up, view);
+	glm_vec3_add(position, camera->front, temp);
+	glm_lookat(position, temp, camera->up, view);
 	shader_set_mat4(game_shader, "view", &view);
 
 	// Projection matrix

@@ -29,4 +29,4 @@ void render_mesh_isometric(res_pack_t *res_pack, mesh_t mesh, index_t texture_in
 
 void render_grid_ortho(res_pack_t *res_pack, grid_t *grid, enum ortho_view orientation, float zoom, mat4 *projection, i32 min_y, i32 max_y, bool enable_transparency);
 
-void render_game(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, camera_t *camera);
+void render_game(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, vec3 position, camera_t *camera);

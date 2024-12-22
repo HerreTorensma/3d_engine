@@ -14,59 +14,38 @@ typedef struct {
 } rotating_c;
 
 // Generic flags
-typedef enum entity_flag {
-	IS_PLAYER,
-	IS_SPRITE,
-	IS_BILLBOARD_SPRITE,
-	IS_MESH,
-} entity_flag_t;
+// typedef enum entity_flag {
+// 	IS_PLAYER,
+// 	IS_SPRITE,
+// 	IS_BILLBOARD_SPRITE,
+// 	IS_MESH,
+// } entity_flag_t;
 
-// Specific types
-// typedef enum entity_type {
-
-// } entity_type_t;
+// enum {
+//     TRANSFORM_C = 0,
+//     SPRITE_C = 1,
+//     MESH_C = 2,
+//     COLLIDER_C = 3,
+//     CAMERA_C = 4,
+//     PLAYER_CONTROLLER_C = 5,
+//     PLAYER_COLLIDER_C = 6,
+// };
 
 typedef struct entity {
-	transform_t transform;
+	u64 flags;
 
-	camera_t camera;
-
-	index_t texture_index;
-
-	index_t mesh_index;
+	transform_c transform;
+	sprite_c sprite;
+	mesh_c mesh;
+	collider_c collider;
+	camera_c camera;
+	player_controller_c player_controller;
+	player_collider_c player_collider;
+	rotating_c rotating;
 } entity;
 
 enum {
-	ROTATING_C = 4,
-};
-
-static camera_t create_camera() {
-	camera_t camera = {0};
-
-	// glm_vec3_copy((vec3){3.0f, 0.5f, 3.0f}, camera.position);
-	glm_vec3_copy((vec3){3.0f, 1.5f, 3.0f}, camera.position);
-
-	// glm_vec3_copy((vec3){0.0f, 0.3f, 3.0f}, camera.position);
-	// glm_vec3_copy((vec3){0.0f, 1.0f, 3.0f}, camera.position);
-	glm_vec3_copy((vec3){0.0f, 0.0f, -1.0f}, camera.front);
-	glm_vec3_copy((vec3){0.0f, 1.0f, 0.0f}, camera.up);
-
-	camera.pitch = 0.0f;
-	camera.yaw = -90.0f;
-
-	return camera;
-}
-
-static camera_t camera = {0};
-static box_t player_box = {
-	.min_x = -0.15f,
-	.max_x = 0.15f,
-	
-	.min_y = -0.5f,
-	.max_y = 0.0f,
-
-	.min_z = -0.15f,
-	.max_z = 0.15f,
+	ROTATING_C = 7,
 };
 
 static bool frozen = false;
@@ -74,7 +53,7 @@ static bool frozen = false;
 arena_t temp_arena = {0};
 
 
-void game_input(SDL_Event event) {
+void game_input(SDL_Event event, ecs_world_t *ecs, entity_t player_e) {
 	if (event.type == SDL_MOUSEMOTION) {
 		if (frozen) {
 			return;
@@ -87,21 +66,23 @@ void game_input(SDL_Event event) {
 		x_offset *= sensitivity;
 		y_offset *= sensitivity;
 
-		camera.yaw += x_offset;
-		camera.pitch += y_offset;
+		camera_c *camera = ecs_get(ecs, player_e, CAMERA_C);
 
-		if (camera.pitch > 89.0f)
-			camera.pitch = 89.0f;
-		if (camera.pitch < -89.0f)
-			camera.pitch = -89.0f;
+		camera->yaw += x_offset;
+		camera->pitch += y_offset;
+
+		if (camera->pitch > 89.0f)
+			camera->pitch = 89.0f;
+		if (camera->pitch < -89.0f)
+			camera->pitch = -89.0f;
 
 		vec3 front = {0};
-		front[0] = cosf(glm_rad(camera.yaw)) * cosf(glm_rad(camera.pitch));
-		front[1] = sinf(glm_rad(camera.pitch));
-		front[2] = sinf(glm_rad(camera.yaw)) * cosf(glm_rad(camera.pitch));
+		front[0] = cosf(glm_rad(camera->yaw)) * cosf(glm_rad(camera->pitch));
+		front[1] = sinf(glm_rad(camera->pitch));
+		front[2] = sinf(glm_rad(camera->yaw)) * cosf(glm_rad(camera->pitch));
 
 		glm_vec3_normalize(front);
-		glm_vec3_copy(front, camera.front);
+		glm_vec3_copy(front, camera->front);
 	}
 }
 
@@ -125,39 +106,22 @@ static vec3 velocity = {0};
 
 #include "res_loading.c"
 
-void game_update(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, SDL_Window *window) {
-	if (input_key_pressed(SDL_SCANCODE_F)) {
-		SDL_SetRelativeMouseMode(SDL_FALSE);
-		SDL_WarpMouseInWindow(window, window_width / 2, window_height / 2);
-		frozen = true;
+void player_controller_system(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, SDL_Window *window, entity_t player_e) {
+	transform_c *transform = ecs_get(ecs, player_e, TRANSFORM_C);
+	player_controller_c *controller = ecs_get(ecs, player_e, PLAYER_CONTROLLER_C);
+	player_collider_c *collider = ecs_get(ecs, player_e, PLAYER_COLLIDER_C);
+	camera_c *camera = ecs_get(ecs, player_e, CAMERA_C);
+	
+	if (input_key_pressed(SDL_SCANCODE_T)) {
+		audio_play_sound_3d(res_pack, SOUND_JUMP, transform->position, camera->front, (vec3){10.0f, 1.0f, 10.0f});
 	}
 
-	if (input_key_released(SDL_SCANCODE_F)) {
-		SDL_SetRelativeMouseMode(SDL_TRUE);
-		frozen = false;
-	}
-
-	float camera_speed = 0.05f;
+	float speed = controller->walk_speed;
+	float gravity = -0.005f;
 
 	if (input_key_held(SDL_SCANCODE_LSHIFT)) {
-		camera_speed = 0.005f;
+		speed = controller->crouch_speed;
 	}
-
-	if (input_key_pressed(SDL_SCANCODE_T)) {
-		audio_play_sound_3d(res_pack, SOUND_JUMP, camera.position, camera.front, (vec3){10.0f, 1.0f, 10.0f});
-	}
-
-	// if (input_key_held(SDL_SCANCODE_W)) {
-	// 	vec3 temp;
-	// 	glm_vec3_scale(camera.front, camera_speed, temp);
-	// 	glm_vec3_add(camera.position, temp, camera.position);
-	// }
-	// if (input_key_held(SDL_SCANCODE_S)) {
-	// 	vec3 temp;
-	// 	glm_vec3_scale(camera.front, -camera_speed, temp);
-	// 	glm_vec3_add(camera.position, temp, camera.position);
-	// }
-	rotating_system(ecs);
 
 	vec2 input = {
 		input_key_held(SDL_SCANCODE_W) - input_key_held(SDL_SCANCODE_S),
@@ -169,54 +133,47 @@ void game_update(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, SDL_Windo
 		glm_vec2_normalize(input);
 	}
 
-	// Calculate forward and right vectors
 	vec3 right_vector;
-	glm_cross(camera.front, camera.up, right_vector);
+	glm_cross(camera->front, camera->up, right_vector);
 	glm_normalize(right_vector);
 
-	vec3 forward_vector = {camera.front[0], 0.0f, camera.front[2]}; // Zero out y-component
+	vec3 forward_vector = {camera->front[0], 0.0f, camera->front[2]}; // Zero out y-component
 	glm_normalize(forward_vector); // Normalize the forward vector for consistent speed
 
-	// Calculate movement based on input vector
-	vec3 forward_movement = {0.0f, 0.0f, 0.0f};
-	vec3 right_movement = {0.0f, 0.0f, 0.0f};
+	vec3 forward_movement = {0};
+	vec3 right_movement = {0};
 
 	velocity[0] = 0.0f;
 	velocity[2] = 0.0f;
 	// vec3 velocity = {0.0f, 0.0f, 0.0f};
 
-	// Scale forward movement by the input's vertical component (input[0])
-	glm_vec3_scale(forward_vector, input[0] * camera_speed, forward_movement);
+	glm_vec3_scale(forward_vector, input[0] * speed, forward_movement);
 	glm_vec3_add(velocity, forward_movement, velocity);
 
-	// Scale right movement by the input's horizontal component (input[1])
-	glm_vec3_scale(right_vector, -input[1] * camera_speed, right_movement); // Note the negative to align direction
+	glm_vec3_scale(right_vector, -input[1] * speed, right_movement);
 	glm_vec3_add(velocity, right_movement, velocity);
 
-	// Update camera position
-	// glm_vec3_add(camera.position, total_movement, camera.position);
-
 	if (input_key_pressed(SDL_SCANCODE_SPACE) && player_grounded) {
-		velocity[1] = 0.08f;
+		velocity[1] = controller->jump_height;
 		player_grounded = false;
 		// audio_play_sound(res_pack, SOUND_JUMP);
 	}
 	
-	velocity[1] -= 0.005f;
+	velocity[1] += gravity;
 
 	vec3 coming_position = {0};
-	coming_position[0] = camera.position[0] + velocity[0];
-	coming_position[1] = camera.position[1];
-	coming_position[2] = camera.position[2] + velocity[2];
+	coming_position[0] = transform->position[0] + velocity[0];
+	coming_position[1] = transform->position[1];
+	coming_position[2] = transform->position[2] + velocity[2];
 
 	collision_t *collisions = arena_calloc(&temp_arena, 8 * sizeof(collision_t));
-	i32 count = get_player_collisions(res_pack, grid, coming_position, &player_box, collisions);
+	i32 count = get_player_collisions(res_pack, grid, coming_position, &collider->box, collisions);
 	collision_t best_collision = collisions[0];
 
 	if (count > 0) {
-		float max_y_difference = collisions[0].global_box.max_y - (coming_position[1] + player_box.min_y);
+		float max_y_difference = collisions[0].global_box.max_y - (coming_position[1] + collider->box.min_y);
 		for (i32 i = 1; i < count; i++) {
-			float y_difference = collisions[i].global_box.max_y - (coming_position[1] + player_box.min_y);
+			float y_difference = collisions[i].global_box.max_y - (coming_position[1] + collider->box.min_y);
 			if (y_difference > max_y_difference) {
 				max_y_difference = y_difference;
 				best_collision = collisions[i];
@@ -225,48 +182,65 @@ void game_update(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, SDL_Windo
 	}
 
 	if (best_collision.hit) {
-		float y_difference = best_collision.global_box.max_y - (coming_position[1] + player_box.min_y);
+		float y_difference = best_collision.global_box.max_y - (coming_position[1] + collider->box.min_y);
 		if (player_grounded && y_difference > 0.0f && y_difference < 0.2f) {
-			camera.position[1] = best_collision.global_box.max_y - player_box.min_y + 0.001f;
+			transform->position[1] = best_collision.global_box.max_y - collider->box.min_y + 0.001f;
 		}
 	}
 	
-	camera.position[0] += velocity[0];
-	collision_t collision = get_first_player_collision(res_pack, grid, camera.position, &player_box);
+	transform->position[0] += velocity[0];
+	collision_t collision = get_first_player_collision(res_pack, grid, transform->position, &collider->box);
 	if (collision.hit) {
 		if (velocity[0] < 0.0f) {
-			camera.position[0] = collision.global_box.max_x - player_box.min_x + 0.001f;
+			transform->position[0] = collision.global_box.max_x - collider->box.min_x + 0.001f;
 		}
 		if (velocity[0] > 0.0f) {
-			camera.position[0] = collision.global_box.min_x - player_box.max_x - 0.001f;
+			transform->position[0] = collision.global_box.min_x - collider->box.max_x - 0.001f;
 		}
 	}
 	
-	camera.position[2] += velocity[2];
-	collision = get_first_player_collision(res_pack, grid, camera.position, &player_box);
+	transform->position[2] += velocity[2];
+	collision = get_first_player_collision(res_pack, grid, transform->position, &collider->box);
 	if (collision.hit) {
 		if (velocity[2] < 0.0f) {
-			camera.position[2] = collision.global_box.max_z - player_box.min_z + 0.001f;
+			transform->position[2] = collision.global_box.max_z - collider->box.min_z + 0.001f;
 		}
 		if (velocity[2] > 0.0f) {
-			camera.position[2] = collision.global_box.min_z - player_box.max_z - 0.001f;
+			transform->position[2] = collision.global_box.min_z - collider->box.max_z - 0.001f;
 		}
 	}
 
-	camera.position[1] += velocity[1];
-	collision = get_first_player_collision(res_pack, grid, camera.position, &player_box);
+	transform->position[1] += velocity[1];
+	collision = get_first_player_collision(res_pack, grid, transform->position, &collider->box);
 	if (collision.hit) {
 		if (velocity[1] > 0.0f) {
-			camera.position[1] = collision.global_box.min_y - player_box.max_y - 0.001f;
+			transform->position[1] = collision.global_box.min_y - collider->box.max_y - 0.001f;
 			player_grounded = true;
 			velocity[1] = 0.0f;
 		}
 		if (velocity[1] < 0.0f) {
-			camera.position[1] = collision.global_box.max_y - player_box.min_y + 0.001f;
+			transform->position[1] = collision.global_box.max_y - collider->box.min_y + 0.001f;
 			player_grounded = true;
 			velocity[1] = 0.0f;
 		}
 	}
+}
+
+void game_update(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, SDL_Window *window, entity_t player_e) {
+	if (input_key_pressed(SDL_SCANCODE_F)) {
+		SDL_SetRelativeMouseMode(SDL_FALSE);
+		SDL_WarpMouseInWindow(window, window_width / 2, window_height / 2);
+		frozen = true;
+	}
+
+	if (input_key_released(SDL_SCANCODE_F)) {
+		SDL_SetRelativeMouseMode(SDL_TRUE);
+		frozen = false;
+	}
+
+	player_controller_system(res_pack, grid, ecs, window, player_e);
+
+	rotating_system(ecs);
 }
 
 #define FPS 120
@@ -349,8 +323,6 @@ int main(int argc, char *argv[]) {
 	// grid_load(&grid, "test.grid");
 	grid_load(&grid, "test2.grid");
 
-	camera = create_camera();
-
 	bool edit_mode = false;
 	bool fullscreen = false;
 
@@ -364,8 +336,45 @@ int main(int argc, char *argv[]) {
 	ECS_REGISTER(&ecs, transform_c, TRANSFORM_C);
 	ECS_REGISTER(&ecs, sprite_c, SPRITE_C);
 	ECS_REGISTER(&ecs, mesh_c, MESH_C);
-	ECS_REGISTER(&ecs, rotating_c, ROTATING_C);
 	ECS_REGISTER(&ecs, collider_c, COLLIDER_C);
+	ECS_REGISTER(&ecs, camera_c, CAMERA_C);
+	ECS_REGISTER(&ecs, player_controller_c, PLAYER_CONTROLLER_C);
+	ECS_REGISTER(&ecs, player_collider_c, PLAYER_COLLIDER_C);
+
+	ECS_REGISTER(&ecs, rotating_c, ROTATING_C);
+
+	// Make player
+	entity_t player_e = ecs_new(&ecs);
+	{
+		transform_c *transform = ecs_set(&ecs, player_e, TRANSFORM_C);
+		transform->position[0] = 3.0f;
+		transform->position[1] = 1.5f;
+		transform->position[2] = 3.0f;
+
+		// Camera position is relative to the transform position
+		// Or maybe not idk
+		camera_c *camera = ecs_set(&ecs, player_e, CAMERA_C);
+		glm_vec3_copy((vec3){0.0f, 0.0f, -1.0f}, camera->front);
+		glm_vec3_copy((vec3){0.0f, 1.0f, 0.0f}, camera->up);
+		camera->yaw = -90.0f;
+
+		player_controller_c *controller = ecs_set(&ecs, player_e, PLAYER_CONTROLLER_C);
+		controller->walk_speed = 0.05f;
+		controller->crouch_speed = 0.005f;
+		controller->jump_height = 0.08f;
+
+		player_collider_c *collider = ecs_set(&ecs, player_e, PLAYER_COLLIDER_C);
+		collider->box = (box_t){
+			.min_x = -0.15f,
+			.max_x = 0.15f,
+			
+			.min_y = -0.5f,
+			.max_y = 0.0f,
+
+			.min_z = -0.15f,
+			.max_z = 0.15f,
+		};
+	}	
 
 	for (int i = 0; i < 100; i++) {
 		entity_t tree_e = ecs_new(&ecs);
@@ -495,24 +504,12 @@ int main(int argc, char *argv[]) {
 
 			if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED) {
 				resize_window(&res_pack, window);
-				
-				// i32 w, h;
-				// SDL_GetWindowSize(window, &w, &h);
-				// glViewport(0, 0, w, h);
-				// window_width = w;
-				// window_height = h;
-				// screen_scale = min_i32(window_width / res_pack.render_width, window_height / res_pack.render_height);
-				// x_offset = (window_width / 2) - ((res_pack.render_width * screen_scale) / 2);
-				// y_offset = (window_height / 2) - ((res_pack.render_height * screen_scale) / 2);
-				
-				// viewport_width = res_pack.render_width * screen_scale;
-				// viewport_height = res_pack.render_height * screen_scale;
 			}
 
 			if (edit_mode) {
 				editor_input(event);
 			} else {
-				game_input(event);
+				game_input(event, &ecs, player_e);
 			}
 		}
 
@@ -541,7 +538,7 @@ int main(int argc, char *argv[]) {
 		if (edit_mode) {
 			editor_update(&res_pack, &grid);
 		} else {
-			game_update(&res_pack, &grid, &ecs, window);
+			game_update(&res_pack, &grid, &ecs, window, player_e);
 		}
 
 		if (edit_mode) {
@@ -553,8 +550,11 @@ int main(int argc, char *argv[]) {
 			// render_end_frame_buffer(&res_pack);
 		} else {
 			// render_start_frame_buffer(&res_pack);
+			
+			transform_c *transform = ecs_get(&ecs, player_e, TRANSFORM_C);
+			camera_t *camera = ecs_get(&ecs, player_e, CAMERA_C);
 
-			render_game(&res_pack, &grid, &ecs, &camera);
+			render_game(&res_pack, &grid, &ecs, transform->position, camera);
 
 			// Crosshair
 			render_image(&res_pack, TEX_CROSSHAIR, res_pack.render_width / 2 - 4, res_pack.render_height / 2 - 4, COLOR_WHITE);
@@ -605,15 +605,15 @@ int main(int argc, char *argv[]) {
 			{
 				// char buffer[64];
 				char *buffer = arena_alloc(&temp_arena, 64);
-				sprintf(buffer, "X: %f Y: %f Z: %f", camera.position[0], camera.position[1], camera.position[2]);
+				sprintf(buffer, "X: %f Y: %f Z: %f", transform->position[0], transform->position[1], transform->position[2]);
 				gui_print(&res_pack, &res_pack.font, buffer, 1, 8, COLOR_WHITE);
 			}
 			{
 				// char buffer[64];
 				char *buffer = arena_alloc(&temp_arena, 64);
-				i32 map_x = (i32)roundf(camera.position[0]);
-				i32 map_y = (i32)roundf(camera.position[1]);
-				i32 map_z = (i32)roundf(camera.position[2]);
+				i32 map_x = (i32)roundf(transform->position[0]);
+				i32 map_y = (i32)roundf(transform->position[1]);
+				i32 map_z = (i32)roundf(transform->position[2]);
 
 				tile_t current_tile = grid_get_cell(&grid, map_x, map_y, map_z);
 				sprintf(buffer, "MESH: %d", current_tile.mesh_index);
