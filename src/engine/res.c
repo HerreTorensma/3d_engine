@@ -1,6 +1,6 @@
 #include "res.h"
 
-res_pack_t _res_pack = {0};
+res_pack_t *_res_pack = NULL;
 
 static bool index_valid(index_t index) {
 	if (index == 0) {
@@ -14,6 +14,10 @@ static bool index_valid(index_t index) {
 	}
 
 	return true;
+}
+
+void res_init(res_pack_t *res_pack) {
+	_res_pack = res_pack;
 }
 
 void send_mesh_to_gpu(mesh_t *mesh) {
@@ -102,7 +106,7 @@ texture_t *tex_get(index_t index) {
 		return NULL;
 	}
 
-	return &_res_pack.textures[index];
+	return &_res_pack->textures[index];
 }
 
 mesh_t *mesh_get(index_t index) {
@@ -110,5 +114,5 @@ mesh_t *mesh_get(index_t index) {
 		return NULL;
 	}
 
-	return &_res_pack.meshes[index];
+	return &_res_pack->meshes[index];
 }

@@ -12,8 +12,8 @@ static mat4 ortho_views[6] = {0};
 
 static mat4 isometric_view = {0};
 
-static vec3 *global_position = NULL;
-static ecs_world_t *global_ecs = NULL;
+// static vec3 *global_position = NULL;
+// static ecs_world_t *global_ecs = NULL;
 
 static vertex_t quad_vertices[] = {
     {{1.0f,  1.0f, 0.0f}, {1.0f, 1.0f}},
@@ -38,7 +38,7 @@ static void clear(color_t color) {
 	glViewport(x_offset, y_offset, viewport_width, viewport_height);
 }
 
-inline static void render_mesh(res_pack_t *res_pack, mesh_t *mesh, index_t texture_index) {
+inline static void render_mesh(mesh_t *mesh, index_t texture_index) {
 	glActiveTexture(GL_TEXTURE0);
 	// glBindTexture(GL_TEXTURE_2D, res_pack->texture_ids[texture_index]);
 	
@@ -143,32 +143,34 @@ void render_end_frame_buffer(res_pack_t *res_pack) {
 
 	glUseProgram(basic_shader);
 
-	render_mesh(res_pack, &quad_mesh, fbo_tex);
+	render_mesh(&quad_mesh, fbo_tex);
 	
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 }
 
-static i32 compare_by_distance(const void *a, const void *b) {
-	entity_t entity1 = *(entity_t *)a;
-	entity_t entity2 = *(entity_t *)b;
+// static i32 compare_by_distance(const void *a, const void *b) {
+// 	entity_t entity1 = *(entity_t *)a;
+// 	entity_t entity2 = *(entity_t *)b;
 
-	transform_c *transform1 = ecs_get(global_ecs, entity1, TRANSFORM_C);
-	transform_c *transform2 = ecs_get(global_ecs, entity2, TRANSFORM_C);
+// 	transform_c *transform1 = ecs_get(global_ecs, entity1, TRANSFORM_C);
+// 	transform_c *transform2 = ecs_get(global_ecs, entity2, TRANSFORM_C);
 
-	float distance1 = ((*global_position[0] - transform1->position[0]) * (*global_position[0] - transform1->position[0])) + ((*global_position[1] - transform1->position[1]) * (*global_position[1] - transform1->position[1])) + ((*global_position[2] - transform1->position[2]) * (*global_position[2] - transform1->position[2]));
-	float distance2 = ((*global_position[0] - transform2->position[0]) * (*global_position[0] - transform2->position[0])) + ((*global_position[1] - transform2->position[1]) * (*global_position[1] - transform2->position[1])) + ((*global_position[2] - transform2->position[2]) * (*global_position[2] - transform2->position[2]));
+// 	float distance1 = ((*global_position[0] - transform1->position[0]) * (*global_position[0] - transform1->position[0])) + ((*global_position[1] - transform1->position[1]) * (*global_position[1] - transform1->position[1])) + ((*global_position[2] - transform1->position[2]) * (*global_position[2] - transform1->position[2]));
+// 	float distance2 = ((*global_position[0] - transform2->position[0]) * (*global_position[0] - transform2->position[0])) + ((*global_position[1] - transform2->position[1]) * (*global_position[1] - transform2->position[1])) + ((*global_position[2] - transform2->position[2]) * (*global_position[2] - transform2->position[2]));
 
-	if (distance1 > distance2) {
-		return -1;
-	} else if (distance1 < distance2) {
-		return 1;
-	} else {
-		return 0;
-	}
-}
+// 	if (distance1 > distance2) {
+// 		return -1;
+// 	} else if (distance1 < distance2) {
+// 		return 1;
+// 	} else {
+// 		return 0;
+// 	}
+// }
 
-static void render_mesh_transform(res_pack_t *res_pack, transform_t *transform, index_t mesh_index, index_t tex_index) {
+void render_mesh_transform(res_pack_t *res_pack, transform_t *transform, index_t mesh_index, index_t tex_index) {
+	// mesh_t *mesh = &res_pack->meshes[mesh_index];
+	// mesh_t *mesh = mesh_get(mesh_index);
 	mesh_t *mesh = &res_pack->meshes[mesh_index];
 
 	mat4 model;
@@ -182,33 +184,33 @@ static void render_mesh_transform(res_pack_t *res_pack, transform_t *transform, 
 
 	shader_set_mat4(game_shader, "model", &model);
 
-	render_mesh(res_pack, mesh, tex_index);
+	render_mesh(mesh, tex_index);
 }
 
-static void render_mesh_components(res_pack_t *res_pack, ecs_world_t *ecs) {
-	ecs_query_t query = ecs_query(ecs, TRANSFORM_C, MESH_C, -1);
-	for (size_t i = 0; i < query.len; i++) {
-		mesh_c *mesh_component = ecs_get(ecs, query.entities[i], MESH_C);
-		transform_c *transform = ecs_get(ecs, query.entities[i], TRANSFORM_C);
+// static void render_mesh_components(res_pack_t *res_pack, ecs_world_t *ecs) {
+// 	ecs_query_t query = ecs_query(ecs, TRANSFORM_C, MESH_C, -1);
+// 	for (size_t i = 0; i < query.len; i++) {
+// 		mesh_c *mesh_component = ecs_get(ecs, query.entities[i], MESH_C);
+// 		transform_c *transform = ecs_get(ecs, query.entities[i], TRANSFORM_C);
 
-		mesh_t mesh = res_pack->meshes[mesh_component->mesh_index];
+// 		mesh_t mesh = res_pack->meshes[mesh_component->mesh_index];
 
-		mat4 model;
-		glm_mat4_identity(model);
-		glm_translate(model, transform->position);
-		glm_scale(model, (vec3){0.5f, 0.5f, 0.5f});
+// 		mat4 model;
+// 		glm_mat4_identity(model);
+// 		glm_translate(model, transform->position);
+// 		glm_scale(model, (vec3){0.5f, 0.5f, 0.5f});
 
-		glm_rotate(model, glm_rad(transform->rotation[0]), (vec3){1.0f, 0.0f, 0.0f});
-		glm_rotate(model, glm_rad(transform->rotation[1]), (vec3){0.0f, 1.0f, 0.0f});
-		glm_rotate(model, glm_rad(transform->rotation[2]), (vec3){0.0f, 0.0f, 1.0f});
+// 		glm_rotate(model, glm_rad(transform->rotation[0]), (vec3){1.0f, 0.0f, 0.0f});
+// 		glm_rotate(model, glm_rad(transform->rotation[1]), (vec3){0.0f, 1.0f, 0.0f});
+// 		glm_rotate(model, glm_rad(transform->rotation[2]), (vec3){0.0f, 0.0f, 1.0f});
 
-		shader_set_mat4(game_shader, "model", &model);
+// 		shader_set_mat4(game_shader, "model", &model);
 
-		render_mesh(res_pack, &mesh, mesh_component->texture_index);
-	}
-}
+// 		render_mesh(res_pack, &mesh, mesh_component->texture_index);
+// 	}
+// }
 
-static void render_sprite_transform(res_pack_t *res_pack, transform_t *transform, camera_t *camera, sprite_c *sprite) {
+void render_sprite_transform(transform_t *transform, camera_t *camera, sprite_c *sprite) {
 	mat4 model;
 	glm_mat4_identity(model);
 	glm_translate(model, (vec3){transform->position[0], transform->position[1] + ((sprite->y_scale - 1) / 2), transform->position[2]});
@@ -229,51 +231,51 @@ static void render_sprite_transform(res_pack_t *res_pack, transform_t *transform
 
 	shader_set_mat4(game_shader, "model", &model);
 
-	render_mesh(res_pack, &quad_mesh, sprite->texture_index);
+	render_mesh(&quad_mesh, sprite->texture_index);
 }
 
-static void render_sprite_components(res_pack_t *res_pack, ecs_world_t *ecs, camera_t *camera) {
-	// Transparent stuff
-	ecs_query_t query = ecs_query(ecs, TRANSFORM_C, SPRITE_C, -1);
-	qsort(query.entities, query.len, sizeof(entity_t), compare_by_distance);
-	for (size_t i = 0; i < query.len; i++) {
-		sprite_c *sprite = ecs_get(ecs, query.entities[i], SPRITE_C);
-		transform_c *transform = ecs_get(ecs, query.entities[i], TRANSFORM_C);
+// static void render_sprite_components(res_pack_t *res_pack, ecs_world_t *ecs, camera_t *camera) {
+// 	// Transparent stuff
+// 	ecs_query_t query = ecs_query(ecs, TRANSFORM_C, SPRITE_C, -1);
+// 	qsort(query.entities, query.len, sizeof(entity_t), compare_by_distance);
+// 	for (size_t i = 0; i < query.len; i++) {
+// 		sprite_c *sprite = ecs_get(ecs, query.entities[i], SPRITE_C);
+// 		transform_c *transform = ecs_get(ecs, query.entities[i], TRANSFORM_C);
 
-		mesh_t mesh = quad_mesh;
+// 		mesh_t mesh = quad_mesh;
 
-		mat4 model;
-		glm_mat4_identity(model);
-		glm_translate(model, (vec3){transform->position[0], transform->position[1] + ((sprite->y_scale - 1) / 2), transform->position[2]});
-		// glm_scale(model, (vec3){0.5f * sprite->x_scale, 0.5f * sprite->y_scale, 0.5f});
-		glm_scale(model, (vec3){0.5f * sprite->x_scale, 0.5f * sprite->y_scale, 0.5f * sprite->x_scale});
+// 		mat4 model;
+// 		glm_mat4_identity(model);
+// 		glm_translate(model, (vec3){transform->position[0], transform->position[1] + ((sprite->y_scale - 1) / 2), transform->position[2]});
+// 		// glm_scale(model, (vec3){0.5f * sprite->x_scale, 0.5f * sprite->y_scale, 0.5f});
+// 		glm_scale(model, (vec3){0.5f * sprite->x_scale, 0.5f * sprite->y_scale, 0.5f * sprite->x_scale});
 
-		glm_rotate(model, glm_rad(transform->rotation[0]), (vec3){1.0f, 0.0f, 0.0f});
-		glm_rotate(model, glm_rad(transform->rotation[1]), (vec3){0.0f, 1.0f, 0.0f});
-		glm_rotate(model, glm_rad(transform->rotation[2]), (vec3){0.0f, 0.0f, 1.0f});
+// 		glm_rotate(model, glm_rad(transform->rotation[0]), (vec3){1.0f, 0.0f, 0.0f});
+// 		glm_rotate(model, glm_rad(transform->rotation[1]), (vec3){0.0f, 1.0f, 0.0f});
+// 		glm_rotate(model, glm_rad(transform->rotation[2]), (vec3){0.0f, 0.0f, 1.0f});
 
-		if (sprite->billboard) {
-			// vec3 direction = {camera->position[0] - transform->position[0], 0.0f, camera->position[2] - transform->position[2]};
-			// glm_normalize(direction);
-			// float angle = atan2(direction[0], direction[2]);
-			// glm_rotate(model, angle, (vec3){0.0f, 1.0f, 0.0f});
+// 		if (sprite->billboard) {
+// 			// vec3 direction = {camera->position[0] - transform->position[0], 0.0f, camera->position[2] - transform->position[2]};
+// 			// glm_normalize(direction);
+// 			// float angle = atan2(direction[0], direction[2]);
+// 			// glm_rotate(model, angle, (vec3){0.0f, 1.0f, 0.0f});
 
-			    // Get the forward direction of the camera projected onto the XZ plane
-			vec3 camera_forward = {camera->front[0], 0.0f, camera->front[2]};
-			glm_normalize(camera_forward);
+// 			    // Get the forward direction of the camera projected onto the XZ plane
+// 			vec3 camera_forward = {camera->front[0], 0.0f, camera->front[2]};
+// 			glm_normalize(camera_forward);
 
-			// Calculate the angle between the camera's forward direction and the world forward (Z-axis)
-			float angle = atan2(camera_forward[0], camera_forward[2]);
+// 			// Calculate the angle between the camera's forward direction and the world forward (Z-axis)
+// 			float angle = atan2(camera_forward[0], camera_forward[2]);
 
-			// Rotate the sprite to align with the camera's forward direction
-			glm_rotate(model, angle, (vec3){0.0f, 1.0f, 0.0f});
-		}
+// 			// Rotate the sprite to align with the camera's forward direction
+// 			glm_rotate(model, angle, (vec3){0.0f, 1.0f, 0.0f});
+// 		}
 
-		shader_set_mat4(game_shader, "model", &model);
+// 		shader_set_mat4(game_shader, "model", &model);
 
-		render_mesh(res_pack, &mesh, sprite->texture_index);
-	}
-}
+// 		render_mesh(res_pack, &mesh, sprite->texture_index);
+// 	}
+// }
 
 static void render_grid(res_pack_t *res_pack, grid_t *grid) {
 	for (u32 z = 0; z < grid->depth; z++) {
@@ -284,7 +286,7 @@ static void render_grid(res_pack_t *res_pack, grid_t *grid) {
 					continue;
 				}
 
-				mesh_t mesh = res_pack->meshes[tile.mesh_index];
+				mesh_t *mesh = &res_pack->meshes[tile.mesh_index];
                 
                 // Model matrix
 				mat4 model;
@@ -305,7 +307,7 @@ static void render_grid(res_pack_t *res_pack, grid_t *grid) {
 				
 				shader_set_vec3(game_shader, "fogColor", &fog_color);
 
-				render_mesh(res_pack, &mesh, tile.texture_index);
+				render_mesh(mesh, tile.texture_index);
 			}
 		}
 	}
@@ -344,7 +346,7 @@ void render_image(res_pack_t *res_pack, index_t texture_index, i32 x, i32 y, col
 	color_to_gl_color(color, gl_color);
 	shader_set_vec4(gui_shader, "color1", &gl_color);
 
-	render_mesh(res_pack, &quad_mesh, texture_index);
+	render_mesh(&quad_mesh, texture_index);
 }
 
 void render_image_rect(res_pack_t *res_pack, index_t texture_index, rect_t src, rect_t dst, color_t color) {
@@ -390,7 +392,7 @@ void render_image_rect(res_pack_t *res_pack, index_t texture_index, rect_t src, 
 	color_to_gl_color(color, gl_color);
 	shader_set_vec4(gui_shader, "color1", &gl_color);
 
-	render_mesh(res_pack, &quad_mesh, texture_index);
+	render_mesh(&quad_mesh, texture_index);
 }
 
 void render_mesh_isometric(res_pack_t *res_pack, mesh_t mesh, index_t texture_index, i32 x, i32 y, float scale) {
@@ -432,7 +434,7 @@ void render_mesh_isometric(res_pack_t *res_pack, mesh_t mesh, index_t texture_in
     shader_set_mat4(gui_shader, "model", &model);
     shader_set_mat4(gui_shader, "projection", &projection);
 
-    render_mesh(res_pack, &mesh, texture_index);
+    render_mesh(&mesh, texture_index);
 }
 
 void render_grid_ortho(res_pack_t *res_pack, grid_t *grid, enum ortho_view orientation, float zoom, mat4 *projection, i32 min_y, i32 max_y, bool enable_transparency) {
@@ -471,15 +473,16 @@ void render_grid_ortho(res_pack_t *res_pack, grid_t *grid, enum ortho_view orien
 				glm_scale(model, (vec3){0.5f, 0.5f, 0.5f});
 				shader_set_mat4(ortho_shader, "model", &model);
 				
-				render_mesh(res_pack, &mesh, tile.texture_index);
+				render_mesh(&mesh, tile.texture_index);
 			}
 		}
 	}
 }
 
-void render_game(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, vec3 position, camera_t *camera) {
-	global_position = &position;
-	global_ecs = ecs;
+// void render_game(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, vec3 position, camera_t *camera) {
+void render_game(res_pack_t *res_pack, grid_t *grid, vec3 position, camera_t *camera) {
+	// global_position = &position;
+	// global_ecs = ecs;
 
 	clear(res_pack->sky_color);
 	
@@ -510,7 +513,7 @@ void render_game(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, vec3 posi
 
 	render_grid(res_pack, grid);
 
-	render_mesh_components(res_pack, ecs);
+	// render_mesh_components(res_pack, ecs);
 
-	render_sprite_components(res_pack, ecs, camera);
+	// render_sprite_components(res_pack, ecs, camera);
 }

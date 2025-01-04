@@ -7,6 +7,8 @@ This header and source file contain functions related to the resource pack syste
 #include "core.h"
 #include "util.h"
 
+void res_init(res_pack_t *res_pack);
+
 void send_mesh_to_gpu(mesh_t *mesh);
 
 void res_add_mesh(res_pack_t *res_pack, index_t index, mesh_t mesh, multi_box_collider_t *collider);

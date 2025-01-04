@@ -8,12 +8,11 @@ This header and source file contain the rendering code.
 #include "util.h"
 #include "input.h"
 #include "res.h"
-#include "ecs.h"
 
-typedef struct renderer {
-    camera_t *camera;
-    ecs_world_t *ecs;
-} renderer_t;
+// typedef struct renderer {
+//     camera_t *camera;
+//     ecs_world_t *ecs;
+// } renderer_t;
 
 void render_init(res_pack_t *res_pack);
 
@@ -29,4 +28,10 @@ void render_mesh_isometric(res_pack_t *res_pack, mesh_t mesh, index_t texture_in
 
 void render_grid_ortho(res_pack_t *res_pack, grid_t *grid, enum ortho_view orientation, float zoom, mat4 *projection, i32 min_y, i32 max_y, bool enable_transparency);
 
-void render_game(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, vec3 position, camera_t *camera);
+// void render_game(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, vec3 position, camera_t *camera);
+void render_game(res_pack_t *res_pack, grid_t *grid, vec3 position, camera_t *camera);
+
+void render_mesh_transform(res_pack_t *res_pack, transform_t *transform, index_t mesh_index, index_t tex_index);
+
+// void render_sprite_transform(res_pack_t *res_pack, transform_t *transform, camera_t *camera, sprite_c *sprite);
+void render_sprite_transform(transform_t *transform, camera_t *camera, sprite_c *sprite);

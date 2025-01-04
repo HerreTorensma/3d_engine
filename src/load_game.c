@@ -1,45 +1,9 @@
 #include "engine/res.h"
+#include "gamedefs.h"
 
-enum {
-	MESH_CUBE = 1,
-	MESH_SLAB,
-	MESH_CORNER,
-	MESH_FLOOR,
-	MESH_PYRAMID,
-	MESH_SLOPE,
-	MESH_MONKEY,
-	MESH_MUSHROOM,
-	MESH_WALL,
-	MESH_WALL_CORNER,
-	MESH_LOWER_SLAB,
-};
+void load_game(res_pack_t *res_pack) {
+	res_init(res_pack);
 
-enum {
-	TEX_BRICKS = 1,
-	TEX_DIRT,
-	TEX_GRASS,
-	TEX_IRON_BARS,
-    TEX_PLANKS,
-	TEX_SAND,
-	TEX_ROCK,
-
-	TEX_TREE,
-	TEX_BARREL,
-	TEX_CHARACTER,
-
-	TEX_FONT,
-	TEX_CROSSHAIR,
-	TEX_BUTTON,
-	TEX_BUTTON_PRESSED,
-	TEX_FRAME,
-    TEX_BUTTON_SELECTED_INDICATOR,
-};
-
-enum {
-	SOUND_JUMP = 1,
-};
-
-void load_res(res_pack_t *res_pack) {
     res_pack->render_width = 640;
 	res_pack->render_height = 360;
 

@@ -6,6 +6,25 @@ conveniently in one file to avoid cyclic imports.
 
 #include "global.h"
 
+typedef union {
+	struct {
+		float x;
+		float y;
+		float z;
+	};
+
+	float data[3];
+} vec3_t;
+
+typedef union {
+    struct {
+        float x;
+        float y;
+    };
+
+    float data[2];
+} vec2_t;
+
 // Structs
 typedef struct vertex {
     vec3 position;
@@ -156,6 +175,34 @@ typedef struct dialogue {
     i32 response_count;
 } dialogue_t;
 
+typedef struct gun {
+    bool automatic;
+    u32 mag_size;
+    float fire_delay;
+    float reload_time;
+} gun_t;
+
+typedef struct melee {
+    bool automatic;
+    float radius;
+    float use_delay;
+} melee_t;
+
+union items {
+    gun_t gun;
+    melee_t melee;
+};
+
+typedef struct inventory_slot {
+    i32 amount;
+    union items items;
+
+} inventory_slot_t;
+
+typedef struct inventory {
+    inventory_slot_t slots[20];
+} inventory_t;
+
 // Core definitions
 #define COLOR_WHITE (color_t){255, 255, 255, 255}
 #define COLOR_BLACK (color_t){0, 0, 0, 255}
@@ -215,6 +262,8 @@ typedef struct {
     float walk_speed;
     float crouch_speed;
     float jump_height;
+    bool grounded;
+    vec3 velocity;
 } player_controller_c;
 
 typedef struct {

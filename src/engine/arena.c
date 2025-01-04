@@ -1,5 +1,7 @@
 #include "arena.h"
 
+arena_t temp_arena;
+
 void arena_init(arena_t *arena, size_t initial_size) {
     arena->current_position = 0;
     arena->current_size = initial_size;

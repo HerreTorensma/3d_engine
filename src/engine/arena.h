@@ -8,6 +8,9 @@ typedef struct arena {
     size_t current_size;
 } arena_t;
 
+// Should be initialized in main function
+extern arena_t temp_arena;
+
 void arena_init(arena_t *arena, size_t initial_size);
 
 void *arena_alloc(arena_t *arena, size_t size);
