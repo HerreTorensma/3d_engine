@@ -18,7 +18,7 @@ else
 	endif
 endif
 
-SRC = src/main.c src/engine/render.c src/engine/util.c src/engine/shader.c src/engine/input.c src/engine/res.c src/engine/editor.c src/engine/gui.c src/engine/grid.c src/engine/arena.c src/engine/audio.c src/engine/collision.c src/entity.c
+SRC = src/main.c src/engine/render.c src/engine/util.c src/engine/shader.c src/engine/input.c src/engine/res.c src/engine/editor.c src/engine/gui.c src/engine/grid.c src/engine/memory.c src/engine/audio.c src/engine/collision.c src/engine/engine.c src/entity.c
 OBJ = $(SRC:.c=.o)
 
 all: libs game
@@ -34,3 +34,6 @@ game: $(OBJ)
 
 clean:
 	rm $(OBJ) lib/glad/src/glad.o $(EXECUTABLE)
+
+debug:
+	gdb -ex run --args $(EXECUTABLE)

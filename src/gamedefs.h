@@ -58,3 +58,8 @@ typedef struct entity {
 	player_controller_c player_controller;
 	player_collider_c player_collider;
 } entity_t;
+
+enum {
+    STATE_MAIN_MENU,
+    STATE_GAMEPLAY,
+};

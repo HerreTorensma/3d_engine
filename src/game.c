@@ -1,5 +1,5 @@
 #include "entity.h"
-#include "engine/arena.h"
+#include "engine/memory.h"
 #include "engine/render.h"
 #include "engine/res.h"
 #include "engine/core.h"
@@ -7,56 +7,7 @@
 
 #include "load_game.c"
 #include "prefabs.c"
-
-enum {
-    STATE_MAIN_MENU,
-    STATE_GAMEPLAY,
-};
-
-typedef struct state {
-    // entity_t entities[1024];
-    index_t player_ent_index;
-    res_pack_t res_pack;
-    grid_t grid;
-    index_t mode;
-	SDL_Window *window;
-	bool cursor_free;
-	ent_system_t ent_system;
-	// arena_t temp_arena;
-
-	bool edit_mode;
-} state_t;
-
-static state_t state = {0};
-
-void game_init() {
-	window_width = 1280;
-	window_height = 720;
-
-	state.window = create_sdl2_window("Idk game", window_width, window_height);
-	SDL_GLContext *context = create_sdl2_gl_context(state.window, window_width, window_height);
-
-	// arena_init(&state.temp_arena, 1024 * 1024);
-
-    load_game(&state.res_pack);
-
-    state.mode = STATE_GAMEPLAY;
-
-    font_init(&state.res_pack.font, &state.res_pack, TEX_FONT);
-	state.res_pack.font.y_center = -4;
-
-	// grid_init(&grid, 512, 16, 512);
-	// grid_load(&grid, "test.grid");
-	grid_load(&state.grid, "test2.grid");
-
-    state.player_ent_index = spawn_player((transform_t){0});
-
-	spawn_barrel((transform_t){.position[0] = 5.0f, .position[1] = 1.0f, .position[2] = 5.0f});
-	spawn_tree((transform_t){.position[0] = 5.0f, .position[1] = 1.0f, .position[2] = 6.0f});
-
-    render_init(&state.res_pack);
-	editor_init();
-}
+#include "state.h"
 
 void player_controller(res_pack_t *res_pack, grid_t *grid, entity_t *player_ent) {
 	if (input_key_pressed(SDL_SCANCODE_F)) {
@@ -129,8 +80,7 @@ void player_controller(res_pack_t *res_pack, grid_t *grid, entity_t *player_ent)
 	coming_position[1] = transform->position[1];
 	coming_position[2] = transform->position[2] + controller->velocity[2];
 
-	// collision_t *collisions = arena_calloc(&state.temp_arena, 8 * sizeof(collision_t));
-	collision_t *collisions = arena_calloc(&temp_arena, 8 * sizeof(collision_t));
+	collision_t *collisions = temp_calloc(8 * sizeof(collision_t));
 	i32 count = get_player_collisions(res_pack, grid, coming_position, &collider->box, collisions);
 	collision_t best_collision = collisions[0];
 
@@ -203,9 +153,9 @@ void game_update() {
     }
 }
 
-static void compare_sprites(const void *a, const void *b) {
-    entity_t *entity1 = (entity_t *)a;
-	entity_t *entity2 = (entity_t *)b;
+static int compare_sprites(const void *a, const void *b) {
+	entity_t *entity1 = *(entity_t **)a;
+	entity_t *entity2 = *(entity_t **)b;
 
 	entity_t *player_ent = ent_get(state.player_ent_index);
 
@@ -214,13 +164,13 @@ static void compare_sprites(const void *a, const void *b) {
     vec3 *pos1 = entity1->transform.position;
 	vec3 *pos2 = entity2->transform.position;
 
-	float distance1 = ((*player_pos[0] - *pos1[0]) * (*player_pos[0] - *pos1[0])) + ((*player_pos[1] - *pos1[1]) * (*player_pos[1] - *pos1[1])) + ((*player_pos[2] - *pos1[2]) * (*player_pos[2] - *pos1[2]));
-	float distance2 = ((*player_pos[0] - *pos2[0]) * (*player_pos[0] - *pos2[0])) + ((*player_pos[1] - *pos2[1]) * (*player_pos[1] - *pos2[1])) + ((*player_pos[2] - *pos2[2]) * (*player_pos[2] - *pos2[2]));
+	float distance1 = glm_vec3_distance2(pos1, player_pos);
+	float distance2 = glm_vec3_distance2(pos2, player_pos);
 
-	if (distance1 > distance2) {
-		return -1;
-	} else if (distance1 < distance2) {
+	if (distance1 < distance2) {
 		return 1;
+	} else if (distance1 > distance2) {
+		return -1;
 	} else {
 		return 0;
 	}
@@ -233,7 +183,7 @@ static size_t get_sorted_sprite_entities(entity_t **sorted_sprites) {
 		entity_t *ent = ent_get(i);
         if (ent->is_valid && (ent->flags & HAS_SPRITE)) {
             // The entity has a sprite
-            sorted_sprites[sorted_sprites_count] = &ent->sprite;
+            sorted_sprites[sorted_sprites_count] = ent;
             sorted_sprites_count++;
         }
     }
@@ -243,18 +193,25 @@ static size_t get_sorted_sprite_entities(entity_t **sorted_sprites) {
     return sorted_sprites_count;
 }
 
-void game_render(res_pack_t *res_pack) {
+void game_render() {
 	entity_t *player_ent = ent_get(state.player_ent_index);
 
     render_game(&state.res_pack, &state.grid, player_ent->transform.position, &player_ent->camera);
-
-    // entity_t **sorted_sprites = arena_alloc(&state.temp_arena, 1024 * sizeof(entity_t *));
-    entity_t **sorted_sprites = arena_alloc(&temp_arena, 1024 * sizeof(entity_t *));
+    
+	entity_t **sorted_sprites = temp_alloc(1024 * sizeof(entity_t *));
     size_t sorted_sprites_count = get_sorted_sprite_entities(sorted_sprites);
     
-    for (size_t i = 0; i < 1024; i++) {
+    for (size_t i = 0; i < sorted_sprites_count; i++) {
         render_sprite_transform(&sorted_sprites[i]->transform, &player_ent->camera, &sorted_sprites[i]->sprite);
     }
+
+	// Crosshair
+	render_image(&state.res_pack, TEX_CROSSHAIR, state.res_pack.render_width / 2 - 4, state.res_pack.render_height / 2 - 4, COLOR_WHITE);
+
+	// Inventory
+	for (i32 i = 0; i < 20; i++) {
+		gui_button(&state.res_pack, "", (rect_t){i * 2, 43, 2, 2});
+	}
 }
 
 void game_input(SDL_Event event, entity_t *player_ent) {

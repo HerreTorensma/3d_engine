@@ -1,6 +1,6 @@
-#include "arena.h"
+#include "memory.h"
 
-arena_t temp_arena;
+static arena_t _temp_arena;
 
 void arena_init(arena_t *arena, size_t initial_size) {
     arena->current_position = 0;
@@ -37,4 +37,24 @@ void arena_clear(arena_t *arena) {
 
 void arena_free(arena_t *arena) {
     free(arena->data);
+}
+
+void temp_init(size_t initial_size) {
+    arena_init(&_temp_arena, initial_size);
+}
+
+void *temp_alloc(size_t size) {
+    return arena_alloc(&_temp_arena, size);
+}
+
+void *temp_calloc(size_t size) {
+    return arena_calloc(&_temp_arena, size);
+}
+
+void temp_clear() {
+    arena_clear(&_temp_arena);
+}
+
+void temp_free() {
+    arena_free(&_temp_arena);
 }

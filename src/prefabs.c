@@ -44,7 +44,7 @@ void spawn_barrel(transform_t transform) {
     ent->sprite.texture_index = TEX_BARREL;
     ent->sprite.billboard = true;
     ent->sprite.x_scale = 1.0f;
-    ent->sprite.y_scale = 2.0f;
+    ent->sprite.y_scale = 1.0f;
 }
 
 void spawn_tree(transform_t transform) {
@@ -55,7 +55,7 @@ void spawn_tree(transform_t transform) {
     ent->sprite.texture_index = TEX_TREE;
     ent->sprite.billboard = true;
     ent->sprite.x_scale = 1.0f;
-    ent->sprite.y_scale = 2.0f;
+    ent->sprite.y_scale = 1.0f;
 }
 
 void spawn_gate(transform_t transform) {

@@ -1,7 +1,5 @@
 #include "entity.h"
 
-// static entity_t entities[1024] = {0};
-// entity_t entities[1024] = {0};
 static ent_system_t *_ent_system = NULL;
 
 void ent_system_init(ent_system_t *ent_system) {
@@ -11,6 +9,7 @@ void ent_system_init(ent_system_t *ent_system) {
 index_t ent_new() {
     for (size_t i = 0; i < 1024; i++) {
         if (!_ent_system->entities[i].is_valid) {
+            _ent_system->entities[i].is_valid = true;
             return i;
         }
     }
