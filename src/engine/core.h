@@ -143,27 +143,6 @@ typedef struct sound {
     Mix_Chunk *chunk;
 } sound_t;
 
-typedef struct res_pack {
-	color_t fog_color;
-	color_t sky_color;
-	color_t editor_color;
-
-	u32 render_width;
-	u32 render_height;
-
-    mesh_t meshes[256];
-	texture_t textures[256];
-
-    sound_t sounds[256];
-
-	index_t button_tex_index;
-	index_t button_pressed_tex_index;
-    index_t button_pressed_indicator_tex_index;
-	u32 gui_tile_size;
-
-	font_t font;
-} res_pack_t;
-
 typedef struct response {
     char text[512];
     i32 next_dialogue;
@@ -174,34 +153,6 @@ typedef struct dialogue {
     response_t responses[8];
     i32 response_count;
 } dialogue_t;
-
-typedef struct gun {
-    bool automatic;
-    u32 mag_size;
-    float fire_delay;
-    float reload_time;
-} gun_t;
-
-typedef struct melee {
-    bool automatic;
-    float radius;
-    float use_delay;
-} melee_t;
-
-union items {
-    gun_t gun;
-    melee_t melee;
-};
-
-typedef struct inventory_slot {
-    i32 amount;
-    union items items;
-
-} inventory_slot_t;
-
-typedef struct inventory {
-    inventory_slot_t slots[20];
-} inventory_t;
 
 // Core definitions
 #define COLOR_WHITE (color_t){255, 255, 255, 255}
@@ -282,3 +233,89 @@ enum {
     PLAYER_CONTROLLER_C = 5,
     PLAYER_COLLIDER_C = 6,
 };
+
+// Applies to every type of gun
+typedef struct gun_stats {
+    bool automatic;
+    u32 mag_size;
+    float fire_delay;
+    float reload_time;
+} gun_stats_t;
+
+// Applies to just the current slot
+typedef struct gun_mut_stats {
+    u32 bullets_left;
+    float reload_timer;
+} gun_mut_stats_t;
+
+typedef struct melee_stats {
+    bool automatic;
+    float radius;
+    float use_delay;
+} melee_stats_t;
+
+typedef struct melee_mut_stats {
+    float use_timer;
+} melee_mut_stats_t;
+
+typedef enum {
+    STATS_NONE,
+    STATS_GUN,
+    STATS_MELEE,
+} stats_type_t;
+
+union stats {
+    gun_stats_t gun;
+    melee_stats_t melee;
+};
+
+union mut_stats {
+    gun_mut_stats_t gun;
+    melee_mut_stats_t melee;
+};
+
+// struct animated_sprite {
+//     index_t texture_index;
+// }
+
+typedef struct item {
+    bool stackable;
+    index_t thumbnail_index;
+    stats_type_t stats_type;
+    union stats stats;
+} item_t;
+
+typedef struct inventory_slot {
+    index_t item_index;
+    union mut_stats mut_stats;
+    i32 amount;
+} inventory_slot_t;
+
+typedef struct inventory {
+    inventory_slot_t slots[64];
+    size_t slots_amount;
+    index_t selected_slot;
+} inventory_t;
+
+typedef struct res_pack {
+	color_t fog_color;
+	color_t sky_color;
+	color_t editor_color;
+
+	u32 render_width;
+	u32 render_height;
+
+    mesh_t meshes[256];
+	texture_t textures[256];
+
+    sound_t sounds[256];
+
+    item_t items[256];
+
+	index_t button_tex_index;
+	index_t button_pressed_tex_index;
+    index_t button_pressed_indicator_tex_index;
+	u32 gui_tile_size;
+
+	font_t font;
+} res_pack_t;

@@ -101,6 +101,14 @@ void res_add_sound(res_pack_t *res_pack, index_t index, sound_t sound) {
 	res_pack->sounds[index] = sound;
 }
 
+void res_add_item(res_pack_t *res_pack, index_t index, item_t item) {
+	if (!index_valid(index)) {
+		return;
+	}
+
+	res_pack->items[index] = item;
+}
+
 texture_t *tex_get(index_t index) {
 	if (!index_valid(index)) {
 		return NULL;

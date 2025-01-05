@@ -47,6 +47,26 @@ void load_game(res_pack_t *res_pack) {
 	res_add_texture(res_pack, TEX_BUTTON_SELECTED_INDICATOR, load_tga("res/images/button_selected_indicator.tga", false));
     res_pack->button_pressed_indicator_tex_index = TEX_BUTTON_SELECTED_INDICATOR;
 
+	res_add_texture(res_pack, TEX_GLOCK_THUMBNAIL, load_tga("res/images/glock.tga", false));
+	res_add_texture(res_pack, TEX_CIGARETTE, load_tga("res/images/cigarette.tga", false));
+	
+	res_add_item(res_pack, ITEM_GLOCK, (item_t){
+		.stackable = false,
+		.thumbnail_index = TEX_GLOCK_THUMBNAIL,
+		.stats_type = STATS_GUN,
+		.stats.gun = (gun_stats_t){
+			.automatic = false,
+			.fire_delay = 0.2f,
+			.mag_size = 17,
+			.reload_time = 2.0f,
+		},
+	});
+	res_add_item(res_pack, ITEM_CIGARETTE, (item_t){
+		.stackable = true,
+		.thumbnail_index = TEX_CIGARETTE,
+		.stats_type = STATS_NONE,
+	});
+
 	multi_box_collider_t wall_corner_collider = {0};
 	wall_corner_collider.boxes[0] = (box_t){
 		.min_x = -0.5f,

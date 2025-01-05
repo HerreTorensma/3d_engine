@@ -33,10 +33,18 @@ enum {
 	TEX_BUTTON_PRESSED,
 	TEX_FRAME,
     TEX_BUTTON_SELECTED_INDICATOR,
+
+	TEX_GLOCK_THUMBNAIL,
+	TEX_CIGARETTE,
 };
 
 enum {
 	SOUND_JUMP = 1,
+};
+
+enum {
+	ITEM_GLOCK = 1,
+	ITEM_CIGARETTE,
 };
 
 typedef enum entity_flag {
@@ -44,6 +52,7 @@ typedef enum entity_flag {
     HAS_MESH = 2,
     HAS_COLLIDER = 3,
     HAS_PLAYER = 4,
+	HAS_INVENTORY = 5,
 } entity_flag_t;
 
 typedef struct entity {
@@ -57,6 +66,7 @@ typedef struct entity {
 	camera_c camera;
 	player_controller_c player_controller;
 	player_collider_c player_collider;
+	inventory_t inventory;
 } entity_t;
 
 enum {

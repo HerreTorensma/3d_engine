@@ -4,6 +4,7 @@
 #include "engine/res.h"
 #include "engine/core.h"
 #include "engine/collision.h"
+#include "engine/gui.h"
 
 #include "load_game.c"
 #include "prefabs.c"
@@ -19,6 +20,17 @@ void player_controller(res_pack_t *res_pack, grid_t *grid, entity_t *player_ent)
 	if (input_key_released(SDL_SCANCODE_F)) {
 		SDL_SetRelativeMouseMode(SDL_TRUE);
 		state.cursor_free = false;
+	}
+
+	if (input_key_pressed(SDL_SCANCODE_Q)) {
+		// Drop current item
+		player_ent->inventory.slots[player_ent->inventory.selected_slot].amount--;
+
+		spawn_dropped_item(player_ent->transform, player_ent->inventory.slots[player_ent->inventory.selected_slot].item_index);
+
+		if (player_ent->inventory.slots[player_ent->inventory.selected_slot].amount == 0) {
+			memset(&player_ent->inventory.slots[player_ent->inventory.selected_slot], 0, sizeof(inventory_slot_t));
+		}
 	}
 
 	transform_c *transform = &player_ent->transform;
@@ -193,6 +205,24 @@ static size_t get_sorted_sprite_entities(entity_t **sorted_sprites) {
     return sorted_sprites_count;
 }
 
+static void render_inventory(inventory_t *inventory) {
+	for (i32 i = 0; i < inventory->slots_amount; i++) {
+		if (gui_button(&state.res_pack, "", (rect_t){i * 2, 43, 2, 2})) {
+			inventory->selected_slot = i;
+		}
+		
+		render_image(&state.res_pack, state.res_pack.items[inventory->slots[i].item_index].thumbnail_index, i * 2 * 8, 43 * 8, COLOR_WHITE);
+
+		if (state.res_pack.items[inventory->slots[i].item_index].stackable) {
+			char *buffer = temp_alloc(16 * sizeof(char));
+			sprintf(buffer, "%d", inventory->slots[i].amount);
+			gui_print(&state.res_pack, &state.res_pack.font, buffer, i * 2 * 8, 43 * 8, COLOR_BLACK);
+		}
+	}
+	// debug_log("selected slot: %d\n", player_ent->inventory.selected_slot);
+	render_image(&state.res_pack, TEX_BUTTON_SELECTED_INDICATOR, inventory->selected_slot * 2 * 8 + 4, 42 * 8, COLOR_RED);
+}
+
 void game_render() {
 	entity_t *player_ent = ent_get(state.player_ent_index);
 
@@ -209,9 +239,7 @@ void game_render() {
 	render_image(&state.res_pack, TEX_CROSSHAIR, state.res_pack.render_width / 2 - 4, state.res_pack.render_height / 2 - 4, COLOR_WHITE);
 
 	// Inventory
-	for (i32 i = 0; i < 20; i++) {
-		gui_button(&state.res_pack, "", (rect_t){i * 2, 43, 2, 2});
-	}
+	render_inventory(&player_ent->inventory);
 }
 
 void game_input(SDL_Event event, entity_t *player_ent) {
@@ -244,5 +272,23 @@ void game_input(SDL_Event event, entity_t *player_ent) {
 
 		glm_vec3_normalize(front);
 		glm_vec3_copy(front, camera->front);
+	}
+
+	if (event.type == SDL_MOUSEWHEEL) {
+		if (event.wheel.y > 0) {
+			// Scroll up
+			player_ent->inventory.selected_slot--;
+			if (player_ent->inventory.selected_slot < 0) {
+				player_ent->inventory.selected_slot = player_ent->inventory.slots_amount - 1;
+			}
+		}
+
+		if (event.wheel.y < 0) {
+			// Scroll down
+			player_ent->inventory.selected_slot++;
+			if (player_ent->inventory.selected_slot >= player_ent->inventory.slots_amount) {
+				player_ent->inventory.selected_slot = 0;
+			}
+		}
 	}
 }

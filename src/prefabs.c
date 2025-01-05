@@ -33,6 +33,19 @@ index_t spawn_player(transform_t transform) {
         .max_z = 0.15f,
     };
 
+    ent->inventory.slots_amount = 40;
+    ent->inventory.selected_slot = 0;
+    ent->inventory.slots[0] = (inventory_slot_t){
+        .item_index = ITEM_GLOCK,
+        .amount = 1,
+        .mut_stats = {0},
+    };
+    ent->inventory.slots[1] = (inventory_slot_t){
+        .item_index = ITEM_CIGARETTE,
+        .amount = 99,
+        .mut_stats = {0},
+    };
+
     return ent_index;
 }
 
@@ -68,3 +81,14 @@ void spawn_gate(transform_t transform) {
     ent->sprite.x_scale = 1.0f;
     ent->sprite.y_scale = 1.0f;
 }
+
+void spawn_dropped_item(transform_t transform, index_t item_index) {
+    entity_t *ent = ent_get(ent_new());
+    ent->flags = HAS_SPRITE;
+    memcpy(&ent->transform, &transform, sizeof(transform_t));
+
+    ent->sprite.billboard = true;
+    ent->sprite.texture_index = state.res_pack.items[item_index].thumbnail_index;
+    ent->sprite.x_scale = 0.17f;
+    ent->sprite.y_scale = 0.17f;
+};

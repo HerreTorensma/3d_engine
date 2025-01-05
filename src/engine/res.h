@@ -17,6 +17,8 @@ void send_texture_to_gpu(texture_t *texture);
 
 void res_add_texture(res_pack_t *res_pack, index_t index, texture_t texture);
 
+void res_add_item(res_pack_t *res_pack, index_t index, item_t item);
+
 inline rect_t tex_get_default_src(res_pack_t *res_pack, index_t texture_index) {
 	return (rect_t){
 		.x = 0,
