@@ -2,6 +2,7 @@
 This file contains all the functions that spawn entities
 */
 #include "entity.h"
+#include "state.h"
 
 index_t spawn_player(transform_t transform) {
     index_t ent_index = ent_new();
@@ -42,7 +43,7 @@ index_t spawn_player(transform_t transform) {
     };
     ent->inventory.slots[1] = (inventory_slot_t){
         .item_index = ITEM_CIGARETTE,
-        .amount = 99,
+        .amount = 500,
         .mut_stats = {0},
     };
 

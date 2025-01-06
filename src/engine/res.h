@@ -11,11 +11,11 @@ void res_init(res_pack_t *res_pack);
 
 void send_mesh_to_gpu(mesh_t *mesh);
 
-void res_add_mesh(res_pack_t *res_pack, index_t index, mesh_t mesh, multi_box_collider_t *collider);
+void res_add_mesh(res_pack_t *res_pack, index_t index, const char path[], multi_box_collider_t *collider);
 
 void send_texture_to_gpu(texture_t *texture);
 
-void res_add_texture(res_pack_t *res_pack, index_t index, texture_t texture);
+void res_add_texture(res_pack_t *res_pack, index_t index, const char path[]);
 
 void res_add_item(res_pack_t *res_pack, index_t index, item_t item);
 

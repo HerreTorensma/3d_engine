@@ -50,10 +50,12 @@ void send_mesh_to_gpu(mesh_t *mesh) {
 	glBindVertexArray(0);
 }
 
-void res_add_mesh(res_pack_t *res_pack, index_t index, mesh_t mesh, multi_box_collider_t *collider) {
+void res_add_mesh(res_pack_t *res_pack, index_t index, const char path[], multi_box_collider_t *collider) {
 	if (!index_valid(index)) {
 		return;
 	}
+
+	mesh_t mesh = load_mesh(path);
 
 	send_mesh_to_gpu(&mesh);
 
@@ -87,10 +89,12 @@ void send_texture_to_gpu(texture_t *texture) {
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void res_add_texture(res_pack_t *res_pack, index_t index, texture_t texture) {
+void res_add_texture(res_pack_t *res_pack, index_t index, const char path[]) {
 	if (!index_valid(index)) {
 		return;
 	}
+
+	texture_t texture = load_tga(path);
 
 	send_texture_to_gpu(&texture);
 

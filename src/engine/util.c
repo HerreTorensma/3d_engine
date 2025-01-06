@@ -41,7 +41,7 @@ char *load_file_to_string(const char path[]) {
 
 // Loads a tga image file to a byte array that can be used by OpenGL as a texture
 // Represented as BGRA
-texture_t load_tga(const char path[], bool flip) {
+texture_t load_tga(const char path[]) {
 	texture_t image = {0};
 	
 	// Open file
@@ -65,28 +65,13 @@ texture_t load_tga(const char path[], bool flip) {
 	fread(&image.width, 2, 1, file);
 	fread(&image.height, 2, 1, file);
 
-	u8 *buffer = malloc(image.width * image.height * 4);
+	image.pixels = malloc(image.width * image.height * 4);
 
 	// Read pixel data
 	fseek(file, 18, SEEK_SET);
-	fread(buffer, 1, image.width * image.height * 4, file);
+	fread(image.pixels, 1, image.width * image.height * 4, file);
 
 	fclose(file);
-
-	image.pixels = malloc(image.width * image.height * 4);
-	if (flip) {
-		// Cool type casting magic
-		u32 *pixels_colors = (u32 *)image.pixels;
-		u32 *buffer_colors = (u32 *)buffer;
-
-		for (size_t i = 0; i < image.width * image.height; i++) {
-			pixels_colors[i] = buffer_colors[image.width * image.height - i - 1];
-		}
-	} else {
-		memcpy(image.pixels, buffer, image.width * image.height * 4);
-	}
-
-	free(buffer);
 
 	return image;
 }

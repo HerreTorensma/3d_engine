@@ -45,7 +45,11 @@ vec3 getNearestPaletteColor(vec3 color) {
 
 void main()
 {
-    FragColor = texture(texture1, TexCoord);
+    vec2 newTexCoord = TexCoord;
+    newTexCoord.x = 1.0 - newTexCoord.x;
+    newTexCoord.y = 1.0 - newTexCoord.y;
+
+    FragColor = texture(texture1, newTexCoord);
     // if (FragColor != vec4(0)) {
     //     FragColor = mix(vec4(fogColor, 1.0), FragColor, Visibility);
     // }

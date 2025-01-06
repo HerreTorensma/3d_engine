@@ -22,33 +22,33 @@ void load_game(res_pack_t *res_pack) {
 
 	res_pack->editor_color = (color_t){50, 50, 50, 255};
 
-	res_add_texture(res_pack, TEX_BRICKS, load_tga("res/images/bricks.tga", true));
-	res_add_texture(res_pack, TEX_DIRT, load_tga("res/images/dirt.tga", true));
-	res_add_texture(res_pack, TEX_GRASS, load_tga("res/images/grass.tga", false));
-	res_add_texture(res_pack, TEX_IRON_BARS, load_tga("res/images/iron_bars.tga", true));
-	res_add_texture(res_pack, TEX_PLANKS, load_tga("res/images/planks.tga", false));
-	res_add_texture(res_pack, TEX_SAND, load_tga("res/images/sand.tga", false));
-	res_add_texture(res_pack, TEX_ROCK, load_tga("res/images/rock.tga", false));
+	res_add_texture(res_pack, TEX_BRICKS, "res/images/bricks.tga");
+	res_add_texture(res_pack, TEX_DIRT, "res/images/dirt.tga");
+	res_add_texture(res_pack, TEX_GRASS, "res/images/grass.tga");
+	res_add_texture(res_pack, TEX_IRON_BARS, "res/images/iron_bars.tga");
+	res_add_texture(res_pack, TEX_PLANKS, "res/images/planks.tga");
+	res_add_texture(res_pack, TEX_SAND, "res/images/sand.tga");
+	res_add_texture(res_pack, TEX_ROCK, "res/images/rock.tga");
 	
-	res_add_texture(res_pack, TEX_TREE, load_tga("res/images/tree.tga", true));
-	res_add_texture(res_pack, TEX_BARREL, load_tga("res/images/barrel.tga", true));
-	res_add_texture(res_pack, TEX_CHARACTER, load_tga("res/images/character.tga", true));
+	res_add_texture(res_pack, TEX_TREE, "res/images/tree.tga");
+	res_add_texture(res_pack, TEX_BARREL, "res/images/barrel.tga");
+	res_add_texture(res_pack, TEX_CHARACTER, "res/images/character.tga");
 
-	res_add_texture(res_pack, TEX_FONT, load_tga("res/images/font.tga", false));
-	res_add_texture(res_pack, TEX_CROSSHAIR, load_tga("res/images/crosshair.tga", true));
+	res_add_texture(res_pack, TEX_FONT, "res/images/font.tga");
+	res_add_texture(res_pack, TEX_CROSSHAIR, "res/images/crosshair.tga");
 	
-	res_add_texture(res_pack, TEX_BUTTON, load_tga("res/images/button_sheet.tga", false));
-	res_add_texture(res_pack, TEX_BUTTON_PRESSED, load_tga("res/images/button_pressed_sheet.tga", false));
+	res_add_texture(res_pack, TEX_BUTTON, "res/images/button_sheet.tga");
+	res_add_texture(res_pack, TEX_BUTTON_PRESSED, "res/images/button_pressed_sheet.tga");
 	res_pack->button_tex_index = TEX_BUTTON;
 	res_pack->button_pressed_tex_index = TEX_BUTTON_PRESSED;
 	res_pack->gui_tile_size = 8;
 
-	res_add_texture(res_pack, TEX_FRAME, load_tga("res/images/frame.tga", false));
-	res_add_texture(res_pack, TEX_BUTTON_SELECTED_INDICATOR, load_tga("res/images/button_selected_indicator.tga", false));
+	res_add_texture(res_pack, TEX_FRAME, "res/images/frame.tga");
+	res_add_texture(res_pack, TEX_BUTTON_SELECTED_INDICATOR, "res/images/button_selected_indicator.tga");
     res_pack->button_pressed_indicator_tex_index = TEX_BUTTON_SELECTED_INDICATOR;
 
-	res_add_texture(res_pack, TEX_GLOCK_THUMBNAIL, load_tga("res/images/glock.tga", false));
-	res_add_texture(res_pack, TEX_CIGARETTE, load_tga("res/images/cigarette.tga", false));
+	res_add_texture(res_pack, TEX_GLOCK_THUMBNAIL, "res/images/glock.tga");
+	res_add_texture(res_pack, TEX_CIGARETTE, "res/images/cigarette.tga");
 	
 	res_add_item(res_pack, ITEM_GLOCK, (item_t){
 		.stackable = false,
@@ -86,17 +86,17 @@ void load_game(res_pack_t *res_pack) {
 	};
 	wall_corner_collider.boxes_len = 2;
 
-	res_add_mesh(res_pack, MESH_CUBE, load_mesh("res/meshes/cube.mesh"), NULL);
-	res_add_mesh(res_pack, MESH_FLOOR, load_mesh("res/meshes/floor.mesh"), NULL);
-	res_add_mesh(res_pack, MESH_SLAB, load_mesh("res/meshes/slab.mesh"), NULL);
-	res_add_mesh(res_pack, MESH_SLOPE, load_mesh("res/meshes/slope.mesh"), NULL);
-	res_add_mesh(res_pack, MESH_PYRAMID, load_mesh("res/meshes/pyramid.mesh"), NULL);
-	res_add_mesh(res_pack, MESH_CORNER, load_mesh("res/meshes/corner.mesh"), NULL);
-	res_add_mesh(res_pack, MESH_MONKEY, load_mesh("res/meshes/monkey.mesh"), NULL);
-	res_add_mesh(res_pack, MESH_MUSHROOM, load_mesh("res/meshes/mushroom.mesh"), NULL);
-	res_add_mesh(res_pack, MESH_WALL, load_mesh("res/meshes/wall.mesh"), NULL);
-	res_add_mesh(res_pack, MESH_WALL_CORNER, load_mesh("res/meshes/wall_corner.mesh"), &wall_corner_collider);
-	res_add_mesh(res_pack, MESH_LOWER_SLAB, load_mesh("res/meshes/lower_slab.mesh"), NULL);
+	res_add_mesh(res_pack, MESH_CUBE, "res/meshes/cube.mesh", NULL);
+	res_add_mesh(res_pack, MESH_FLOOR, "res/meshes/floor.mesh", NULL);
+	res_add_mesh(res_pack, MESH_SLAB, "res/meshes/slab.mesh", NULL);
+	res_add_mesh(res_pack, MESH_SLOPE, "res/meshes/slope.mesh", NULL);
+	res_add_mesh(res_pack, MESH_PYRAMID, "res/meshes/pyramid.mesh", NULL);
+	res_add_mesh(res_pack, MESH_CORNER, "res/meshes/corner.mesh", NULL);
+	res_add_mesh(res_pack, MESH_MONKEY, "res/meshes/monkey.mesh", NULL);
+	res_add_mesh(res_pack, MESH_MUSHROOM, "res/meshes/mushroom.mesh", NULL);
+	res_add_mesh(res_pack, MESH_WALL, "res/meshes/wall.mesh", NULL);
+	res_add_mesh(res_pack, MESH_WALL_CORNER, "res/meshes/wall_corner.mesh", &wall_corner_collider);
+	res_add_mesh(res_pack, MESH_LOWER_SLAB, "res/meshes/lower_slab.mesh", NULL);
 
 	// print_box(&res_pack->meshes[MESH_LOWER_SLAB].collider.boxes[0]);
 

@@ -18,7 +18,7 @@ extern i32 viewport_height;
 
 char *load_file_to_string(const char path[]);
 
-texture_t load_tga(const char path[], bool flip);
+texture_t load_tga(const char path[]);
 
 mesh_t load_mesh_raw(vertex_t *vertices, u32 vertex_count, u32 *indices, u32 index_count);
 
