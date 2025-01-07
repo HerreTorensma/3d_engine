@@ -223,6 +223,12 @@ typedef struct {
     float radius;
 } player_collider_c;
 
+typedef struct {
+    box_t box;
+    u64 collision_layer;
+    u64 collision_mask;
+} overlap_c;
+
 // Continue your own enum at 3
 enum {
     TRANSFORM_C = 0,

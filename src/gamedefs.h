@@ -48,11 +48,13 @@ enum {
 };
 
 typedef enum entity_flag {
-    HAS_SPRITE = 1,
-    HAS_MESH = 2,
-    HAS_COLLIDER = 3,
-    HAS_PLAYER = 4,
-	HAS_INVENTORY = 5,
+    HAS_SPRITE = (1 << 0),
+    HAS_MESH = (1 << 1),
+    HAS_COLLIDER = (1 << 2),
+    HAS_PLAYER = (1 << 3),
+	HAS_INVENTORY = (1 << 4),
+	HAS_OVERLAP = (1 << 5),
+	HAS_ITEM = (1 << 6),
 } entity_flag_t;
 
 typedef struct entity {
@@ -67,9 +69,16 @@ typedef struct entity {
 	player_controller_c player_controller;
 	player_collider_c player_collider;
 	inventory_t inventory;
+	overlap_c overlap;
+	index_t item_index;
 } entity_t;
 
 enum {
     STATE_MAIN_MENU,
     STATE_GAMEPLAY,
+};
+
+enum {
+	LAYER_PLAYER = (1 << 0),
+	LAYER_ITEMS = (1 << 1),
 };

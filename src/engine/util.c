@@ -252,3 +252,18 @@ void print_mesh(res_pack_t *res_pack, index_t mesh_index) {
 		printf("\n");
 	}
 }
+
+box_t generate_even_box(float size) {
+	box_t box = {0};
+
+	box.min_x = -size;
+	box.max_x = size;
+
+	box.min_y = -size;
+	box.max_y = size;
+
+	box.min_z = -size;
+	box.max_z = size;
+
+	return box;
+}

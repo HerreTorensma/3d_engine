@@ -26,6 +26,8 @@ void input(SDL_Event event) {
 int main(int argc, char *argv[]) {
 	engine_init("My fuckass 'desert game' set in a currently unknown location", 1280, 720, 640, 360, input);
 
+	// memset(state.ent_system.entities, 0, 1024 * sizeof(entity_t));
+
 	load_game(&state.res_pack);
 
 	SDL_SetRelativeMouseMode(SDL_TRUE);

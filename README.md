@@ -137,6 +137,9 @@
         - Think about how to organize the game itself and the state (main menu, level select whatever) and edit mode
             - Edit mode is part of game
 
+        - When you pick up ammo, add to the amount of the slot of the weapon it belongs to
+        - Same for cigarettes except it will be consumed completely
+
 ## Dependencies
 - SDL2
 - SDL_mixer

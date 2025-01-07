@@ -3,6 +3,7 @@ This file contains all the functions that spawn entities
 */
 #include "entity.h"
 #include "state.h"
+#include "engine/util.h"
 
 index_t spawn_player(transform_t transform) {
     index_t ent_index = ent_new();
@@ -84,12 +85,19 @@ void spawn_gate(transform_t transform) {
 }
 
 void spawn_dropped_item(transform_t transform, index_t item_index) {
-    entity_t *ent = ent_get(ent_new());
-    ent->flags = HAS_SPRITE;
+    index_t ent_index = ent_new();
+    entity_t *ent = ent_get(ent_index);
+    ent->flags = HAS_SPRITE | HAS_OVERLAP | HAS_ITEM;
     memcpy(&ent->transform, &transform, sizeof(transform_t));
 
     ent->sprite.billboard = true;
     ent->sprite.texture_index = state.res_pack.items[item_index].thumbnail_index;
     ent->sprite.x_scale = 0.17f;
     ent->sprite.y_scale = 0.17f;
+
+    ent->overlap.box = generate_even_box(0.25f);
+    ent->overlap.collision_layer = LAYER_ITEMS;
+    ent->overlap.collision_mask = LAYER_PLAYER;
+
+    ent->item_index = item_index;
 };

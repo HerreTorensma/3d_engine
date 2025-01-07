@@ -10,6 +10,26 @@
 #include "prefabs.c"
 #include "state.h"
 
+static void drop_item(entity_t *player_ent) {
+	// Drop current item
+	player_ent->inventory.slots[player_ent->inventory.selected_slot].amount--;
+
+	transform_t new_transform = {0};
+	vec3 offset;
+	glm_vec3_copy(&player_ent->transform, &new_transform);
+	glm_vec3_scale(player_ent->camera.front, 1.0f, offset);
+
+	new_transform.position[0] += offset[0];
+	// new_transform.position[1] += offset[1];
+	new_transform.position[2] += offset[2];
+
+	spawn_dropped_item(new_transform, player_ent->inventory.slots[player_ent->inventory.selected_slot].item_index);
+
+	if (player_ent->inventory.slots[player_ent->inventory.selected_slot].amount == 0) {
+		memset(&player_ent->inventory.slots[player_ent->inventory.selected_slot], 0, sizeof(inventory_slot_t));
+	}
+}
+
 void player_controller(res_pack_t *res_pack, grid_t *grid, entity_t *player_ent) {
 	if (input_key_pressed(SDL_SCANCODE_F)) {
 		SDL_SetRelativeMouseMode(SDL_FALSE);
@@ -23,13 +43,8 @@ void player_controller(res_pack_t *res_pack, grid_t *grid, entity_t *player_ent)
 	}
 
 	if (input_key_pressed(SDL_SCANCODE_Q)) {
-		// Drop current item
-		player_ent->inventory.slots[player_ent->inventory.selected_slot].amount--;
-
-		spawn_dropped_item(player_ent->transform, player_ent->inventory.slots[player_ent->inventory.selected_slot].item_index);
-
-		if (player_ent->inventory.slots[player_ent->inventory.selected_slot].amount == 0) {
-			memset(&player_ent->inventory.slots[player_ent->inventory.selected_slot], 0, sizeof(inventory_slot_t));
+		if (player_ent->inventory.slots[player_ent->inventory.selected_slot].amount != 0) {
+			drop_item(player_ent);
 		}
 	}
 
@@ -152,6 +167,36 @@ void player_controller(res_pack_t *res_pack, grid_t *grid, entity_t *player_ent)
 	}
 }
 
+static void pickup_item(index_t ent_index) {
+	entity_t *ent = ent_get(ent_index);
+
+	inventory_t *inventory = &ent_get(state.player_ent_index)->inventory;
+
+	size_t first_free_slot = 0;
+	bool first_free_slot_found = false;
+	bool item_in_inventory = false;
+
+	for (size_t i = 0; i < inventory->slots_amount; i++) {
+		if (inventory->slots[i].item_index == ent->item_index) {
+			inventory->slots[i].amount++;
+			item_in_inventory = true;
+			break;
+		}
+
+		if (inventory->slots[i].item_index == 0 && !first_free_slot_found) {
+			first_free_slot = i;
+			first_free_slot_found = true;
+		}
+	}
+
+	if (!item_in_inventory) {
+		inventory->slots[first_free_slot].item_index = ent->item_index;
+		inventory->slots[first_free_slot].amount = 1;
+	}
+
+	ent_destroy(ent_index);
+}
+
 void game_update() {
 	entity_t *player_ent = ent_get(state.player_ent_index);
 
@@ -160,7 +205,25 @@ void game_update() {
     for (size_t i = 0; i < 1024; i++) {
 		entity_t *ent = ent_get(i);
         if (ent->is_valid) {
+			// if ((ent->flags & HAS_OVERLAP) == HAS_OVERLAP) {
+			// 	if ((ent->overlap.collision_mask & LAYER_PLAYER) == LAYER_PLAYER) {
+			// 		if (box_overlap_box(player_ent->transform.position, player_ent->player_collider.box, ent->transform.position, ent->overlap.box)) {
+			// 			if ((ent->flags & HAS_ITEM) == HAS_ITEM) {
+			// 				pickup_item(i);
+			// 			}
+			// 		}
+			// 	}
+			// }
 
+			if (ent->flags & HAS_OVERLAP) {
+				if (ent->overlap.collision_mask & LAYER_PLAYER) {
+					if (box_overlap_box(player_ent->transform.position, player_ent->player_collider.box, ent->transform.position, ent->overlap.box)) {
+						if (ent->flags & HAS_ITEM) {
+							pickup_item(i);
+						}
+					}
+				}
+			}
         }
     }
 }
