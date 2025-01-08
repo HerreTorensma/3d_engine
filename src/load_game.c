@@ -49,12 +49,18 @@ void load_game(res_pack_t *res_pack) {
 
 	res_add_texture(res_pack, TEX_GLOCK_THUMBNAIL, "res/images/glock.tga");
 	res_add_texture(res_pack, TEX_CIGARETTE, "res/images/cigarette.tga");
+	res_add_texture(res_pack, TEX_GLOCK_FRAME, "res/images/glock_frame.tga");
+	res_add_texture(res_pack, TEX_CIGARETTE_FRAME, "res/images/cigarette_frame.tga");
 	
 	res_add_item(res_pack, ITEM_GLOCK, (item_t){
+		.name = "Glock",
+		.desc = "A small handgun",
+
 		.stackable = false,
 		.thumbnail_index = TEX_GLOCK_THUMBNAIL,
 		.stats_type = STATS_GUN,
 		.stats.gun = (gun_stats_t){
+			.image_index = TEX_GLOCK_FRAME,
 			.automatic = false,
 			.fire_delay = 0.2f,
 			.mag_size = 17,
@@ -62,7 +68,11 @@ void load_game(res_pack_t *res_pack) {
 		},
 	});
 	res_add_item(res_pack, ITEM_CIGARETTE, (item_t){
+		.name = "Cigarette",
+		.desc = "A nice smokable cig that you could smoke or litter. 10mg nicotine",
+
 		.stackable = true,
+		.image_index = TEX_CIGARETTE_FRAME,
 		.thumbnail_index = TEX_CIGARETTE,
 		.stats_type = STATS_NONE,
 	});

@@ -39,12 +39,22 @@ void font_init(font_t *font, res_pack_t *res_pack, size_t texture_index) {
 void gui_print(res_pack_t *res_pack, font_t *font, const char text[], i32 x, i32 y, color_t color) {
     i32 index = 0;
     i32 current_x = x;
+    i32 current_y = y;
+
     while (text[index] != '\0') {
+        if (text[index] == '\n') {
+            current_x = x;
+            current_y += font->rects['A'].h;
+
+            index++;
+            continue;
+        }
+
         vec2 scale = {1.0f, 1.0f};
         // render_image_ex(res_pack, font->texture_index, PIVOT_TOP_LEFT, font->rects[text[index]], current_x, y, 0.0f, scale, res_pack->font.color);
         rect_t dst = {
             .x = current_x,
-            .y = y,
+            .y = current_y,
             .w = font->rects[text[index]].w,
             .h = font->rects[text[index]].h,
         };
@@ -57,7 +67,7 @@ void gui_print(res_pack_t *res_pack, font_t *font, const char text[], i32 x, i32
     }
 }
 
-static i32 gui_get_text_width(res_pack_t *res_pack, font_t *font, const char text[]) {
+static i32 gui_get_text_width(font_t *font, const char text[]) {
     i32 index = 0;
     i32 current_x = 0;
 
@@ -87,7 +97,8 @@ bool gui_button(res_pack_t *res_pack, const char text[], rect_t tile_rect) {
     rect_t global_rect = tile_to_global(res_pack, tile_rect);
 
     bool released = false;
-	if (mouse_x >= global_rect.x && mouse_x < global_rect.x + global_rect.w && mouse_y >= global_rect.y && mouse_y < global_rect.y + global_rect.h) {
+	// if (mouse_x >= global_rect.x && mouse_x < global_rect.x + global_rect.w && mouse_y >= global_rect.y && mouse_y < global_rect.y + global_rect.h) {
+	if (point_overlap_rect(mouse_x, mouse_y, global_rect)) {
         if (input_mouse_button_held(SDL_BUTTON_LEFT)) {
 			tex_index = res_pack->button_pressed_tex_index;
 		}
@@ -130,7 +141,7 @@ bool gui_button(res_pack_t *res_pack, const char text[], rect_t tile_rect) {
         }
     }
 
-    i32 text_width = gui_get_text_width(res_pack, &res_pack->font, text);
+    i32 text_width = gui_get_text_width(&res_pack->font, text);
 
     i32 text_x = global_rect.x + (global_rect.w / 2) - (text_width / 2) - 1;
     // i32 text_y = global_rect.y + (global_rect.h / 2) + res_pack->font.y_center;
@@ -300,4 +311,26 @@ void gui_id_reset(void) {
 u32 gui_id_gen(void) {
     current_id++;
     return current_id;
+}
+
+void wrap_text(font_t *font, char *buffer, i32 max_width) {
+    // Since strtok changes the spaces into \0 characters,
+    // we can use strtok and if the max width is exceeded replace the \0 with a \n
+    // and replace the \0's with spaces again
+    // I haven't tested this function for memory safety
+
+    char *token = strtok(buffer, " ");
+    i32 current_length = 0;
+    while (token != NULL) {
+        current_length += gui_get_text_width(font, token) + gui_get_text_width(font, " ");
+
+        if (current_length > max_width) {
+            *(token - 1) = '\n';
+            current_length = gui_get_text_width(font, token);
+        } else {
+            *(token - 1) = ' ';
+        }
+
+        token = strtok(NULL, " ");
+    }
 }

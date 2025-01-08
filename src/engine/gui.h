@@ -20,3 +20,5 @@ void gui_text_edit(res_pack_t *res_pack, char text[], size_t buffer_size, rect_t
 void gui_id_reset(void);
 
 u32 gui_id_gen(void);
+
+void wrap_text(font_t *font, char *buffer, i32 max_width);

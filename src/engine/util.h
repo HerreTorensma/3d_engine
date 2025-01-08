@@ -40,6 +40,8 @@ void print_mesh(res_pack_t *res_pack, index_t mesh_index);
 
 box_t generate_even_box(float size);
 
+bool point_overlap_rect(i32 x, i32 y, rect_t rect);
+
 inline i32 min_i32(i32 a, i32 b) {
 	if (a < b) {
 		return a;

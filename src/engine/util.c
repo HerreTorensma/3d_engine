@@ -267,3 +267,7 @@ box_t generate_even_box(float size) {
 
 	return box;
 }
+
+bool point_overlap_rect(i32 x, i32 y, rect_t rect) {
+	return (x >= rect.x && x < rect.x + rect.w && y >= rect.y && y < rect.y + rect.h);
+}

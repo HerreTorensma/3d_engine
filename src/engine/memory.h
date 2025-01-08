@@ -27,3 +27,5 @@ void *temp_calloc(size_t size);
 void temp_clear();
 
 void temp_free();
+
+char *temp_strdup(char *string);

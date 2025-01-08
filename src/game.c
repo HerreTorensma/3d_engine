@@ -30,6 +30,14 @@ static void drop_item(entity_t *player_ent) {
 	}
 }
 
+static void gun_update() {
+
+}
+
+static void gun_render(gun_stats_t *stats) {
+	render_image(&state.res_pack, stats->image_index, 0, 0, COLOR_WHITE);
+}
+
 void player_controller(res_pack_t *res_pack, grid_t *grid, entity_t *player_ent) {
 	if (input_key_pressed(SDL_SCANCODE_F)) {
 		SDL_SetRelativeMouseMode(SDL_FALSE);
@@ -270,20 +278,44 @@ static size_t get_sorted_sprite_entities(entity_t **sorted_sprites) {
 
 static void render_inventory(inventory_t *inventory) {
 	for (i32 i = 0; i < inventory->slots_amount; i++) {
+		item_t *item = &state.res_pack.items[inventory->slots[i].item_index];
+
 		if (gui_button(&state.res_pack, "", (rect_t){i * 2, 43, 2, 2})) {
 			inventory->selected_slot = i;
 		}
 		
-		render_image(&state.res_pack, state.res_pack.items[inventory->slots[i].item_index].thumbnail_index, i * 2 * 8, 43 * 8, COLOR_WHITE);
+		render_image(&state.res_pack, item->thumbnail_index, i * 2 * 8, 43 * 8, COLOR_WHITE);
 
-		if (state.res_pack.items[inventory->slots[i].item_index].stackable) {
+		if (item->stackable) {
 			char *buffer = temp_alloc(16 * sizeof(char));
 			sprintf(buffer, "%d", inventory->slots[i].amount);
 			gui_print(&state.res_pack, &state.res_pack.font, buffer, i * 2 * 8, 43 * 8, COLOR_BLACK);
 		}
 	}
-	// debug_log("selected slot: %d\n", player_ent->inventory.selected_slot);
+
 	render_image(&state.res_pack, TEX_BUTTON_SELECTED_INDICATOR, inventory->selected_slot * 2 * 8 + 4, 42 * 8, COLOR_RED);
+
+	for (i32 i = 0; i < inventory->slots_amount; i++) {
+		if (inventory->slots[i].item_index == 0) {
+			continue;
+		}
+
+		item_t *item = &state.res_pack.items[inventory->slots[i].item_index];
+
+		i32 mouse_x, mouse_y;
+		get_mouse_pos(&mouse_x, &mouse_y);
+		if (point_overlap_rect(mouse_x, mouse_y, (rect_t){i * 2 * 8, 43 * 8, 2 * 8, 2 * 8})) {
+			mouse_y -= 48;
+
+			render_filled_rect(&state.res_pack, (rect_t){mouse_x, mouse_y, 96, 48}, COLOR_BLACK);
+			gui_print(&state.res_pack, &state.res_pack.font, item->name, mouse_x + 1, mouse_y, COLOR_WHITE);
+
+			// Text wrap the description
+			char *wrapped_desc = temp_strdup(item->desc);
+			wrap_text(&state.res_pack.font, wrapped_desc, 96);
+			gui_print(&state.res_pack, &state.res_pack.font, wrapped_desc, mouse_x + 1, mouse_y+8, COLOR_WHITE);
+		}
+	}
 }
 
 void game_render() {
@@ -303,6 +335,17 @@ void game_render() {
 
 	// Inventory
 	render_inventory(&player_ent->inventory);
+
+	item_t *selected_item = &state.res_pack.items[player_ent->inventory.slots[player_ent->inventory.selected_slot].item_index];
+	if (selected_item->stats_type == STATS_NONE) {
+		render_image(&state.res_pack, selected_item->image_index, 0, 0, COLOR_WHITE);
+	} else {
+		switch (selected_item->stats_type) {
+			case STATS_GUN:
+				gun_render(&selected_item->stats.gun);
+				break;
+		}
+	}
 }
 
 void game_input(SDL_Event event, entity_t *player_ent) {

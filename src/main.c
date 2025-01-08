@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
 
     font_init(&state.res_pack.font, &state.res_pack, TEX_FONT);
 	state.res_pack.font.y_center = -4;
-
+	
 	// grid_init(&grid, 512, 16, 512);
 	// grid_load(&grid, "test.grid");
 	grid_load(&state.grid, "test2.grid");

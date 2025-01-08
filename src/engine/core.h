@@ -242,6 +242,8 @@ enum {
 
 // Applies to every type of gun
 typedef struct gun_stats {
+    index_t image_index;
+
     bool automatic;
     u32 mag_size;
     float fire_delay;
@@ -285,7 +287,11 @@ union mut_stats {
 // }
 
 typedef struct item {
+    char name[32];
+    char desc[128];
+
     bool stackable;
+    index_t image_index;
     index_t thumbnail_index;
     stats_type_t stats_type;
     union stats stats;

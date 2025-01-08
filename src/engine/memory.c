@@ -58,3 +58,9 @@ void temp_clear() {
 void temp_free() {
     arena_free(&_temp_arena);
 }
+
+char *temp_strdup(char *string) {
+    size_t size = strlen(string);
+    char *buffer = temp_alloc(size + 1);
+    strcpy(buffer, string);
+}

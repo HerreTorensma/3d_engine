@@ -308,6 +308,39 @@ void render_image_rect(res_pack_t *res_pack, index_t texture_index, rect_t src, 
 	render_mesh(&quad_mesh, texture_index);
 }
 
+void render_filled_rect(res_pack_t *res_pack, rect_t dst, color_t color) {
+	glDisable(GL_DEPTH_TEST);
+
+	glUseProgram(gui_shader);
+
+	mat4 projection = {0};
+	// glm_ortho(0.0f, window_width, window_height, 0.0f, -1.0f, 1.0f, projection);
+	glm_ortho(0.0f, res_pack->render_width, res_pack->render_height, 0.0f, -1.0f, 1.0f, projection);
+
+	mat4 model = {0};
+	glm_mat4_identity(model);
+
+	// glm_translate(model, (vec3){x_offset, y_offset, 0.0f});
+	// glm_translate(model, (vec3){(float)dst.x * screen_scale, (float)dst.y * screen_scale, 0.0f});
+	glm_translate(model, (vec3){(float)dst.x, (float)dst.y, 0.0f});
+	
+	// Scale according to the dst rect
+	glm_scale(model, (vec3){(float)dst.w / 2.0f, (float)dst.h / 2.0f, 0.0f});
+	// glm_scale(model, (vec3){(float)screen_scale, (float)screen_scale, 0.0f});
+
+	// Draw from top left instead of center
+	glm_translate(model, (vec3){1.0f, 1.0f, 0.0f});
+
+	shader_set_mat4(gui_shader, "model", &model);
+	shader_set_mat4(gui_shader, "projection", &projection);
+
+	vec4 gl_color = {0};
+	color_to_gl_color(color, gl_color);
+	shader_set_vec4(gui_shader, "color1", &gl_color);
+
+	render_mesh(&quad_mesh, 0);
+}
+
 void render_mesh_isometric(res_pack_t *res_pack, mesh_t mesh, index_t texture_index, i32 x, i32 y, float scale) {
     glEnable(GL_DEPTH_TEST);
 
