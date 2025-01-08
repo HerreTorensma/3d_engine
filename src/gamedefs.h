@@ -38,6 +38,7 @@ enum {
 	TEX_CIGARETTE,
 	TEX_GLOCK_FRAME,
 	TEX_CIGARETTE_FRAME,
+	TEX_BULLET,
 };
 
 enum {
@@ -57,6 +58,7 @@ typedef enum entity_flag {
 	HAS_INVENTORY = (1 << 4),
 	HAS_OVERLAP = (1 << 5),
 	HAS_ITEM = (1 << 6),
+	HAS_MOVING = (1 << 7),
 } entity_flag_t;
 
 typedef struct entity {
@@ -73,6 +75,7 @@ typedef struct entity {
 	inventory_t inventory;
 	overlap_c overlap;
 	index_t item_index;
+	transform_t moving_delta;
 } entity_t;
 
 enum {

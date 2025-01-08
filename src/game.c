@@ -30,8 +30,13 @@ static void drop_item(entity_t *player_ent) {
 	}
 }
 
-static void gun_update() {
+static void gun_update(gun_stats_t *stats) {
+	entity_t *player_ent = ent_get(state.player_ent_index);
 
+	if (input_mouse_button_pressed(SDL_BUTTON_LEFT)) {
+		// Spawn bullet
+		spawn_bullet(ent_get(state.player_ent_index)->transform, (transform_t){.position = {player_ent->camera.front[0], player_ent->camera.front[1], player_ent->camera.front[2]}});
+	}
 }
 
 static void gun_render(gun_stats_t *stats) {
@@ -48,6 +53,11 @@ void player_controller(res_pack_t *res_pack, grid_t *grid, entity_t *player_ent)
 	if (input_key_released(SDL_SCANCODE_F)) {
 		SDL_SetRelativeMouseMode(SDL_TRUE);
 		state.cursor_free = false;
+	}
+
+	if (!state.cursor_free) {
+		// Lock mouse in the middle of the screen so you don't fuck with the inventory while playing
+		SDL_WarpMouseInWindow(state.window, window_width / 2, window_height / 2);
 	}
 
 	if (input_key_pressed(SDL_SCANCODE_Q)) {
@@ -210,6 +220,13 @@ void game_update() {
 
     player_controller(&state.res_pack, &state.grid, player_ent);
 
+	item_t *selected_item = &state.res_pack.items[player_ent->inventory.slots[player_ent->inventory.selected_slot].item_index];
+	switch (selected_item->stats_type) {
+		case STATS_GUN:
+			gun_update(&selected_item->stats.gun);
+			break;
+	}
+
     for (size_t i = 0; i < 1024; i++) {
 		entity_t *ent = ent_get(i);
         if (ent->is_valid) {
@@ -231,6 +248,10 @@ void game_update() {
 						}
 					}
 				}
+			}
+
+			if (ent->flags & HAS_MOVING) {
+				glm_vec3_add(&ent->transform, &ent->moving_delta, &ent->transform);
 			}
         }
     }

@@ -101,3 +101,16 @@ void spawn_dropped_item(transform_t transform, index_t item_index) {
 
     ent->item_index = item_index;
 };
+
+void spawn_bullet(transform_t transform, transform_t moving_delta) {
+    entity_t *ent = ent_get(ent_new());
+    ent->flags = HAS_SPRITE | HAS_MOVING;
+    memcpy(&ent->transform, &transform, sizeof(transform_t));
+    ent->sprite.texture_index = TEX_BULLET;
+
+    ent->sprite.billboard = true;
+    ent->sprite.x_scale = 1.0f;
+    ent->sprite.y_scale = 1.0f;
+
+    memcpy(&ent->moving_delta, &moving_delta, sizeof(transform_t));
+}
