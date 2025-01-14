@@ -313,6 +313,7 @@ typedef struct res_pack {
 	color_t fog_color;
 	color_t sky_color;
 	color_t editor_color;
+    u32 skybox_id;
 
 	u32 render_width;
 	u32 render_height;

@@ -4,6 +4,7 @@ static u32 game_shader = 0;
 static u32 basic_shader = 0;
 static u32 ortho_shader = 0;
 static u32 gui_shader = 0;
+static u32 skybox_shader = 0;
 
 static u32 fbo = 0;
 static u32 fbo_tex = 0;
@@ -119,6 +120,7 @@ void render_init(res_pack_t *res_pack) {
     basic_shader = create_shader_program("res/shaders/2d/vert.glsl", "res/shaders/2d/frag.glsl");
     ortho_shader = create_shader_program("res/shaders/editor/vert.glsl", "res/shaders/editor/frag.glsl");
     gui_shader = create_shader_program("res/shaders/gui/vert.glsl", "res/shaders/gui/frag.glsl");
+    skybox_shader = create_shader_program("res/shaders/skybox/vert.glsl", "res/shaders/skybox/frag.glsl");
 	
 	init_frame_buffer(res_pack);
 
@@ -425,6 +427,42 @@ void render_grid_ortho(res_pack_t *res_pack, grid_t *grid, enum ortho_view orien
 	}
 }
 
+static void render_skybox(res_pack_t *res_pack, vec3 position, camera_t *camera) {
+	glUseProgram(skybox_shader);
+
+	mat4 view = {0};
+	vec3 temp = {0};
+	glm_vec3_add(position, camera->front, temp);
+	glm_lookat(position, temp, camera->up, view);
+	// Reset translation
+	view[3][0] = 0.0f;
+	view[3][1] = 0.0f;
+	view[3][2] = 0.0f;
+	shader_set_mat4(skybox_shader, "view", &view);
+
+	mat4 projection = {0};
+	glm_perspective(glm_rad(60.0f), (float)(viewport_width) / (float)(viewport_height), 0.1f, 100.0f, projection);
+	
+	shader_set_mat4(skybox_shader, "projection", &projection);
+
+	glDepthMask(GL_FALSE);
+	glDepthFunc(GL_LEQUAL);
+
+	glBindVertexArray(res_pack->meshes[1].vao);
+	
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, res_pack->skybox_id);
+	shader_set_int(skybox_shader, "skybox", 0);
+	
+	// TODO: Make cube inherent part of game engine as well
+	glDrawElements(GL_TRIANGLES, res_pack->meshes[1].index_count, GL_UNSIGNED_INT, 0);
+
+	glBindVertexArray(0);
+
+	glDepthMask(GL_TRUE);
+	glDepthFunc(GL_LESS);
+}
+
 // void render_game(res_pack_t *res_pack, grid_t *grid, ecs_world_t *ecs, vec3 position, camera_t *camera) {
 void render_game(res_pack_t *res_pack, grid_t *grid, vec3 position, camera_t *camera) {
 	// global_position = &position;
@@ -436,6 +474,9 @@ void render_game(res_pack_t *res_pack, grid_t *grid, vec3 position, camera_t *ca
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
+	// TODO: call this after everything as an optimization or whatever
+	render_skybox(res_pack, position, camera);
 
     glUseProgram(game_shader);
 
@@ -458,6 +499,7 @@ void render_game(res_pack_t *res_pack, grid_t *grid, vec3 position, camera_t *ca
 	// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	render_grid(res_pack, grid);
+	
 
 	// render_mesh_components(res_pack, ecs);
 

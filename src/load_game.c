@@ -52,6 +52,16 @@ void load_game(res_pack_t *res_pack) {
 	res_add_texture(res_pack, TEX_GLOCK_FRAME, "res/images/glock_frame.tga");
 	res_add_texture(res_pack, TEX_CIGARETTE_FRAME, "res/images/cigarette_frame.tga");
 	res_add_texture(res_pack, TEX_BULLET, "res/images/bullet.tga");
+
+	// res_add_skybox(res_pack, "res/images/skybox.tga");
+	res_add_skybox(res_pack,
+		"res/images/skybox/right.tga",
+		"res/images/skybox/left.tga",
+		"res/images/skybox/top.tga",
+		"res/images/skybox/bottom.tga",
+		"res/images/skybox/front.tga",
+		"res/images/skybox/back.tga"
+	);
 	
 	res_add_item(res_pack, ITEM_GLOCK, (item_t){
 		.name = "Glock",

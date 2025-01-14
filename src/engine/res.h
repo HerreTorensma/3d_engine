@@ -33,3 +33,5 @@ void res_add_sound(res_pack_t *res_pack, index_t index, sound_t sound);
 texture_t *tex_get(index_t index);
 
 mesh_t *mesh_get(index_t index);
+
+void res_add_skybox(res_pack_t *res_pack, const char right_path[], const char left_path[], const char top_path[], const char bottom_path[], const char front_path[], const char back_path[]);

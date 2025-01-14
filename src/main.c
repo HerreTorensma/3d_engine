@@ -32,6 +32,8 @@ int main(int argc, char *argv[]) {
 
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 
+	print_mesh(&state.res_pack, MESH_CUBE);
+
     state.mode = STATE_GAMEPLAY;
 
     font_init(&state.res_pack.font, &state.res_pack, TEX_FONT);

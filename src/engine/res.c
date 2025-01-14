@@ -89,6 +89,40 @@ void send_texture_to_gpu(texture_t *texture) {
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+static u32 send_cube_map_to_gpu(texture_t *right_texture, texture_t *left_texture, texture_t *top_texture, texture_t *bottom_texture, texture_t *front_texture, texture_t *back_texture) {
+	u32 id = 0;
+
+	glGenTextures(1, &id);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, id);
+
+	{
+		texture_t right = load_tga("res/images/skybox/right.tga");
+		texture_t left = load_tga("res/images/skybox/left.tga");
+		texture_t top = load_tga("res/images/skybox/top.tga");
+		texture_t bottom = load_tga("res/images/skybox/bottom.tga");
+		texture_t front = load_tga("res/images/skybox/front.tga");
+		texture_t back = load_tga("res/images/skybox/back.tga");
+		
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGBA, right.width, right.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, right.pixels);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGBA, left.width, left.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, left.pixels);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGBA, top.width, top.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, top.pixels);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGBA, bottom.width, bottom.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, bottom.pixels);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGBA, front.width, front.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, front.pixels);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGBA, back.width, back.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, back.pixels);
+	}
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+	return id;
+}
+
 void res_add_texture(res_pack_t *res_pack, index_t index, const char path[]) {
 	if (!index_valid(index)) {
 		return;
@@ -127,4 +161,15 @@ mesh_t *mesh_get(index_t index) {
 	}
 
 	return &_res_pack->meshes[index];
+}
+
+void res_add_skybox(res_pack_t *res_pack, const char right_path[], const char left_path[], const char top_path[], const char bottom_path[], const char front_path[], const char back_path[]) {
+	texture_t right_texture = load_tga(right_path);
+	texture_t left_texture = load_tga(left_path);
+	texture_t top_texture = load_tga(top_path);
+	texture_t bottom_texture = load_tga(bottom_path);
+	texture_t front_texture = load_tga(front_path);
+	texture_t back_texture = load_tga(back_path);
+	
+	res_pack->skybox_id = send_cube_map_to_gpu(&right_texture, &left_texture, &top_texture, &bottom_texture, &front_texture, &back_texture);
 }
