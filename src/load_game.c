@@ -49,7 +49,7 @@ void load_game(res_pack_t *res_pack) {
 
 	res_add_texture(res_pack, TEX_GLOCK_THUMBNAIL, "res/images/glock.tga");
 	res_add_texture(res_pack, TEX_CIGARETTE, "res/images/cigarette.tga");
-	res_add_texture(res_pack, TEX_GLOCK_FRAME, "res/images/glock_frame.tga");
+	res_add_texture(res_pack, TEX_GLOCK_FRAME, "res/images/1911_frame.tga");
 	res_add_texture(res_pack, TEX_CIGARETTE_FRAME, "res/images/cigarette_frame.tga");
 	res_add_texture(res_pack, TEX_BULLET, "res/images/bullet.tga");
 
@@ -64,7 +64,7 @@ void load_game(res_pack_t *res_pack) {
 	);
 	
 	res_add_item(res_pack, ITEM_GLOCK, (item_t){
-		.name = "Glock",
+		.name = "1911 pistol",
 		.desc = "A small handgun",
 
 		.stackable = false,
@@ -74,7 +74,7 @@ void load_game(res_pack_t *res_pack) {
 			.image_index = TEX_GLOCK_FRAME,
 			.automatic = false,
 			.fire_delay = 0.2f,
-			.mag_size = 17,
+			.mag_size = 8,
 			.reload_time = 2.0f,
 		},
 	});

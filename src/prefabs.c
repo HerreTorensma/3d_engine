@@ -40,7 +40,7 @@ index_t spawn_player(transform_t transform) {
     ent->inventory.slots[0] = (inventory_slot_t){
         .item_index = ITEM_GLOCK,
         .amount = 1,
-        .mut_stats = {0},
+        .mut_stats = {.gun.bullets_left = 8},
     };
     ent->inventory.slots[1] = (inventory_slot_t){
         .item_index = ITEM_CIGARETTE,

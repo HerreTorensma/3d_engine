@@ -96,12 +96,19 @@ static u32 send_cube_map_to_gpu(texture_t *right_texture, texture_t *left_textur
 	glBindTexture(GL_TEXTURE_CUBE_MAP, id);
 
 	{
-		texture_t right = load_tga("res/images/skybox/right.tga");
-		texture_t left = load_tga("res/images/skybox/left.tga");
+		// texture_t right = load_tga("res/images/skybox/right.tga");
+		// texture_t left = load_tga("res/images/skybox/left.tga");
+		// texture_t top = load_tga("res/images/skybox/top.tga");
+		// texture_t bottom = load_tga("res/images/skybox/bottom.tga");
+		// texture_t front = load_tga("res/images/skybox/front.tga");
+		// texture_t back = load_tga("res/images/skybox/back.tga");
+
+		texture_t right = load_tga("res/images/skybox/top.tga");
+		texture_t left = load_tga("res/images/skybox/top.tga");
 		texture_t top = load_tga("res/images/skybox/top.tga");
-		texture_t bottom = load_tga("res/images/skybox/bottom.tga");
-		texture_t front = load_tga("res/images/skybox/front.tga");
-		texture_t back = load_tga("res/images/skybox/back.tga");
+		texture_t bottom = load_tga("res/images/skybox/top.tga");
+		texture_t front = load_tga("res/images/skybox/top.tga");
+		texture_t back = load_tga("res/images/skybox/top.tga");
 		
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGBA, right.width, right.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, right.pixels);
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGBA, left.width, left.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, left.pixels);

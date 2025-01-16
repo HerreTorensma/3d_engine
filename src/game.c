@@ -30,17 +30,25 @@ static void drop_item(entity_t *player_ent) {
 	}
 }
 
-static void gun_update(gun_stats_t *stats) {
+static void gun_update(const gun_stats_t *stats, gun_mut_stats_t *mut_stats) {
 	entity_t *player_ent = ent_get(state.player_ent_index);
 
 	if (input_mouse_button_pressed(SDL_BUTTON_LEFT)) {
 		// Spawn bullet
-		spawn_bullet(ent_get(state.player_ent_index)->transform, (transform_t){.position = {player_ent->camera.front[0], player_ent->camera.front[1], player_ent->camera.front[2]}});
+		spawn_bullet(ent_get(state.player_ent_index)->transform, (transform_t){.position = {player_ent->camera.front[0] * 2.0f, player_ent->camera.front[1] * 2.0f, player_ent->camera.front[2] * 2.0f}});
+		mut_stats->bullets_left--;
+		if (mut_stats->bullets_left == 0) {
+			mut_stats->bullets_left = stats->mag_size;
+		}
 	}
 }
 
-static void gun_render(gun_stats_t *stats) {
+static void gun_render(const gun_stats_t *stats, gun_mut_stats_t *mut_stats) {
 	render_image(&state.res_pack, stats->image_index, 0, 0, COLOR_WHITE);
+
+	char *ammo_text = temp_alloc(32);
+	sprintf(ammo_text, "%d/%d", mut_stats->bullets_left, stats->mag_size);
+	gui_print(&state.res_pack, &state.res_pack.font, ammo_text, 640 - 24, 360 - 24, COLOR_BLACK);
 }
 
 // i32 get_entity_collisions(vec3 player_pos, box_t *player_box, collision_t *collisions) {
@@ -327,9 +335,11 @@ void game_update() {
     player_controller(&state.res_pack, &state.grid, player_ent);
 
 	item_t *selected_item = &state.res_pack.items[player_ent->inventory.slots[player_ent->inventory.selected_slot].item_index];
+	union mut_stats *mut_stats = &player_ent->inventory.slots[player_ent->inventory.selected_slot].mut_stats;
+
 	switch (selected_item->stats_type) {
 		case STATS_GUN:
-			gun_update(&selected_item->stats.gun);
+			gun_update(&selected_item->stats.gun, &mut_stats->gun);
 			break;
 	}
 
@@ -458,21 +468,24 @@ void game_render() {
     }
 
 	// Crosshair
-	render_image(&state.res_pack, TEX_CROSSHAIR, state.res_pack.render_width / 2 - 4, state.res_pack.render_height / 2 - 4, COLOR_WHITE);
+	render_image(&state.res_pack, TEX_CROSSHAIR, state.res_pack.render_width / 2 - 3, state.res_pack.render_height / 2 - 3, COLOR_WHITE);
 
-	// Inventory
-	render_inventory(&player_ent->inventory);
-
+	// Current item
 	item_t *selected_item = &state.res_pack.items[player_ent->inventory.slots[player_ent->inventory.selected_slot].item_index];
+	union mut_stats *mut_stats = &player_ent->inventory.slots[player_ent->inventory.selected_slot].mut_stats;
+
 	if (selected_item->stats_type == STATS_NONE) {
 		render_image(&state.res_pack, selected_item->image_index, 0, 0, COLOR_WHITE);
 	} else {
 		switch (selected_item->stats_type) {
 			case STATS_GUN:
-				gun_render(&selected_item->stats.gun);
+				gun_render(&selected_item->stats.gun, &mut_stats->gun);
 				break;
 		}
 	}
+
+	// Inventory
+	render_inventory(&player_ent->inventory);
 }
 
 void game_input(SDL_Event event, entity_t *player_ent) {
