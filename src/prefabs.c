@@ -60,6 +60,18 @@ void spawn_barrel(transform_t transform) {
     ent->sprite.billboard = true;
     ent->sprite.x_scale = 1.0f;
     ent->sprite.y_scale = 1.0f;
+
+    ent->collider.boxes[0] = (box_t){
+        .min_x = -0.1,
+        .max_x = 0.1,
+
+        .min_y = -0.1,
+        .max_y = 0.1,
+
+        .min_z = -0.1,
+        .max_z = 0.1,
+    };
+    ent->collider.boxes_len = 1;
 }
 
 void spawn_tree(transform_t transform) {
@@ -71,6 +83,18 @@ void spawn_tree(transform_t transform) {
     ent->sprite.billboard = true;
     ent->sprite.x_scale = 1.0f;
     ent->sprite.y_scale = 1.0f;
+
+    ent->collider.boxes[0] = (box_t){
+        .min_x = -0.1,
+        .max_x = 0.1,
+
+        .min_y = -0.1,
+        .max_y = 0.1,
+
+        .min_z = -0.1,
+        .max_z = 0.1,
+    };
+    ent->collider.boxes_len = 1;
 }
 
 void spawn_gate(transform_t transform) {

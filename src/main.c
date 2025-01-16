@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
     state.player_ent_index = spawn_player((transform_t){0});
 
 	spawn_barrel((transform_t){.position[0] = 5.0f, .position[1] = 1.0f, .position[2] = 5.0f});
-	spawn_tree((transform_t){.position[0] = 5.0f, .position[1] = 1.0f, .position[2] = 6.0f});
+	spawn_tree((transform_t){.position[0] = 5.3f, .position[1] = 1.0f, .position[2] = 5.3f});
 
     render_init(&state.res_pack);
 	editor_init();

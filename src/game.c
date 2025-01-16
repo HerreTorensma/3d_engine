@@ -43,6 +43,66 @@ static void gun_render(gun_stats_t *stats) {
 	render_image(&state.res_pack, stats->image_index, 0, 0, COLOR_WHITE);
 }
 
+// i32 get_entity_collisions(vec3 player_pos, box_t *player_box, collision_t *collisions) {
+// 	entity_t *player_ent = ent_get(state.player_ent_index);
+	
+// 	i32 count = 0;
+
+// 	for (size_t i = 0; i < 1024; i++) {
+// 		entity_t *ent = ent_get(i);
+//         if (ent->is_valid) {
+// 			if (ent->flags & HAS_COLLIDER) {
+// 				// if (ent->collider.collision_mask & LAYER_PLAYER) {
+// 					if (box_overlap_box(player_ent->transform.position, player_ent->player_collider.box, ent->transform.position, ent->collider.boxes[0])) {
+// 						collisions[count] = (collision_t){.hit = true, .global_box = (box_t){
+// 							.min_x = ent->transform.position[0] + ent->collider.boxes[0].min_x,
+// 							.max_x = ent->transform.position[0] + ent->collider.boxes[0].max_x,
+
+// 							.min_y = ent->transform.position[1] + ent->collider.boxes[0].min_y,
+// 							.max_y = ent->transform.position[1] + ent->collider.boxes[0].max_y,
+
+// 							.min_z = ent->transform.position[2] + ent->collider.boxes[0].min_z,
+// 							.max_z = ent->transform.position[2] + ent->collider.boxes[0].max_z,
+// 						}};
+// 						count++;
+// 					}
+// 				// }
+// 			}
+//         }
+//     }
+// 	return count;
+// }
+
+collision_t get_first_entity_collision(vec3 player_pos, box_t *player_box) {
+	entity_t *player_ent = ent_get(state.player_ent_index);
+	
+	for (size_t i = 0; i < 1024; i++) {
+		entity_t *ent = ent_get(i);
+        if (ent->is_valid) {
+			if (ent->flags & HAS_COLLIDER) {
+				// if (ent->collider.collision_mask & LAYER_PLAYER) {
+					if (box_overlap_box(player_ent->transform.position, player_ent->player_collider.box, ent->transform.position, ent->collider.boxes[0])) {
+						return (collision_t){.hit = true, .global_box = (box_t){
+							.min_x = ent->transform.position[0] + ent->collider.boxes[0].min_x,
+							.max_x = ent->transform.position[0] + ent->collider.boxes[0].max_x,
+
+							.min_y = ent->transform.position[1] + ent->collider.boxes[0].min_y,
+							.max_y = ent->transform.position[1] + ent->collider.boxes[0].max_y,
+
+							.min_z = ent->transform.position[2] + ent->collider.boxes[0].min_z,
+							.max_z = ent->transform.position[2] + ent->collider.boxes[0].max_z,
+						}};
+					}
+				// }
+			}
+        }
+    }
+}
+
+void handle_collision() {
+
+}
+
 void player_controller(res_pack_t *res_pack, grid_t *grid, entity_t *player_ent) {
 	if (input_key_pressed(SDL_SCANCODE_F)) {
 		SDL_SetRelativeMouseMode(SDL_FALSE);
@@ -125,7 +185,7 @@ void player_controller(res_pack_t *res_pack, grid_t *grid, entity_t *player_ent)
 	coming_position[1] = transform->position[1];
 	coming_position[2] = transform->position[2] + controller->velocity[2];
 
-	collision_t *collisions = temp_calloc(8 * sizeof(collision_t));
+	collision_t *collisions = temp_calloc(64 * sizeof(collision_t));
 	i32 count = get_player_collisions(res_pack, grid, coming_position, &collider->box, collisions);
 	collision_t best_collision = collisions[0];
 
@@ -147,7 +207,10 @@ void player_controller(res_pack_t *res_pack, grid_t *grid, entity_t *player_ent)
 		}
 	}
 	
+	// X axis
 	transform->position[0] += controller->velocity[0];
+	
+	// Grid
 	collision_t collision = get_first_player_collision(res_pack, grid, transform->position, &collider->box);
 	if (collision.hit) {
 		if (controller->velocity[0] < 0.0f) {
@@ -157,8 +220,22 @@ void player_controller(res_pack_t *res_pack, grid_t *grid, entity_t *player_ent)
 			transform->position[0] = collision.global_box.min_x - collider->box.max_x - 0.001f;
 		}
 	}
+
+	// Entities
+	collision = get_first_entity_collision(transform->position, &collider->box);
+	if (collision.hit) {
+		if (controller->velocity[0] < 0.0f) {
+			transform->position[0] = collision.global_box.max_x - collider->box.min_x + 0.001f;
+		}
+		if (controller->velocity[0] > 0.0f) {
+			transform->position[0] = collision.global_box.min_x - collider->box.max_x - 0.001f;
+		}
+	}
 	
+	// Z axis
 	transform->position[2] += controller->velocity[2];
+	
+	// Grid
 	collision = get_first_player_collision(res_pack, grid, transform->position, &collider->box);
 	if (collision.hit) {
 		if (controller->velocity[2] < 0.0f) {
@@ -169,8 +246,37 @@ void player_controller(res_pack_t *res_pack, grid_t *grid, entity_t *player_ent)
 		}
 	}
 
+	// Entities
+	collision = get_first_entity_collision(transform->position, &collider->box);
+	if (collision.hit) {
+		if (controller->velocity[2] < 0.0f) {
+			transform->position[2] = collision.global_box.max_z - collider->box.min_z + 0.001f;
+		}
+		if (controller->velocity[2] > 0.0f) {
+			transform->position[2] = collision.global_box.min_z - collider->box.max_z - 0.001f;
+		}
+	}
+
+	// Y axis
 	transform->position[1] += controller->velocity[1];
+	
+	// Grid
 	collision = get_first_player_collision(res_pack, grid, transform->position, &collider->box);
+	if (collision.hit) {
+		if (controller->velocity[1] > 0.0f) {
+			transform->position[1] = collision.global_box.min_y - collider->box.max_y - 0.001f;
+			controller->grounded = true;
+			controller->velocity[1] = 0.0f;
+		}
+		if (controller->velocity[1] < 0.0f) {
+			transform->position[1] = collision.global_box.max_y - collider->box.min_y + 0.001f;
+			controller->grounded = true;
+			controller->velocity[1] = 0.0f;
+		}
+	}
+
+	// Entities
+	collision = get_first_entity_collision(transform->position, &collider->box);
 	if (collision.hit) {
 		if (controller->velocity[1] > 0.0f) {
 			transform->position[1] = collision.global_box.min_y - collider->box.max_y - 0.001f;
