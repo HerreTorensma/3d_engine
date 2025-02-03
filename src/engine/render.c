@@ -8,6 +8,7 @@ static u32 skybox_shader = 0;
 
 static u32 fbo = 0;
 static u32 fbo_tex = 0;
+static u32 rbo = 0;
 
 static mat4 ortho_views[6] = {0};
 
@@ -29,14 +30,18 @@ static u32 quad_indices[] = {
 
 mesh_t quad_mesh = {0};
 
-static void clear(color_t color) {
-	glViewport(0, 0, window_width, window_height);
+void render_clear(color_t color) {
+	// GLint prev_viewport[4];
+    // glGetIntegerv(GL_VIEWPORT, prev_viewport); // [x, y, width, height]
+
+	// glViewport(0, 0, window_width, window_height);
 
 	vec4 gl_color = {0};
 	color_to_gl_color(color, gl_color);
 	glClearColor(gl_color[0], gl_color[1], gl_color[2], gl_color[3]);
-
-	glViewport(x_offset, y_offset, viewport_width, viewport_height);
+	// glViewport(x_offset, y_offset, viewport_width, viewport_height);
+	
+	// glViewport(prev_viewport[0], prev_viewport[1], prev_viewport[2], prev_viewport[3]);
 }
 
 inline static void render_mesh(mesh_t *mesh, index_t texture_index) {
@@ -57,7 +62,7 @@ static void init_frame_buffer(res_pack_t *res_pack) {
 	glGenFramebuffers(1, &fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
-	u32 rbo;
+	// u32 rbo;
 	glGenRenderbuffers(1, &rbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, res_pack->render_width, res_pack->render_height);
@@ -132,7 +137,11 @@ void render_init(res_pack_t *res_pack) {
 void render_start_frame_buffer(res_pack_t *res_pack) {
 	// Frame buffer stuff
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	// glBindRenderbuffer(GL_RENDERBUFFER, rbo);
 	glViewport(0, 0, res_pack->render_width, res_pack->render_height);
+
+	// printf("render width, height: %d %d\n", res_pack->render_width, res_pack->render_height);
+
 }
 
 void render_end_frame_buffer(res_pack_t *res_pack) {
@@ -140,15 +149,45 @@ void render_end_frame_buffer(res_pack_t *res_pack) {
 
 	// More framebuffer stuff
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);  // Bind default framebuffer
-	glViewport(0, 0, window_width, window_height);  // Set viewport back to full resolution
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	
+	// glViewport(0, 0, window_width, window_height);
+	glViewport(x_offset, y_offset, viewport_width, viewport_height);
+	// printf("viewport: x: %d, y: %d\n", viewport_width, viewport_height);
 	glDisable(GL_DEPTH_TEST);
+
+	// printf("window width, height: %d %d\n", window_width, window_height);
 
 	glUseProgram(basic_shader);
 
 	render_mesh(&quad_mesh, fbo_tex);
-	
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);  // Bind default framebuffer
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	
+
+	// glBindVertexArray(0);	
+	// glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	// glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+
+
+	// glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	// glBlitFramebuffer(0, 0, 640, 360, 0, 0, 1280, 768, 
+    // GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+
+	// glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+	// glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
+	// glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	// glBlitFramebuffer(
+	// 	0, 0, res_pack->render_width, res_pack->render_height,  // Source
+	// 	0, 0, window_width, window_height,                      // Destination
+	// 	GL_COLOR_BUFFER_BIT, GL_NEAREST
+	// );
+	// glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
 }
 
 void render_mesh_transform(res_pack_t *res_pack, transform_t *transform, index_t mesh_index, index_t tex_index) {
@@ -386,7 +425,9 @@ void render_mesh_isometric(res_pack_t *res_pack, mesh_t mesh, index_t texture_in
 }
 
 void render_grid_ortho(res_pack_t *res_pack, grid_t *grid, enum ortho_view orientation, float zoom, mat4 *projection, i32 min_y, i32 max_y, bool enable_transparency) {
-	clear(res_pack->editor_color);
+	// glViewport(0, 0, window_width, window_height);
+	// glViewport(x_offset, y_offset, viewport_width, viewport_height);
+	render_clear(res_pack->editor_color);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
@@ -441,7 +482,8 @@ static void render_skybox(res_pack_t *res_pack, vec3 position, camera_t *camera)
 	shader_set_mat4(skybox_shader, "view", &view);
 
 	mat4 projection = {0};
-	glm_perspective(glm_rad(60.0f), (float)(viewport_width) / (float)(viewport_height), 0.1f, 100.0f, projection);
+	// glm_perspective(glm_rad(60.0f), (float)(viewport_width) / (float)(viewport_height), 0.1f, 100.0f, projection);
+	glm_perspective(glm_rad(60.0f), (float)(res_pack->render_width) / (float)(res_pack->render_height), 0.1f, 100.0f, projection);
 	
 	shader_set_mat4(skybox_shader, "projection", &projection);
 
@@ -468,7 +510,8 @@ void render_game(res_pack_t *res_pack, grid_t *grid, vec3 position, camera_t *ca
 	// global_position = &position;
 	// global_ecs = ecs;
 
-	clear(res_pack->sky_color);
+	// render_clear(res_pack->sky_color);
+	// render_clear(COLOR_BLACK);
 	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
@@ -489,7 +532,8 @@ void render_game(res_pack_t *res_pack, grid_t *grid, vec3 position, camera_t *ca
 
 	// Projection matrix
 	mat4 projection = {0};
-	glm_perspective(glm_rad(60.0f), (float)(viewport_width) / (float)(viewport_height), 0.1f, 100.0f, projection);
+	// glm_perspective(glm_rad(60.0f), (float)(viewport_width) / (float)(viewport_height), 0.1f, 100.0f, projection);
+	glm_perspective(glm_rad(60.0f), (float)(res_pack->render_width) / (float)(res_pack->render_height), 0.1f, 100.0f, projection);
 	
 	shader_set_mat4(game_shader, "projection", &projection);
 

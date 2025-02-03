@@ -14,6 +14,8 @@ This header and source file contain the rendering code.
 //     ecs_world_t *ecs;
 // } renderer_t;
 
+void render_clear(color_t color);
+
 void render_init(res_pack_t *res_pack);
 
 void render_start_frame_buffer(res_pack_t *res_pack);

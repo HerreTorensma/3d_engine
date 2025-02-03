@@ -51,10 +51,11 @@ void editor_init(void) {
 	}
 }
 
-static void compute_projection(void) {
+static void compute_projection(res_pack_t *res_pack) {
 	// Projection matrix
 	// float aspect = (float)window_width / (float)window_height;
-	float aspect = (float)(viewport_width) / (float)(viewport_height);
+	// float aspect = (float)(viewport_width) / (float)(viewport_height);
+	float aspect = (float)(res_pack->render_width) / (float)(res_pack->render_height);
 
 	float left = -zoom + pos[0];
 	float right = zoom + pos[0];
@@ -136,7 +137,7 @@ void editor_update(res_pack_t *res_pack, grid_t *grid) {
 		}
 	}
 
-	compute_projection();
+	compute_projection(res_pack);
 
 	// Just create it every frame based on the mesh and texture
 	tile_t selected_tile = {

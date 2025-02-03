@@ -456,6 +456,11 @@ static void render_inventory(inventory_t *inventory) {
 }
 
 void game_render() {
+	glViewport(0, 0, window_width, window_height);
+	render_clear(COLOR_BLACK);
+	glViewport(x_offset, y_offset, viewport_width, viewport_height);
+	render_start_frame_buffer(&state.res_pack);
+
 	entity_t *player_ent = ent_get(state.player_ent_index);
 
     render_game(&state.res_pack, &state.grid, player_ent->transform.position, &player_ent->camera);
@@ -466,6 +471,8 @@ void game_render() {
     for (size_t i = 0; i < sorted_sprites_count; i++) {
         render_sprite_transform(&sorted_sprites[i]->transform, &player_ent->camera, &sorted_sprites[i]->sprite);
     }
+
+	render_end_frame_buffer(&state.res_pack);
 
 	// Crosshair
 	render_image(&state.res_pack, TEX_CROSSHAIR, state.res_pack.render_width / 2 - 3, state.res_pack.render_height / 2 - 3, COLOR_WHITE);
@@ -486,6 +493,8 @@ void game_render() {
 
 	// Inventory
 	render_inventory(&player_ent->inventory);
+
+	// render_end_frame_buffer(&state.res_pack);
 }
 
 void game_input(SDL_Event event, entity_t *player_ent) {

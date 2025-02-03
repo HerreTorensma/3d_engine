@@ -71,8 +71,12 @@ int main(int argc, char *argv[]) {
 			game_update();
 		}
 
+		render_clear(COLOR_BLACK);
 		if (state.edit_mode) {
+			// render_start_frame_buffer(&state.res_pack);
+			// render_clear(COLOR_BLACK);
 			editor_render(&state.res_pack, &state.grid, 13, 13);
+			// render_end_frame_buffer(&state.res_pack);
 		} else {
 			game_render();
 		}

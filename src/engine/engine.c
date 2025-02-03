@@ -73,19 +73,25 @@ static SDL_GLContext *create_sdl2_gl_context(SDL_Window *window, i32 width, i32 
 static void resize_window(SDL_Window *window, i32 render_width, i32 render_height) {
 	i32 w, h;
 	SDL_GetWindowSize(window, &w, &h);
-	glViewport(0, 0, w, h);
+
+	// glViewport(0, 0, w, h);
+	
 	window_width = w;
 	window_height = h;
+
 	screen_scale = min_i32(window_width / render_width, window_height / render_height);
-    if (screen_scale < 0) {
+    if (screen_scale <= 0) {
         screen_scale = 1;
     }
 
 	x_offset = (window_width / 2) - ((render_width * screen_scale) / 2);
 	y_offset = (window_height / 2) - ((render_height * screen_scale) / 2);
 	
+
 	viewport_width = render_width * screen_scale;
 	viewport_height = render_height * screen_scale;
+
+	glViewport(x_offset, y_offset, viewport_width, viewport_height);
 }
 
 void engine_init(const char window_title[], i32 width, i32 height, i32 _render_width, i32 _render_height, void (*input_function)(SDL_Event event)) {
